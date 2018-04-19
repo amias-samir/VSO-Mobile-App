@@ -36,9 +36,7 @@
     <dimen name="medium_icon_size">32dp</dimen>
     <dimen name="small_icon_size">24dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-
-
-
+    <dimen name="elevation_minimum">2dp</dimen>
 
 
 </resources>

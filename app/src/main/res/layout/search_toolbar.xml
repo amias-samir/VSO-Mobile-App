@@ -1,0 +1,41 @@
+<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appbar_general"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp">
+
+        <com.mypopsy.widget.FloatingSearchView
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_centerInParent="true"
+            android:layout_margin="16dp"
+            android:background="#90000000"
+            android:hint="@string/search_hint"
+            app:fsv_menu="@menu/menu_search"
+            app:logo="@mipmap/ic_launcher"
+            app:theme="@style/CustomFloatingSearchViewTheme"
+            tools:context="com.mypopsy.floatingsearchview.demo.MainActivity" />
+    </RelativeLayout>
+
+
+    <ProgressBar
+        android:id="@+id/toolbar_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="-7dp"
+        android:layout_marginTop="-4dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+
+</android.support.design.widget.AppBarLayout>
