@@ -1,7 +1,6 @@
 package np.com.naxa.vso;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,18 +14,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import com.arlib.floatingsearchview.FloatingSearchView;
-
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton floatingHospital;
 
     FolderOverlay myOverLay;
+    Polyline polylineLayer;
+    IMapController mapController;
+    GeoPoint centerPoint;
+    Long mapZoomLevel = 12L;
 
 
     @Override
@@ -60,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         checkPermission();
 
         initMap();
+
+        loadMunicipalityBoarder();
+
+        polylineLayer = new Polyline();
     }
 
 
@@ -72,18 +78,19 @@ public class MainActivity extends AppCompatActivity {
 
         vMapView.setBuiltInZoomControls(true);
         vMapView.setMultiTouchControls(true);
-        IMapController mapController = vMapView.getController();
-        mapController.setZoom(12);
-        GeoPoint startPoint = new GeoPoint(27.716278, 85.427889);
-        mapController.setCenter(startPoint);
+        mapController = vMapView.getController();
+        mapController.setZoom(mapZoomLevel);
+        centerPoint = new GeoPoint(27.696268407446215, 85.462727834610064);
+        mapController.setCenter(centerPoint);
 
         Marker startMarker = new Marker(vMapView);
-        startMarker.setPosition(startPoint);
+        startMarker.setPosition(centerPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         vMapView.getOverlays().add(startMarker);
 
         startMarker.setIcon(getResources().getDrawable(R.drawable.marker_default));
         startMarker.setTitle("Chagunayayan Nagarpalika");
+
     }
 
     public void onResume(){
@@ -110,12 +117,16 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.floating_school:
+
+                loadMunicipalityBoarder();
                 addAdditionalLayerSchool();
                 break;
             case R.id.floating_openspaces:
+                loadMunicipalityBoarder();
                 addAdditionalLayerOpenSpace();
                 break;
             case R.id.floating_hospital:
+                loadMunicipalityBoarder();
                 addAdditionalLayerHospital();
                 break;
         }
@@ -137,11 +148,64 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void loadMunicipalityBoarder() {
+        vMapView.getOverlays().clear();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+            Log.d(TAG, "loadMunicipalityBoarder: ");
+//            vMapView.getOverlays().clear();
+
+            String jsonString = null;
+            try {
+                InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
+                int size = jsonStream.available();
+                byte[] buffer = new byte[size];
+                jsonStream.read(buffer);
+                jsonStream.close();
+                jsonString = new String(buffer,"UTF-8");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return;
+            }
+
+            final KmlDocument kmlDocument = new KmlDocument();
+            kmlDocument.parseGeoJSON(jsonString);
+
+            Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+            Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+            final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
+                        vMapView.getOverlays().add(myOverLay );
+                        vMapView.invalidate();
+                        mapController.animateTo(centerPoint);
+                    }
+                });
+
+
+
+            }
+        }).start();
+    }
 
     private void addAdditionalLayerSchool () {
-
         Log.d(TAG, "addAdditionalLayerSchool: ");
-        vMapView.getOverlays().clear();
+
+        new Thread(new Runnable() {
+    @Override
+    public void run() {
+
+
+//        vMapView.getOverlays().clear();
 
         String jsonString = null;
         try {
@@ -156,89 +220,136 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        KmlDocument kmlDocument = new KmlDocument();
+        final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(jsonString);
 
         Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
 
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 
-        Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+        final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
 
-
+runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
         myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
         vMapView.getOverlays().add(myOverLay );
         vMapView.invalidate();
+    }
+});
 
 
+    }
+        }).start();
     }
 
     private void addAdditionalLayerHospital () {
 
         Log.d(TAG, "addAdditionalLayerHospital: ");
-        vMapView.getOverlays().clear();
+//        vMapView.getOverlays().clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        String jsonString = null;
-        try {
-            InputStream jsonStream = getResources().openRawResource(R.raw.health_facilities);
-            int size = jsonStream.available();
-            byte[] buffer = new byte[size];
-            jsonStream.read(buffer);
-            jsonStream.close();
-            jsonString = new String(buffer,"UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.health_facilities);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer,"UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
 
-        KmlDocument kmlDocument = new KmlDocument();
-        kmlDocument.parseGeoJSON(jsonString);
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
 
-        Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
 
-        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 
-        Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
 
-        myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
-        vMapView.getOverlays().add(myOverLay );
-        vMapView.invalidate();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
+                        vMapView.getOverlays().add(myOverLay );
+                        vMapView.invalidate();
+                    }
+                });
 
 
+            }
+        }).start();
     }
 
     private void addAdditionalLayerOpenSpace () {
 
         Log.d(TAG, "addAdditionalLayerOpenSpace: ");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        vMapView.getOverlays().clear();
 
-        String jsonString = null;
+//        vMapView.getOverlays().clear();
+
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.open_space);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer,"UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
+                        vMapView.getOverlays().add(myOverLay );
+                        vMapView.invalidate();
+                    }
+                });
+
+
+            }
+        }).start();
+    }
+
+    private void setMunicipalityMapCamera() {
+
         try {
-            InputStream jsonStream = getResources().openRawResource(R.raw.open_space);
-            int size = jsonStream.available();
-            byte[] buffer = new byte[size];
-            jsonStream.read(buffer);
-            jsonStream.close();
-            jsonString = new String(buffer,"UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
+            final BoundingBox DISTRICT = new BoundingBox( 27.656397051552265, 85.396515496102595 ,27.727697867932854, 85.525113426326428);
+
+//            vMapView.setLatLngBoundsForCameraTarget(DISTRICT);
+//
+//
+//            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(DISTRICT, 0);
+////            map.moveCamera(cu);
+//            vMapView.animateCamera(cu);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "settMapCamera: ERROR");
         }
-
-        KmlDocument kmlDocument = new KmlDocument();
-        kmlDocument.parseGeoJSON(jsonString);
-
-        Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-
-        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-
-        Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
-
-        myOverLay = (FolderOverlay)kmlDocument.mKmlRoot.buildOverlay(vMapView,defaultStyle,null,kmlDocument);
-        vMapView.getOverlays().add(myOverLay );
-        vMapView.invalidate();
-
     }
 
 }
