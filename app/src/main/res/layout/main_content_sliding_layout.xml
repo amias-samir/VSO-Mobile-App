@@ -3,11 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-    android:background="@color/colorWindowBackground"
+
     android:focusable="false"
     android:orientation="vertical">
 
+
+    <com.github.zagum.expandicon.ExpandIconView
+        android:visibility="gone"
+        android:background="@drawable/white_to_transparent"
+        android:id="@+id/expand_icon_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
     <android.support.v7.widget.RecyclerView
+        android:background="@color/colorWindowBackground"
         android:id="@+id/recylcer_view_map_categories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -31,6 +31,7 @@ dependencies {
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.github.rubensousa:floatingtoolbar:1.5.1'
     implementation 'com.github.arimorty:floatingsearchview:2.1.1'
+    implementation 'com.github.zagum:Android-ExpandIcon:1.2.1'
 
     //helping libs
     implementation 'com.jakewharton:butterknife:8.8.1'
