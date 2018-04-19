@@ -5,6 +5,8 @@ import com.chad.library.adapter.base.entity.SectionEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import np.com.naxa.vso.R;
+
 public class MySection extends SectionEntity<MapDataCategory> {
     private boolean isMore;
 
@@ -19,16 +21,16 @@ public class MySection extends SectionEntity<MapDataCategory> {
 
     public static List<MySection> getMapDataCatergorySections() {
 
-        String HTTPS_AVATARS1_GITHUBUSERCONTENT_COM_LINK = "One";
-        String CYM_CHAD = "Two";
+
+
 
 
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(true, "Section 1"));
-        list.add(new MySection(new MapDataCategory(HTTPS_AVATARS1_GITHUBUSERCONTENT_COM_LINK, CYM_CHAD)));
-        list.add(new MySection(new MapDataCategory(HTTPS_AVATARS1_GITHUBUSERCONTENT_COM_LINK, CYM_CHAD)));
-        list.add(new MySection(new MapDataCategory(HTTPS_AVATARS1_GITHUBUSERCONTENT_COM_LINK, CYM_CHAD)));
-        list.add(new MySection(new MapDataCategory(HTTPS_AVATARS1_GITHUBUSERCONTENT_COM_LINK, CYM_CHAD)));
+        list.add(new MySection(true, "Browse data set"));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_local_hospital_black_24dp, "Hospital")));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_transfer_within_a_station_black_24dp, "Open Spaces")));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Education")));
+
 
         return list;
     }

@@ -6,7 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.BindView;
@@ -28,12 +31,27 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        setupRecyclerView();
+        setupSlidingPanel();
+    }
 
-        LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+    private void setupSlidingPanel() {
+
+
+    }
+
+    private void setupRecyclerView() {
+
+        LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setAdapter(new SectionAdapter(R.layout.square_image_title,R.layout.list_section_header, MySection.getMapDataCatergorySections()));
+        SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, MySection.getMapDataCatergorySections());
+        recyclerView.setAdapter(sectionAdapter);
 
-        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing_large);
-        recyclerView.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
+        sectionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
     }
 }

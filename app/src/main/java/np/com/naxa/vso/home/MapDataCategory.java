@@ -5,14 +5,14 @@ import java.util.List;
 
 public class MapDataCategory {
 
-    public String image;
+    public int image;
 
-    public MapDataCategory(String image, String name) {
+    public MapDataCategory(int image, String name) {
         this.image = image;
         this.name = name;
     }
 
-    public String getImage() {
+    public int getImage() {
         return image;
     }
 
@@ -22,16 +22,5 @@ public class MapDataCategory {
 
     public String name;
 
-    public static List<MapDataCategory> getCategories() {
-        List<MapDataCategory> list = new ArrayList<>();
-        MapDataCategory category;
 
-        list.add(new MapDataCategory("","Hospital"));
-        list.add(new MapDataCategory("","Hospital"));
-        list.add(new MapDataCategory("","Hospital"));
-        list.add(new MapDataCategory("","Hospital"));
-        list.add(new MapDataCategory("","Hospital"));
-
-        return list;
-    }
 }
