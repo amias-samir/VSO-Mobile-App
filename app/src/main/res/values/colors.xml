@@ -5,4 +5,8 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="colorWindowBackground">#f3f3f3</color>
+
+    <color name="background_button_sheet">#1f2e3f</color>
+    <color name="button_button_sheet">#bfcbd9</color>
+
 </resources>

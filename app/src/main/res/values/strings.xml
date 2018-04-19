@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">VSO</string>
+
+
     <string name="search_hint">Search Places</string>
 
     <string name="speech_prompt">Say Something</string>
@@ -8,4 +9,5 @@
     <string name="menu.tts">text to speech</string>
     <string name="menu.toggle.icon">Icon Visible</string>
     <string name="menu.icon.type">Icon Type</string>
+
 </resources>

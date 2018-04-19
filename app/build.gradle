@@ -20,6 +20,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //core libs
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:27.1.1'
@@ -29,13 +30,30 @@ dependencies {
     implementation 'com.github.renaudcerrato:FloatingSearchView:1.0.1'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.github.rubensousa:floatingtoolbar:1.5.1'
+    implementation 'com.github.arimorty:floatingsearchview:2.1.1'
 
     //helping libs
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.38'
 
+    //debug libs
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
+
+    //map
+  //  implementation 'org.osmdroid:osmdroid-android:6.0.0-SNAPSHOT'
+    implementation 'com.github.MKergall:osmbonuspack:6.3'
+//    implementation project(':osmbonuspack_6.5.1')
+
+    //data
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    androidTestImplementation 'com.android.support.test:runner:0.5'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+
+
 }
