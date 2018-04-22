@@ -1,6 +1,7 @@
 package np.com.naxa.vso.emergencyContacts;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,9 @@ public class EmergencyContactsActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_general)
     Toolbar toolbar;
 
+    private EmergencyContactsRecyclerViewAdapter adapter;
+    private List<EmergencyContactsPojo> pojos;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +38,30 @@ public class EmergencyContactsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         initToolbar();
+
         setupRecyclerView();
+
+        removeDataAndNotify();
+
+    }
+
+    private void removeDataAndNotify() {
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!pojos.isEmpty()) {
+                    handler.postDelayed(this, 2000);
+                    pojos.remove(pojos.size() - 1);
+                    adapter.setNewData(pojos);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(EmergencyContactsActivity.this, "Data finished!!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
+        handler.post(runnable);
     }
 
     private void initToolbar() {
@@ -46,7 +73,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        EmergencyContactsRecyclerViewAdapter adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
+        adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -57,7 +84,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
     }
 
     private List<EmergencyContactsPojo> dummyContactlist() {
-        List<EmergencyContactsPojo> pojos = new ArrayList<>();
+        pojos = new ArrayList<>();
 
         pojos.add(new EmergencyContactsPojo("Ram", "123"));
         pojos.add(new EmergencyContactsPojo("Shyam", "234"));
