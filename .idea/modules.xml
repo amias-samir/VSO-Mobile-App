@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/VSO.iml" filepath="$PROJECT_DIR$/VSO.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/osmdroid-android-6.0.0-SNAPSHOT/osmdroid-android-6.0.0-SNAPSHOT.iml" filepath="$PROJECT_DIR$/osmdroid-android-6.0.0-SNAPSHOT/osmdroid-android-6.0.0-SNAPSHOT.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/vso-mobile-app.iml" filepath="$PROJECT_DIR$/.idea/vso-mobile-app.iml" />
+      <module fileurl="file://C:\Users\user\AndroidStudioProjects\Naxa Project\VSO\.idea\vso-mobile-app.iml" filepath="C:\Users\user\AndroidStudioProjects\Naxa Project\VSO\.idea\vso-mobile-app.iml" />
     </modules>
   </component>
 </project>
