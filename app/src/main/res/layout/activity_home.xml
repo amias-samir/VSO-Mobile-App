@@ -11,7 +11,7 @@
     sothree:umanoPanelHeight="100dp"
     sothree:umanoParallaxOffset="100dp"
     sothree:umanoScrollableView="@+id/list"
-    sothree:umanoShadowHeight="4dp">
+    >
 
     <include layout="@layout/main_content_acitivity_main"/>
 

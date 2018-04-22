@@ -1,10 +1,12 @@
 package np.com.naxa.vso;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,6 +55,8 @@ public class HomeActivity extends AppCompatActivity {
     BottomNavigationViewEx bnve;
 
     private MapDataRepository mapDataRepository;
+
+    int rotationAngle = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -142,10 +146,8 @@ public class HomeActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab_location_toggle)
     public void turnGPSon() {
-        if (hasGPSPermissions()) {
+      }
 
-        }
-    }
 
 
     private boolean hasGPSPermissions() {
