@@ -1,13 +1,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dragView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-
     android:focusable="false"
     android:orientation="vertical">
 
 
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@+id/bnve"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemIconTint="@color/dark_gray"
+        app:itemTextColor="@color/dark_gray"
+        android:background="@color/cardview_light_background"
+        app:menu="@menu/menu_bottom_bar" />
+    
     <com.github.zagum.expandicon.ExpandIconView
         android:visibility="gone"
         android:background="@drawable/white_to_transparent"

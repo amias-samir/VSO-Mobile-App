@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     Polyline polylineLayer;
     IMapController mapController;
     GeoPoint centerPoint;
-    Long mapZoomLevel = 12L;
+    int mapZoomLevel = 12;
 
 
     @Override

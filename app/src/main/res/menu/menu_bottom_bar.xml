@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+
+        android:icon="@drawable/ic_phone_in_talk_black_24dp"
+        android:title="Emergency contacts"
+        app:showAsAction="always" />
+    <item
+
+        android:icon="@drawable/ic_help_outline_black_24dp"
+        android:title="Ask for help"
+        app:showAsAction="always" />
+
+    <item
+
+        android:icon="@drawable/ic_directions_run_black_24dp"
+        android:title="Nearest open space"
+        app:showAsAction="always" />
+
+
+</menu>
