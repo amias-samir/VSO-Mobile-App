@@ -20,8 +20,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -34,10 +36,16 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     public static void start(Context context) {
-        Intent intent = new Intent(context,HomeActivity.class);
+        Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
     }
 
@@ -90,7 +98,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         mapDataRepository = new MapDataRepository();
-        centerPoint = new GeoPoint(27.716278, 85.427889);
+        centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
         setupRecyclerView();
         setupSlidingPanel();
         setupMap();
@@ -103,6 +111,7 @@ public class HomeActivity extends AppCompatActivity {
         bnve.enableAnimation(false);
         bnve.enableShiftingMode(false);
         bnve.enableItemShiftingMode(false);
+
 
         bnve.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -145,13 +154,40 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupMap() {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setBuiltInZoomControls(true);
+        mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
+        mapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                return false;
+            }
+        });
         mapController = mapView.getController();
-        mapController.setZoom(12);
+        mapController.setZoom(13);
 
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                InfoWindow.closeAllInfoWindowsOn(mapView);
+                slidingPanel.setPanelHeight(110);
+                Log.i("Mia",p.getLatitude()+"  "+p.getLongitude());
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        });
+
+        mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
-
         mapDataRepository.getMunicipalityBorder(mapView)
                 .doOnNext(new Consumer<FolderOverlay>() {
                     @Override
@@ -162,7 +198,12 @@ public class HomeActivity extends AppCompatActivity {
                         mapController.animateTo(centerPoint);
 
                     }
-                })
+                }).doOnError(new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                throwable.printStackTrace();
+            }
+        })
                 .subscribe();
     }
 
@@ -408,6 +449,14 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         showGPSSetting();
+    }
+
+    @OnClick(R.id.fab_map_layer)
+    public void showMaplayerMenu() {
+        PopupMenu popup = new PopupMenu(this, findViewById(R.id.fab_map_layer));
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_map_layer, popup.getMenu());
+        popup.show();
     }
 
     @AfterPermissionGranted(Permissions.RC_GPS_PERM)

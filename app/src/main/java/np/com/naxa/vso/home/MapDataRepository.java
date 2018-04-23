@@ -2,9 +2,9 @@ package np.com.naxa.vso.home;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.MainThread;
 import android.support.annotation.RawRes;
 
 import org.osmdroid.bonuspack.kml.KmlDocument;
@@ -17,7 +17,6 @@ import java.io.InputStream;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
@@ -76,7 +75,7 @@ public class MapDataRepository {
 
                     Drawable defaultMarker = context.getResources().getDrawable(R.drawable.marker_default);
                     Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-                    final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+                    final Style defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
                     FolderOverlay myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
 
                     emitter.onNext(myOverLay);

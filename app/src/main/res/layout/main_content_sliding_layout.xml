@@ -11,12 +11,13 @@
 
 
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        app:elevation="1dp"
         android:id="@+id/bnve"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/cardview_light_background"
-        app:itemIconTint="@color/dark_gray"
-        app:itemTextColor="@color/dark_gray"
+        app:itemIconTint="@color/black"
+        app:itemTextColor="@color/black"
         app:menu="@menu/menu_bottom_bar" />
 
     <com.github.zagum.expandicon.ExpandIconView
