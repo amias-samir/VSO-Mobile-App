@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
-    
+
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.map)
@@ -50,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
     Polyline polylineLayer;
     IMapController mapController;
     GeoPoint centerPoint;
-    long mapZoomLevel = 12L;
-
+    int mapZoomLevel = 12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

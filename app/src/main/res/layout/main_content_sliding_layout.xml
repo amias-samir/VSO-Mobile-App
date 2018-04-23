@@ -1,26 +1,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dragView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
-
     android:focusable="false"
     android:orientation="vertical">
 
 
-    <com.github.zagum.expandicon.ExpandIconView
-        android:visibility="gone"
-        android:background="@drawable/white_to_transparent"
-        android:id="@+id/expand_icon_view"
-        android:layout_gravity="center"
+
+
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@+id/bnve"
         android:layout_width="match_parent"
-        android:layout_height="48dp"/>
+        android:layout_height="wrap_content"
+        android:background="@color/cardview_light_background"
+        app:itemIconTint="@color/dark_gray"
+        app:itemTextColor="@color/dark_gray"
+        app:menu="@menu/menu_bottom_bar" />
+
+    <com.github.zagum.expandicon.ExpandIconView
+        android:id="@+id/expand_icon_view"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:background="@drawable/white_to_transparent"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
-        android:background="@color/colorWindowBackground"
         android:id="@+id/recylcer_view_map_categories"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/colorWindowBackground" />
 
 
 </LinearLayout>

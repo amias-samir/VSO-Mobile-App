@@ -23,18 +23,20 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
                 break;
             case 1:
                 helper.setImageResource(R.id.iv, mapDataCategory.getImage());
-                helper.addOnClickListener(R.id.card_view);
+
                 break;
 
+
         }
+
+        helper.addOnClickListener(R.id.card_view);
         helper.setText(R.id.tv_title, mapDataCategory.getName());
         helper.setText(R.id.tv_subtitle, String.valueOf(new Random().nextInt(50) + 1));
     }
+
     @Override
     protected void convertHead(BaseViewHolder helper, final MySection item) {
         helper.setText(R.id.header, item.header);
-
-
 
 
     }
