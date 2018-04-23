@@ -26,6 +26,7 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
 
                 break;
 
+
         }
 
         helper.addOnClickListener(R.id.card_view);

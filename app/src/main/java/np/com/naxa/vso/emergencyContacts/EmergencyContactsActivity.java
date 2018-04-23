@@ -1,5 +1,7 @@
 package np.com.naxa.vso.emergencyContacts;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -30,6 +32,12 @@ public class EmergencyContactsActivity extends AppCompatActivity {
 
     private EmergencyContactsRecyclerViewAdapter adapter;
     private List<EmergencyContactsPojo> pojos;
+
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, EmergencyContactsActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

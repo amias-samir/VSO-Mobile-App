@@ -2,16 +2,23 @@ package np.com.naxa.vso;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -30,6 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
+import np.com.naxa.vso.emergencyContacts.EmergencyContactsActivity;
 import np.com.naxa.vso.home.MapDataCategory;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
@@ -68,10 +76,31 @@ public class HomeActivity extends AppCompatActivity {
         setupRecyclerView();
         setupSlidingPanel();
         setupMap();
+        setupBottomBar();
 
+    }
+
+    private void setupBottomBar() {
         bnve.enableAnimation(false);
         bnve.enableShiftingMode(false);
         bnve.enableItemShiftingMode(false);
+
+        bnve.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+                    case R.id.menu_ask_for_help:
+                        break;
+                    case R.id.menu_emergency_contacts:
+                        EmergencyContactsActivity.start(HomeActivity.this);
+                        break;
+                    case R.id.menu_open_spaces:
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -140,6 +169,59 @@ public class HomeActivity extends AppCompatActivity {
         sectionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+
+                mapDataRepository.getHealthServicesLayer(mapView)
+                        .doOnNext(new Consumer<FolderOverlay>() {
+                            @Override
+                            public void accept(FolderOverlay folderOverlay) throws Exception {
+                                mapView.getOverlays().add(folderOverlay);
+                                mapView.invalidate();
+                            }
+                        }).subscribe();
+
+                if (true) return;
+
+
+                switch (position) {
+                    case 0:
+                        mapDataRepository.getHealthServicesLayer(mapView)
+                                .doOnNext(new Consumer<FolderOverlay>() {
+                                    @Override
+                                    public void accept(FolderOverlay folderOverlay) throws Exception {
+                                        mapView.getOverlays().add(folderOverlay);
+                                        mapView.invalidate();
+                                    }
+                                }).subscribe();
+                        break;
+                    case 1:
+                        mapDataRepository.getOpenSpacesLayer(mapView).doOnNext(new Consumer<FolderOverlay>() {
+                            @Override
+                            public void accept(FolderOverlay folderOverlay) throws Exception {
+
+                                mapView.getOverlays().add(folderOverlay);
+                                mapView.invalidate();
+
+
+                            }
+                        }).subscribe();
+
+                        break;
+                    case 2:
+                        mapDataRepository.getSchoolsLayer(mapView).doOnNext(new Consumer<FolderOverlay>() {
+                            @Override
+                            public void accept(FolderOverlay folderOverlay) throws Exception {
+
+                                mapView.getOverlays().add(folderOverlay);
+                                mapView.invalidate();
+
+
+                            }
+                        }).subscribe();
+
+                        break;
+                }
+
+
                 new MapDataRepository().getMunicipalityBorder(mapView);
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
@@ -148,8 +230,23 @@ public class HomeActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab_location_toggle)
     public void turnGPSon() {
-      }
+        if (!hasGPSPermissions()) {
+            EasyPermissions.requestPermissions(
+                    this,
+                    getString(R.string.rationale_gps),
+                    Permissions.RC_GPS_PERM,
+                    Manifest.permission.CAMERA);
+            return;
+        }
 
+        showGPSSetting();
+    }
+
+    @AfterPermissionGranted(Permissions.RC_GPS_PERM)
+    public void showGPSSetting() {
+        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+    }
 
 
     private boolean hasGPSPermissions() {

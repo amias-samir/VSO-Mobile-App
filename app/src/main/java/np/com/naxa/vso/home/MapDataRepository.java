@@ -43,6 +43,20 @@ public class MapDataRepository {
 
     }
 
+    public Observable<FolderOverlay> getSchoolsLayer(MapView mapView) {
+        return loadGeoJSON(R.raw.educational_institutes, mapView)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+
+    }
+
+    public Observable<FolderOverlay> getOpenSpacesLayer(MapView mapView) {
+        return loadGeoJSON(R.raw.open_space, mapView)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+
+    }
+
     private Observable<FolderOverlay> loadGeoJSON(@RawRes final int resource, final MapView mapView) {
         return Observable.create(new ObservableOnSubscribe<FolderOverlay>() {
             @Override
