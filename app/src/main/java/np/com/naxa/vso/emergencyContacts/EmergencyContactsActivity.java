@@ -41,7 +41,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
 
         setupRecyclerView();
 
-        removeDataAndNotify();
+//        removeDataAndNotify();
 
     }
 
@@ -50,13 +50,14 @@ public class EmergencyContactsActivity extends AppCompatActivity {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                handler.postDelayed(this, 500);
                 if (!pojos.isEmpty()) {
-                    handler.postDelayed(this, 2000);
                     pojos.remove(pojos.size() - 1);
                     adapter.setNewData(pojos);
                     adapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(EmergencyContactsActivity.this, "Data finished!!", Toast.LENGTH_SHORT).show();
+                    adapter.setNewData(dummyContactlist());
+                    adapter.notifyDataSetChanged();
                 }
 
             }
@@ -86,11 +87,11 @@ public class EmergencyContactsActivity extends AppCompatActivity {
     private List<EmergencyContactsPojo> dummyContactlist() {
         pojos = new ArrayList<>();
 
-        pojos.add(new EmergencyContactsPojo("Ram", "123"));
-        pojos.add(new EmergencyContactsPojo("Shyam", "234"));
-        pojos.add(new EmergencyContactsPojo("Hari", "345"));
-        pojos.add(new EmergencyContactsPojo("Gita", "456"));
-        pojos.add(new EmergencyContactsPojo("Sita", "567"));
+        pojos.add(new EmergencyContactsPojo("Hospital", "123"));
+        pojos.add(new EmergencyContactsPojo("School", "234"));
+        pojos.add(new EmergencyContactsPojo("Heritage", "345"));
+        pojos.add(new EmergencyContactsPojo("Restaurant", "456"));
+        pojos.add(new EmergencyContactsPojo("Colleges", "567"));
 
         return pojos;
     }
