@@ -2,6 +2,7 @@ package np.com.naxa.vso;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -77,6 +78,12 @@ public class HomeActivity extends AppCompatActivity {
     private IMapController mapController;
     GeoPoint centerPoint;
 
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context,HomeActivity.class);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +110,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.menu_ask_for_help:
+                        ReportActivity.start(HomeActivity.this);
                         break;
                     case R.id.menu_emergency_contacts:
                         EmergencyContactsActivity.start(HomeActivity.this);
