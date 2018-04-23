@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
-    
+
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.map)
@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     IMapController mapController;
     GeoPoint centerPoint;
     int mapZoomLevel = 12;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         vMapView.setBuiltInZoomControls(true);
         vMapView.setMultiTouchControls(true);
         mapController = vMapView.getController();
-        mapController.setZoom(mapZoomLevel);
+        mapController.setZoom((int)mapZoomLevel);
         centerPoint = new GeoPoint(27.696268407446215, 85.462727834610064);
         mapController.setCenter(centerPoint);
 

@@ -107,9 +107,11 @@ public class HomeActivity extends AppCompatActivity {
                 .doOnNext(new Consumer<FolderOverlay>() {
                     @Override
                     public void accept(FolderOverlay folderOverlay) throws Exception {
+
                         mapView.getOverlays().add(folderOverlay);
                         mapView.invalidate();
                         mapController.animateTo(startPoint);
+
                     }
                 })
                 .subscribe();
