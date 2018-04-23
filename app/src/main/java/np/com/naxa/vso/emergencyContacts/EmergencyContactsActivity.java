@@ -60,12 +60,12 @@ public class EmergencyContactsActivity extends AppCompatActivity {
             public void run() {
                 handler.postDelayed(this, 500);
                 if (!pojos.isEmpty()) {
-                    pojos.remove(pojos.size() - 1);
-                    adapter.setNewData(pojos);
-                    adapter.notifyDataSetChanged();
+//                    pojos.remove(pojos.size() - 1);
+//                    adapter.setNewData(pojos);
+//                    adapter.notifyDataSetChanged();
                 } else {
-                    adapter.setNewData(dummyContactlist());
-                    adapter.notifyDataSetChanged();
+//                    adapter.setNewData(dummyContactlist());
+//                    adapter.notifyDataSetChanged();
                 }
 
             }
@@ -82,24 +82,24 @@ public class EmergencyContactsActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
-        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                Toast.makeText(EmergencyContactsActivity.this, "You clicked on position " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+//        adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
+//        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+//            @Override
+//            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+//                Toast.makeText(EmergencyContactsActivity.this, "You clicked on position " + position, Toast.LENGTH_SHORT).show();
+//            }
+//        });
         recyclerView.setAdapter(adapter);
     }
 
     private List<EmergencyContactsPojo> dummyContactlist() {
         pojos = new ArrayList<>();
 
-        pojos.add(new EmergencyContactsPojo("Hospital", "123"));
-        pojos.add(new EmergencyContactsPojo("School", "234"));
-        pojos.add(new EmergencyContactsPojo("Heritage", "345"));
-        pojos.add(new EmergencyContactsPojo("Restaurant", "456"));
-        pojos.add(new EmergencyContactsPojo("Colleges", "567"));
+//        pojos.add(new EmergencyContactsPojo("Hospital", "123"));
+//        pojos.add(new EmergencyContactsPojo("School", "234"));
+//        pojos.add(new EmergencyContactsPojo("Heritage", "345"));
+//        pojos.add(new EmergencyContactsPojo("Restaurant", "456"));
+//        pojos.add(new EmergencyContactsPojo("Colleges", "567"));
 
         return pojos;
     }
