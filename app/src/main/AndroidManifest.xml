@@ -35,6 +35,12 @@
         <activity android:name=".gps.GeoPointActivity"
             android:exported="true">
         </activity>
+
+        <activity
+            android:name=".emergencyContacts.EmergencyContactsActivity"
+            android:exported="true">
+        </activity>
     </application>
+
 
 </manifest>
