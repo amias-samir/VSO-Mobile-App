@@ -60,8 +60,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 String name = vName.getText().toString();
                 String message = vMessage.getText().toString();
                 String contact = vMessage.getText().toString();
-//                latitude = IcLocationTracker.getLatitude();
-//                longitude = IcLocationTracker.getLongitude();
+//              latitude = IcLocationTracker.getLatitude();
+//              longitude = IcLocationTracker.getLongitude();
                 Toast.makeText(getApplicationContext(), latitude + "/n" + longitude, Toast.LENGTH_SHORT).show();
             }
         });
