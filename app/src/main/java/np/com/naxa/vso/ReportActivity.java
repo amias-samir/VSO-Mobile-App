@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import np.com.naxa.vso.emergencyContacts.EmergencyContactsActivity;
 
+
 public class ReportActivity extends AppCompatActivity implements LocationListener {
     ImageButton vCamera_Icon;
     EditText vName;
@@ -27,7 +28,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     ImageButton vShare;
     ImageButton vSave;
     LocationManager DcoLocationManager;
- //   LocationTracker IcLocationTracker;
+
     double latitude;
     double longitude;
 
@@ -41,7 +42,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         vCamera_Icon = findViewById(R.id.camera_icon);
         vShare = findViewById(R.id.imageButton);
         vSave = findViewById(R.id.imageButton2);
-    //    IcLocationTracker = new LocationTracker(getApplicationContext());
+
+//        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // DcoLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ReportActivity);
 
