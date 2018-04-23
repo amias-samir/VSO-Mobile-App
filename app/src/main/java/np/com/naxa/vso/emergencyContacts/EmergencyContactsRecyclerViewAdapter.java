@@ -47,4 +47,17 @@ public class EmergencyContactsRecyclerViewAdapter extends BaseMultiItemQuickAdap
                 break;
         }
     }
+
+    public class SingleContactAdapter extends BaseQuickAdapter<EmergencyContactsPojo.ContactSingle, BaseViewHolder>{
+
+
+        public SingleContactAdapter(@Nullable List<EmergencyContactsPojo.ContactSingle> data) {
+            super(data);
+        }
+
+        @Override
+        protected void convert(BaseViewHolder helper, EmergencyContactsPojo.ContactSingle item) {
+
+        }
+    }
 }
