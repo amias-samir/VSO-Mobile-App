@@ -9,15 +9,18 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import np.com.naxa.vso.database.dao.ContactDao;
+import np.com.naxa.vso.database.dao.OpenSpaceDao;
 import np.com.naxa.vso.database.entity.Contact;
+import np.com.naxa.vso.database.entity.OpenSpace;
 
 /**
  * Created by samir on 4/22/2018.
  */
 
-@Database(entities = {Contact.class}, version = 1, exportSchema = false)
+@Database(entities = {Contact.class, OpenSpace.class}, version = 1, exportSchema = false)
 public abstract class VsoRoomDatabase extends RoomDatabase {
     public abstract ContactDao contactDao();
+    public abstract OpenSpaceDao openSpaceDao();
 
     private static VsoRoomDatabase INSTANCE;
 
@@ -59,25 +62,28 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
      */
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
-        private final ContactDao mCondatcDao;
+        private final ContactDao mContactDao;
+        private final OpenSpaceDao mOpenSpaceDao;
 
         PopulateDbAsync(VsoRoomDatabase db) {
-            mCondatcDao = db.contactDao();
+            mContactDao = db.contactDao();
+            mOpenSpaceDao = db.openSpaceDao();
         }
 
         @Override
         protected Void doInBackground(final Void... params) {
             // Start the app with a clean database every time.
             // Not needed if you only populate on creation.
-//            mCondatcDao.deleteAll();
+//            mContactDao.deleteAll();
+//            mOpenSpaceDao.deleteAll();
            insertContact();
             return null;
         }
         private void insertContact(){
             Contact contact = new Contact("samir", "dangal", 40);
-            mCondatcDao.insert(contact);
+            mContactDao.insert(contact);
             contact = new Contact("nishon", "tandukar", 40);
-            mCondatcDao.insert(contact);
+            mContactDao.insert(contact);
         }
     }
 

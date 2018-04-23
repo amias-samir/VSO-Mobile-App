@@ -24,8 +24,15 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".activity.ContactActivity"
+            android:exported="true">
+        </activity>
 
-        <activity android:name=".activity.ContactActivity"
+        <activity android:name=".activity.OpenSpaceActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".gps.GeoPointActivity"
             android:exported="true">
         </activity>
     </application>

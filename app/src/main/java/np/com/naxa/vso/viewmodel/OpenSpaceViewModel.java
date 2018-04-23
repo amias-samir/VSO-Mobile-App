@@ -8,35 +8,37 @@ import android.util.Log;
 import java.util.List;
 
 import np.com.naxa.vso.database.databaserepository.ContactRepository;
-import np.com.naxa.vso.database.entity.Contact;
+import np.com.naxa.vso.database.databaserepository.OpenSpaceRepository;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
 /**
- * Created by samir on 4/22/2018.
+ * Created by samir on 4/23/2018.
  */
 
-public class ContactViewModel extends AndroidViewModel {
+public class OpenSpaceViewModel extends AndroidViewModel {
     private ContactRepository mRepository;
+    private OpenSpaceRepository openSpaceRepository;
     // Using LiveData and caching what getAlphabetizedWords returns has several benefits:
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    private LiveData<List<Contact>> mAllContacts;
     private LiveData<List<OpenSpace>> mAllOpenSpaces;
 
-    public ContactViewModel(Application application) {
+    public OpenSpaceViewModel(Application application) {
         super(application);
-        mRepository = new ContactRepository(application);
+        openSpaceRepository = new OpenSpaceRepository(application);
 
-        mAllContacts = mRepository.getAllContacts();
+        mAllOpenSpaces = openSpaceRepository.getAllOpenSpaces();
+
     }
-    //    contact
-    public LiveData<List<Contact>> getAllContacts() { return mAllContacts; }
 
-    public void insert(Contact contact) {
-        Log.d("VIewholder", "insert: "+contact.getFirstName());
-        mRepository.insert(contact); }
+    public LiveData<List<OpenSpace>> getmAllOpenSpaces() {
+        return mAllOpenSpaces;
+    }
 
-
-
+    public void insert(OpenSpace openSpace) {
+        Log.d("VIewholder", "insert: " + openSpace.getName());
+        openSpaceRepository.insert(openSpace);
+    }
 }
+

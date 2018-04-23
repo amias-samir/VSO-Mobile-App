@@ -27,7 +27,7 @@ public class Contact {
     public Contact() {
     }
 
-    public Contact(String firstName, String lastName, int age) {
+     public Contact(String firstName, String lastName, int age) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;

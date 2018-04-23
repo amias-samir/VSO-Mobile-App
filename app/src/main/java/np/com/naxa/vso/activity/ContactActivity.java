@@ -44,19 +44,35 @@ public class ContactActivity extends AppCompatActivity {
             }
         });
 
-        saveViaRoom();
+        saveConactDataViaRoom();
 
     }
 
-    public void saveViaRoom(){
-        Contact contact = new Contact();
-        for (int i = 0; i < 10; i++) {
-            Log.d(TAG, "saveViaRoom: insert inserting "+i);
-            contact.setFirstName( "Name_" + i);
-            contact.setLastName("Lastname_" + i);
-            contact.setAge(41 + i);
-            mContactViewModel.insert(contact);
-        }
+    public void saveConactDataViaRoom(){
+        Contact contact = new Contact("ram","lama",42);
+        mContactViewModel.insert(contact);
+
+        contact = new Contact("hari","shrestha", 45);
+        mContactViewModel.insert(contact);
+
+        contact = new Contact("krishna","shrestha", 41);
+        mContactViewModel.insert(contact);
+
+        contact = new Contact("gita","gaire", 47);
+        mContactViewModel.insert(contact);
+
+        contact = new Contact("sita","bastola", 43);
+        mContactViewModel.insert(contact);
+
+        contact = new Contact("harke","hawaldaar", 39);
+        mContactViewModel.insert(contact);
+
+//        for (int i = 0; i < 10; i++) {
+            Log.d(TAG, "saveOpenSpaceDataViaRoom: insert inserting ");
+//            contact.setFirstName( "Name_" + i);
+//            contact.setLastName("Lastname_" + i);
+//            contact.setAge(41 + i);
+//        }
 
 
 
