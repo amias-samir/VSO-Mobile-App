@@ -1,4 +1,4 @@
-package com.naxa.changunaryanapp.changunaryanmunicipality.ReportActivity;
+package np.com.naxa.vso;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,8 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.naxa.changunaryanapp.changunaryanmunicipality.R;
-import com.naxa.changunaryanapp.changunaryanmunicipality.Utils.LocationTracker;
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
     ImageButton vCamera_Icon;
@@ -25,7 +23,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     ImageButton vShare;
     ImageButton vSave;
     LocationManager DcoLocationManager;
-    LocationTracker IcLocationTracker;
+    //    LocationTracker IcLocationTracker;
     double latitude;
     double longitude;
 
@@ -39,7 +37,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         vCamera_Icon = findViewById(R.id.camera_icon);
         vShare = findViewById(R.id.imageButton);
         vSave = findViewById(R.id.imageButton2);
-        IcLocationTracker = new LocationTracker(getApplicationContext());
+//        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // DcoLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ReportActivity);
 
@@ -56,8 +54,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 String name = vName.getText().toString();
                 String message = vMessage.getText().toString();
                 String contact = vMessage.getText().toString();
-                latitude = IcLocationTracker.getLatitude();
-                longitude = IcLocationTracker.getLongitude();
+//                latitude = IcLocationTracker.getLatitude();
+//                longitude = IcLocationTracker.getLongitude();
                 Toast.makeText(getApplicationContext(), latitude + "/n" + longitude, Toast.LENGTH_SHORT).show();
             }
         });
