@@ -1,5 +1,7 @@
 package np.com.naxa.vso.emergencyContacts;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.ReportActivity;
 
 /**
  * https://github.com/CymChad/BaseRecyclerViewAdapterHelper
@@ -20,6 +23,12 @@ public class ExpandableUseActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     ExpandableItemAdapter adapter;
     ArrayList<MultiItemEntity> list;
+
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, ExpandableUseActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
