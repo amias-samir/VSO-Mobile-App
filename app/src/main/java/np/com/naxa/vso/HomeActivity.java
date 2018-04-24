@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.zagum.expandicon.ExpandIconView;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.osmdroid.api.IMapController;
@@ -73,6 +74,9 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.map)
     MapView mapView;
 
+    @BindView(R.id.mapView)
+    com.mapbox.mapboxsdk.maps.MapView  mapboxMapview;
+
     @BindView(R.id.expand_icon_view)
     ExpandIconView expandIconView;
 
@@ -104,6 +108,8 @@ public class HomeActivity extends AppCompatActivity {
         setupMap();
         setupBottomBar();
 
+        Mapbox.getInstance(this, getString(R.string.access_token));
+
 
     }
 
@@ -113,22 +119,19 @@ public class HomeActivity extends AppCompatActivity {
         bnve.enableItemShiftingMode(false);
 
 
-        bnve.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bnve.setOnNavigationItemSelectedListener(item -> {
 
-                switch (item.getItemId()) {
-                    case R.id.menu_ask_for_help:
-                        ReportActivity.start(HomeActivity.this);
-                        break;
-                    case R.id.menu_emergency_contacts:
-                        EmergencyContactsActivity.start(HomeActivity.this);
-                        break;
-                    case R.id.menu_open_spaces:
-                        break;
-                }
-                return true;
+            switch (item.getItemId()) {
+                case R.id.menu_ask_for_help:
+                    ReportActivity.start(HomeActivity.this);
+                    break;
+                case R.id.menu_emergency_contacts:
+                    EmergencyContactsActivity.start(HomeActivity.this);
+                    break;
+                case R.id.menu_open_spaces:
+                    break;
             }
+            return true;
         });
     }
 

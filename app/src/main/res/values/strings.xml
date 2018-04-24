@@ -9,6 +9,8 @@
     <string name="menu.tts">text to speech</string>
     <string name="menu.toggle.icon">Icon Visible</string>
     <string name="menu.icon.type">Icon Type</string>
-    <string name="rationale_gps">Acess to device gps is required for this feature.</string>
+    <string name="rationale_gps">Access to device gps is required for this feature.</string>
+    <string name="access_token" translatable="false">pk.eyJ1IjoiY2FtbWFjZSIsImEiOiJjaW9vbGtydnQwMDAwdmRrcWlpdDVoM3pjIn0.Oy_gHelWnV12kJxHQWV7XQ</string>
+
 
 </resources>
