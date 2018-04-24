@@ -3,45 +3,30 @@ package np.com.naxa.vso.emergencyContacts;
 import com.chad.library.adapter.base.entity.AbstractExpandableItem;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 
-public class EmergencyContactsPojo extends AbstractExpandableItem<EmergencyContactsPojo.ContactSingle>{
+public class EmergencyContactsPojo extends AbstractExpandableItem<ContactDetail> implements MultiItemEntity {
 
     @Override
     public int getLevel() {
         return 0;
     }
 
-    public class ContactSingle{
-        private int pic;
-        private String name,phone;
-
-        public ContactSingle(String name, String phone) {
-            this.name = name;
-            this.phone = phone;
-        }
-
-        public int getPic() {
-            return pic;
-        }
-
-        public void setPic(int pic) {
-            this.pic = pic;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getPhone() {
-            return phone;
-        }
-
-        public void setPhone(String phone) {
-            this.phone = phone;
-        }
+    @Override
+    public int getItemType() {
+        return 0;
     }
+
+    private String header;
+
+    public String getHeader() {
+        return header;
+    }
+
+
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+
 
 }
