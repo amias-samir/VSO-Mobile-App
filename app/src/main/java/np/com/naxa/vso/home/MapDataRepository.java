@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.RawRes;
 
 import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.KmlFeature;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
@@ -72,6 +73,8 @@ public class MapDataRepository {
 
                     final KmlDocument kmlDocument = new KmlDocument();
                     kmlDocument.parseGeoJSON(jsonString);
+
+                    KmlFeature.Styler styler = new KMLStyler();
 
                     Drawable defaultMarker = context.getResources().getDrawable(R.drawable.marker_default);
                     Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();

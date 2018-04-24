@@ -176,7 +176,6 @@ public class HomeActivity extends AppCompatActivity {
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 InfoWindow.closeAllInfoWindowsOn(mapView);
                 slidingPanel.setPanelHeight(110);
-                Log.i("Mia",p.getLatitude()+"  "+p.getLongitude());
                 return false;
             }
 
