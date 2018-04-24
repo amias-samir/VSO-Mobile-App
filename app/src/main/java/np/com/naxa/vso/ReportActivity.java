@@ -14,6 +14,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+//import com.naxa.changunaryanapp.changunaryanmunicipality.R;
+//import com.naxa.changunaryanapp.changunaryanmunicipality.Utils.LocationTracker;
+
+import np.com.naxa.vso.emergencyContacts.EmergencyContactsActivity;
+
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
     ImageButton vCamera_Icon;
@@ -23,7 +28,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     ImageButton vShare;
     ImageButton vSave;
     LocationManager DcoLocationManager;
-    //    LocationTracker IcLocationTracker;
+
     double latitude;
     double longitude;
 
@@ -37,6 +42,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         vCamera_Icon = findViewById(R.id.camera_icon);
         vShare = findViewById(R.id.imageButton);
         vSave = findViewById(R.id.imageButton2);
+
 //        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // DcoLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ReportActivity);
@@ -87,5 +93,10 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, ReportActivity.class);
+        context.startActivity(intent);
     }
 }

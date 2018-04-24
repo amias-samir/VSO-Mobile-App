@@ -46,7 +46,7 @@ dependencies {
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
 
     //map
-  //  implementation 'org.osmdroid:osmdroid-android:6.0.0-SNAPSHOT'
+    //  implementation 'org.osmdroid:osmdroid-android:6.0.0-SNAPSHOT'
     implementation 'com.github.MKergall:osmbonuspack:6.3'
 //    implementation project(':osmbonuspack_6.5.1')
 

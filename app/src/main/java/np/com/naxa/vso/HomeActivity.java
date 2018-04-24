@@ -2,8 +2,12 @@ package np.com.naxa.vso;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -27,11 +31,16 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,8 +72,17 @@ public class HomeActivity extends AppCompatActivity {
     BottomNavigationViewEx bnve;
 
     private MapDataRepository mapDataRepository;
+    private FolderOverlay myOverLay;
 
-    int rotationAngle = 0;
+    private final String TAG = this.getClass().getSimpleName();
+    private IMapController mapController;
+    GeoPoint centerPoint;
+
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context,HomeActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,11 +90,12 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         mapDataRepository = new MapDataRepository();
-
+        centerPoint = new GeoPoint(27.716278, 85.427889);
         setupRecyclerView();
         setupSlidingPanel();
         setupMap();
         setupBottomBar();
+
 
     }
 
@@ -91,6 +110,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.menu_ask_for_help:
+                        ReportActivity.start(HomeActivity.this);
                         break;
                     case R.id.menu_emergency_contacts:
                         EmergencyContactsActivity.start(HomeActivity.this);
@@ -127,10 +147,10 @@ public class HomeActivity extends AppCompatActivity {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(true);
         mapView.setMultiTouchControls(true);
-        final IMapController mapController = mapView.getController();
+        mapController = mapView.getController();
         mapController.setZoom(12);
-        final GeoPoint startPoint = new GeoPoint(27.716278, 85.427889);
-        mapController.setCenter(startPoint);
+
+        mapController.setCenter(centerPoint);
 
         mapDataRepository.getMunicipalityBorder(mapView)
                 .doOnNext(new Consumer<FolderOverlay>() {
@@ -139,7 +159,7 @@ public class HomeActivity extends AppCompatActivity {
 
                         mapView.getOverlays().add(folderOverlay);
                         mapView.invalidate();
-                        mapController.animateTo(startPoint);
+                        mapController.animateTo(centerPoint);
 
                     }
                 })
@@ -170,62 +190,210 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
 
-                mapDataRepository.getHealthServicesLayer(mapView)
-                        .doOnNext(new Consumer<FolderOverlay>() {
-                            @Override
-                            public void accept(FolderOverlay folderOverlay) throws Exception {
-                                mapView.getOverlays().add(folderOverlay);
-                                mapView.invalidate();
-                            }
-                        }).subscribe();
-
-                if (true) return;
-
-
-                switch (position) {
-                    case 0:
-                        mapDataRepository.getHealthServicesLayer(mapView)
-                                .doOnNext(new Consumer<FolderOverlay>() {
-                                    @Override
-                                    public void accept(FolderOverlay folderOverlay) throws Exception {
-                                        mapView.getOverlays().add(folderOverlay);
-                                        mapView.invalidate();
-                                    }
-                                }).subscribe();
-                        break;
-                    case 1:
-                        mapDataRepository.getOpenSpacesLayer(mapView).doOnNext(new Consumer<FolderOverlay>() {
-                            @Override
-                            public void accept(FolderOverlay folderOverlay) throws Exception {
-
-                                mapView.getOverlays().add(folderOverlay);
-                                mapView.invalidate();
-
-
-                            }
-                        }).subscribe();
-
-                        break;
-                    case 2:
-                        mapDataRepository.getSchoolsLayer(mapView).doOnNext(new Consumer<FolderOverlay>() {
-                            @Override
-                            public void accept(FolderOverlay folderOverlay) throws Exception {
-
-                                mapView.getOverlays().add(folderOverlay);
-                                mapView.invalidate();
-
-
-                            }
-                        }).subscribe();
-
-                        break;
-                }
-
-
-                new MapDataRepository().getMunicipalityBorder(mapView);
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                loadMunicipalityBoarder();
+                addAdditionalLayerHospital();
+
+//                switch (position) {
+//                    case 0:
+//                        addAdditionalLayerHospital();
+//                        break;
+//                    case 1:
+//                       addAdditionalLayerOpenSpace();
+//                        break;
+//                    case 2:
+//                        addAdditionalLayerSchool();
+//                        break;
+//                }
+
+
             }
         });
+    }
+
+
+    private void loadMunicipalityBoarder() {
+        mapView.getOverlays().clear();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                Log.d(TAG, "loadMunicipalityBoarder: ");
+//            mapView.getOverlays().clear();
+
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer, "UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        mapView.getOverlays().add(myOverLay);
+                        mapView.invalidate();
+                        mapController.animateTo(centerPoint);
+                    }
+                });
+
+
+            }
+        }).start();
+    }
+
+    private void addAdditionalLayerSchool() {
+        Log.d(TAG, "addAdditionalLayerSchool: ");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+//        mapView.getOverlays().clear();
+
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.educational_institutes);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer, "UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        mapView.getOverlays().add(myOverLay);
+                        mapView.invalidate();
+                    }
+                });
+
+
+            }
+        }).start();
+    }
+
+    private void addAdditionalLayerHospital() {
+
+        Log.d(TAG, "addAdditionalLayerHospital: ");
+//        mapView.getOverlays().clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.health_facilities);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer, "UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        mapView.getOverlays().add(myOverLay);
+                        mapView.invalidate();
+                    }
+                });
+
+
+            }
+        }).start();
+    }
+
+    private void addAdditionalLayerOpenSpace() {
+
+        Log.d(TAG, "addAdditionalLayerOpenSpace: ");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+//        mapView.getOverlays().clear();
+
+                String jsonString = null;
+                try {
+                    InputStream jsonStream = getResources().openRawResource(R.raw.open_space);
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer, "UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        mapView.getOverlays().add(myOverLay);
+                        mapView.invalidate();
+                    }
+                });
+
+
+            }
+        }).start();
     }
 
     @OnClick(R.id.fab_location_toggle)
