@@ -26,7 +26,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //core libs
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -49,10 +49,7 @@ dependencies {
     //debug libs
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
 
-    //map
-    //  implementation 'org.osmdroid:osmdroid-android:6.0.0-SNAPSHOT'
-    implementation 'com.github.MKergall:osmbonuspack:6.3'
-//    implementation project(':osmbonuspack_6.5.1')
+    //mapbox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1'
 
     //data

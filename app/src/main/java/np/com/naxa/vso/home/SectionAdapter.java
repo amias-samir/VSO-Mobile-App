@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.home.model.MapDataCategory;
 
 public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewHolder> {
     public SectionAdapter(int layoutResId, int sectionHeadResId, List data) {

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.home.model.MapDataCategory;
 
 public class MySection extends SectionEntity<MapDataCategory> {
     private boolean isMore;

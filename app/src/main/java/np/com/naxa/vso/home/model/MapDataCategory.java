@@ -1,4 +1,4 @@
-package np.com.naxa.vso.home;
+package np.com.naxa.vso.home.model;
 
 import java.util.ArrayList;
 import java.util.List;
