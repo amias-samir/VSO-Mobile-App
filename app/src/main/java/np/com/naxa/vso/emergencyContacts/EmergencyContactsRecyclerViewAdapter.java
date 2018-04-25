@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import np.com.naxa.vso.R;
 
-public class EmergencyContactsRecyclerViewAdapter extends BaseMultiItemQuickAdapter<MultiItemEntity, BaseViewHolder> {
+public class EmergencyContactsRecyclerViewAdapter extends BaseMultiItemQuickAdapter<EmergencyContactsPojo, BaseViewHolder> {
 
     private static final int TYPE_0_HEADING = 0;
     private static final int TYPE_1_DETAIL = 1;
@@ -29,35 +30,24 @@ public class EmergencyContactsRecyclerViewAdapter extends BaseMultiItemQuickAdap
      *
      * @param data A new list is created out of this one to avoid mutable list
      */
-    public EmergencyContactsRecyclerViewAdapter(List<MultiItemEntity> data) {
+    public EmergencyContactsRecyclerViewAdapter(List<EmergencyContactsPojo> data) {
         super(data);
         addItemType(TYPE_0_HEADING, R.layout.item_emergency_contact_heading);
         addItemType(TYPE_1_DETAIL, R.layout.item_emergency_contacts_detail);
     }
 
-
     @Override
-    protected void convert(final BaseViewHolder helper, MultiItemEntity item) {
-        switch (helper.getItemViewType()) {
+    protected void convert(final BaseViewHolder helper, EmergencyContactsPojo item) {
+        switch (helper.getItemViewType()){
             case TYPE_0_HEADING:
-
+                helper.setText(R.id.header,item.getHeader());
                 break;
+
             case TYPE_1_DETAIL:
 
                 break;
         }
     }
 
-    public class SingleContactAdapter extends BaseQuickAdapter<EmergencyContactsPojo.ContactSingle, BaseViewHolder>{
 
-
-        public SingleContactAdapter(@Nullable List<EmergencyContactsPojo.ContactSingle> data) {
-            super(data);
-        }
-
-        @Override
-        protected void convert(BaseViewHolder helper, EmergencyContactsPojo.ContactSingle item) {
-
-        }
-    }
 }

@@ -82,7 +82,7 @@ public class EmergencyContactsActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
+        adapter = new EmergencyContactsRecyclerViewAdapter(dummyContactlist());
 //        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
 //            @Override
 //            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
