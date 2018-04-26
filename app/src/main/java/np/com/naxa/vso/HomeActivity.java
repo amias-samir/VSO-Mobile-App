@@ -52,6 +52,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -61,10 +62,12 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 
+import np.com.naxa.vso.home.CategoriesDetailAdapter;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
 import np.com.naxa.vso.home.RawAssetLoader;
 import np.com.naxa.vso.home.SectionAdapter;
+import np.com.naxa.vso.home.model.CategoriesDetail;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -232,6 +235,19 @@ public class HomeActivity extends AppCompatActivity {
             showListSlider();
             showOverlayOnMap(position);
         });
+
+        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());
+        recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewCatDetails.setAdapter(categoriesDetailAdapter);
+        categoriesDetailAdapter.setOnItemClickListener((adapter, view, position) -> Toast.makeText(HomeActivity.this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show());
+    }
+
+    private List<CategoriesDetail> dummyCategoryData() {
+        List<CategoriesDetail> list = new ArrayList<>();
+        list.add(new CategoriesDetail(0, "Ram", "Bafal", "Last fata manche"));
+        list.add(new CategoriesDetail(0, "Shyam", "Kalanki", "Last super fata manche"));
+        list.add(new CategoriesDetail(0, "Hari", "Naxal", "First fata manche"));
+        return list;
     }
 
     private void showOverlayOnMap(int position) {
@@ -283,7 +299,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     }
                 });
-    }ma
+    }
 
     @Override
     public void onBackPressed() {
