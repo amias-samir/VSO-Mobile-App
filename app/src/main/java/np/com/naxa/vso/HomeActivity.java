@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -18,18 +19,30 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.zagum.expandicon.ExpandIconView;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
+import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.TileSet;
@@ -39,13 +52,18 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 
+import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
+import np.com.naxa.vso.home.RawAssetLoader;
 import np.com.naxa.vso.home.SectionAdapter;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -67,9 +85,22 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.bnve)
     BottomNavigationViewEx bnve;
 
+    @BindView(R.id.view_switcher_slide_layout)
+    ViewSwitcher viewSwitcher;
+
+    @BindView(R.id.recylcer_view_categories_detail)
+    RecyclerView recyclerViewCatDetails;
+
+    @BindView(R.id.toggle_slide_panel_main_grid)
+    ImageView sliderToggleMainGrid;
+
+    @BindView(R.id.toggle_slide_panel_list_grid)
+    ImageView sliderToggleList;
+
     private static final String SRC_WARD_LAYER = "geoJsonData";
-
-
+    private int rotationAngle;
+    private MapDataRepository repo;
+    private MapboxMap mapboxMap;
 
 
     public static void start(Context context) {
@@ -84,11 +115,25 @@ public class HomeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setupRecyclerView();
+        setupCatDetailsRecylcerView();
         setupSlidingPanel();
         setupBottomBar();
 
         setupMapBox();
-        Mapbox.getInstance(this, getString(R.string.access_token));
+        setupViewSwitcher();
+
+
+    }
+
+    private void setupCatDetailsRecylcerView() {
+
+    }
+
+    private void setupViewSwitcher() {
+        Animation out = AnimationUtils.loadAnimation(this, R.anim.bottom_down); // load an animation
+        Animation in = AnimationUtils.loadAnimation(this, R.anim.bottom_up); // load an animation
+        viewSwitcher.setOutAnimation(out); // set out Animation for ViewSwitcher
+        viewSwitcher.setInAnimation(in); // set out Animation for ViewSwitcher
 
 
     }
@@ -98,7 +143,7 @@ public class HomeActivity extends AppCompatActivity {
         mapboxMapview.getMapAsync(mapboxMap -> {
             try {
 
-
+                this.mapboxMap = mapboxMap;
                 LatLng latlng = new LatLng(27.657531140175244, 85.46161651611328);
 
                 CameraPosition position = new CameraPosition.Builder()
@@ -107,11 +152,11 @@ public class HomeActivity extends AppCompatActivity {
                         .tilt(20)
                         .build();
 
-                GeoJsonSource source = new GeoJsonSource(SRC_WARD_LAYER, new URL("https://gist.githubusercontent.com/nishontan/c7cd998d3ec44062d138fbcf01d2cdc8/raw/824acdceb0d4e4e992920629e217adabe9c37a8f/changu.geojson"));
-
-
-                mapboxMap.addSource(source);
-                mapboxMap.addLayer(new LineLayer("line", SRC_WARD_LAYER));
+//                GeoJsonSource source = new GeoJsonSource(SRC_WARD_LAYER, new URL("https://gist.githubusercontent.com/nishontan/c7cd998d3ec44062d138fbcf01d2cdc8/raw/824acdceb0d4e4e992920629e217adabe9c37a8f/changu.geojson"));
+//
+//
+//                mapboxMap.addSource(source);
+//                mapboxMap.addLayer(new LineLayer("line", SRC_WARD_LAYER));
 
                 RasterSource webMapSource = new RasterSource(
                         "web-map-source",
@@ -156,12 +201,23 @@ public class HomeActivity extends AppCompatActivity {
         slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                expandIconView.setFraction(slideOffset, true);
+
             }
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                switch (newState) {
+                    case COLLAPSED:
+                        sliderToggleList.animate().rotation(180).setDuration(500).start();
+                        sliderToggleMainGrid.animate().rotation(180).setDuration(500).start();
+                        break;
+                    case EXPANDED:
+                        sliderToggleList.animate().rotation(0).setDuration(500).start();
+                        sliderToggleMainGrid.animate().rotation(0).setDuration(500).start();
 
+
+                        break;
+                }
             }
         });
     }
@@ -173,13 +229,82 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView.setAdapter(sectionAdapter);
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            switch (position) {
-                case 1:
-                    break;
-            }
-
+            showListSlider();
+            showOverlayOnMap(position);
         });
+    }
+
+    private void showOverlayOnMap(int position) {
+        repo = new MapDataRepository();
+        repo.getMapLayerObserver(23)
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(String geoJsonString) {
+                        GeoJsonSource source = new GeoJsonSource(SRC_WARD_LAYER, geoJsonString);
+                        mapboxMap.addSource(source);
+                        mapboxMap.addLayer(new LineLayer("line", SRC_WARD_LAYER));
+
+
+                        if (mapboxMap != null) {
+                            //loading lines
+
+//                            mapboxMap.addSource(source);
+//                            mapboxMap.addLayer(new LineLayer("geojson", "geojson"));
+
+                            //loading markers
+//                            FeatureCollection featureCollection = FeatureCollection.fromJson(geoJsonString);
+//
+//                            List<Feature> features = featureCollection.features();
+//                            for (Feature f : features) {
+//                                if (f.geometry() instanceof Point) {
+//                                    double lat = ((Point) f.geometry()).latitude();
+//                                    double lon = ((Point) f.geometry()).longitude();
+//
+//                                    mapboxMap.addMarker(
+//                                            new MarkerViewOptions().position(new
+//                                                    LatLng(lat, lon)));
+//                                }
+//                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }ma
+
+    @Override
+    public void onBackPressed() {
+        switch (viewSwitcher.getCurrentView().getId()) {
+            case R.id.drag_view_main_slider:
+                super.onBackPressed();
+                break;
+            case R.id.drag_view_list_slider:
+                showGridSlider();
+                break;
+        }
+    }
+
+    private void showGridSlider() {
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        viewSwitcher.showPrevious();
+    }
+
+    private void showListSlider() {
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        viewSwitcher.showNext();
     }
 
     @OnClick(R.id.fab_location_toggle)
@@ -202,6 +327,18 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_map_layer, popup.getMenu());
         popup.show();
+    }
+
+    @OnClick({R.id.toggle_slide_panel_list_grid, R.id.toggle_slide_panel_main_grid})
+    public void toggleSlidePanel() {
+        SlidingUpPanelLayout.PanelState currentState = slidingPanel.getPanelState();
+        if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        } else {
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
+
+
     }
 
     @AfterPermissionGranted(Permissions.RC_GPS_PERM)
