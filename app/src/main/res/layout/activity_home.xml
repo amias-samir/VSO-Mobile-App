@@ -6,15 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:umanoDragView="@+id/dragView"
-    sothree:umanoOverlay="true"
-    sothree:umanoPanelHeight="250dp"
-    sothree:umanoParallaxOffset="100dp"
+    sothree:umanoPanelHeight="150dp"
+    sothree:umanoParallaxOffset="150dp"
     sothree:umanoScrollableView="@+id/list"
     >
 
     <include layout="@layout/main_content_acitivity_main"/>
 
-    <include layout="@layout/main_content_sliding_layout"/>
+    <ViewSwitcher
+        android:id="@+id/view_switcher_slide_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/main_content_sliding_layout"/>
+
+        <include layout="@layout/list_sliding_layout"/>
+
+
+    </ViewSwitcher>
+
+
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
