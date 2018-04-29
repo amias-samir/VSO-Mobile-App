@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,13 +22,19 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.github.zagum.expandicon.ExpandIconView;
+import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.plugins.geojson.GeoJsonPlugin;
+import com.mapbox.mapboxsdk.plugins.geojson.GeoJsonPluginBuilder;
+import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
+import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -52,13 +59,12 @@ import np.com.naxa.vso.home.model.CategoriesDetail;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonListener, OnMarkerEventListener {
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
     @BindView(R.id.recylcer_view_map_categories)
     RecyclerView recyclerView;
-
 
     @BindView(R.id.mapView)
     MapView mapboxMapview;
@@ -85,7 +91,7 @@ public class HomeActivity extends AppCompatActivity {
     private int rotationAngle;
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
-
+    private GeoJsonPlugin geoJsonPlugin;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -97,6 +103,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        repo = new MapDataRepository();
 
         setupRecyclerView();
         setupCatDetailsRecylcerView();
@@ -107,6 +114,16 @@ public class HomeActivity extends AppCompatActivity {
         setupViewSwitcher();
 
 
+
+    }
+
+    private void setupMapBoxGeoJSON() {
+        geoJsonPlugin = new GeoJsonPluginBuilder()
+                .withContext(this)
+                .withMap(mapboxMap)
+                .withOnLoadingFileAssets(this)
+                .withMarkerClickListener(this)
+                .build();
     }
 
     private void setupCatDetailsRecylcerView() {
@@ -128,6 +145,8 @@ public class HomeActivity extends AppCompatActivity {
             try {
 
                 this.mapboxMap = mapboxMap;
+                setupMapBoxGeoJSON();
+
                 LatLng latlng = new LatLng(27.657531140175244, 85.46161651611328);
 
                 CameraPosition position = new CameraPosition.Builder()
@@ -141,6 +160,7 @@ public class HomeActivity extends AppCompatActivity {
 //
 //                mapboxMap.addSource(source);
 //                mapboxMap.addLayer(new LineLayer("line", SRC_WARD_LAYER));
+
 
                 RasterSource webMapSource = new RasterSource(
                         "web-map-source",
@@ -214,8 +234,19 @@ public class HomeActivity extends AppCompatActivity {
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             showListSlider();
-           //showOverlayOnMap(position);
+            //showOverlayOnMap(position);
+            String assetName = repo.getMapAssetName(position);
+
+            if (mapboxMap != null && geoJsonPlugin != null) {
+                mapboxMap.clear();
+                geoJsonPlugin.setAssetsName(assetName);
+             //   geoJsonPlugin.setAssetsName(repo.getMapAssetName(-1));
+            }
+
+
         });
+
+
 
         CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());
         recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
@@ -231,56 +262,6 @@ public class HomeActivity extends AppCompatActivity {
         return list;
     }
 
-    private void showOverlayOnMap(int position) {
-        repo = new MapDataRepository();
-        repo.getMapLayerObserver(23)
-                .subscribe(new Observer<String>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(String geoJsonString) {
-                        GeoJsonSource source = new GeoJsonSource(SRC_WARD_LAYER, geoJsonString);
-                        mapboxMap.addSource(source);
-                        mapboxMap.addLayer(new LineLayer("line", SRC_WARD_LAYER));
-
-
-                        if (mapboxMap != null) {
-                            //loading lines
-
-//                            mapboxMap.addSource(source);
-//                            mapboxMap.addLayer(new LineLayer("geojson", "geojson"));
-
-                            //loading markers
-//                            FeatureCollection featureCollection = FeatureCollection.fromJson(geoJsonString);
-//
-//                            List<Feature> features = featureCollection.features();
-//                            for (Feature f : features) {
-//                                if (f.geometry() instanceof Point) {
-//                                    double lat = ((Point) f.geometry()).latitude();
-//                                    double lon = ((Point) f.geometry()).longitude();
-//
-//                                    mapboxMap.addMarker(
-//                                            new MarkerViewOptions().position(new
-//                                                    LatLng(lat, lon)));
-//                                }
-//                            }
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
 
     @Override
     public void onBackPressed() {
@@ -290,6 +271,7 @@ public class HomeActivity extends AppCompatActivity {
                 break;
             case R.id.drag_view_list_slider:
                 showGridSlider();
+                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
                 break;
         }
     }
@@ -302,6 +284,8 @@ public class HomeActivity extends AppCompatActivity {
     private void showListSlider() {
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         viewSwitcher.showNext();
+   //     new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
+
     }
 
     @OnClick(R.id.fab_location_toggle)
@@ -347,5 +331,26 @@ public class HomeActivity extends AppCompatActivity {
 
     private boolean hasGPSPermissions() {
         return EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    @Override
+    public void onPreLoading() {
+
+    }
+
+    @Override
+    public void onLoaded() {
+
+    }
+
+    @Override
+    public void onLoadFailed(Exception exception) {
+        Toast.makeText(this, "Error occur during load GeoJson data. see logcat", Toast.LENGTH_LONG).show();
+        exception.printStackTrace();
+    }
+
+    @Override
+    public void onMarkerClickListener(Marker marker, JsonObject properties) {
+
     }
 }

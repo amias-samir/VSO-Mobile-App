@@ -17,7 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 
-public class MapDataRepository extends RawAssetLoader {
+public class MapDataRepository  {
 
     private Context context;
 
@@ -26,51 +26,27 @@ public class MapDataRepository extends RawAssetLoader {
         context = VSO.getInstance().getApplicationContext();
     }
 
-    public Observable<String> getMapLayerObserver(int pos) {
-        Observable<String> observable;
-
+    public String getMapAssetName(int pos) {
+        String assetName;
         switch (pos) {
             case 1:
-                observable = getHealthServicesLayer();
+                assetName = "health_facilities.geojson";
                 break;
             case 2:
-                observable = getOpenSpacesLayer();
+                assetName = "open_space.geojson";
                 break;
             case 3:
-                observable = getSchoolsLayer();
+                assetName = "educational_institutes.geojson";
                 break;
             default:
-                observable = getMunicipalityBorder();
+                assetName = "ward_changu.geojson";
                 break;
+
         }
-        return observable;
+
+        return assetName;
     }
 
-    private Observable<String> getMunicipalityBorder() {
-        return loadTextFromRaw(R.raw.changunarayan_boundary)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-    }
 
-    private Observable<String> getHealthServicesLayer() {
-        return loadTextFromRaw(R.raw.health_facilities)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
-
-    private Observable<String> getSchoolsLayer() {
-        return loadTextFromRaw(R.raw.educational_institutes)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
-
-    private Observable<String> getOpenSpacesLayer() {
-        return loadTextFromRaw(R.raw.open_space)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
 
 }

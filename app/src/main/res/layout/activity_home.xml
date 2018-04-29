@@ -15,6 +15,7 @@
     <include layout="@layout/main_content_acitivity_main"/>
 
     <ViewSwitcher
+
         android:id="@+id/view_switcher_slide_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
