@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.RawRes;
+import android.util.Pair;
 
 
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 
-public class MapDataRepository  {
+public class MapDataRepository extends RawAssetLoader {
 
     private Context context;
 
@@ -26,16 +27,24 @@ public class MapDataRepository  {
         context = VSO.getInstance().getApplicationContext();
     }
 
+
+    public Observable<Pair> getGeoJsonString(int pos) {
+        String assetName = getMapAssetName(pos);
+        return loadTextFromAsset(assetName);
+    }
+
+
+
     public String getMapAssetName(int pos) {
         String assetName;
         switch (pos) {
-            case 1:
+            case 0:
                 assetName = "health_facilities.geojson";
                 break;
-            case 2:
+            case 1:
                 assetName = "open_space.geojson";
                 break;
-            case 3:
+            case 2:
                 assetName = "educational_institutes.geojson";
                 break;
             default:
@@ -46,7 +55,6 @@ public class MapDataRepository  {
 
         return assetName;
     }
-
 
 
 }

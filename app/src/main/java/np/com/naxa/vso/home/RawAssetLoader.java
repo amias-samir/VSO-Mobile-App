@@ -1,6 +1,6 @@
 package np.com.naxa.vso.home;
 
-import android.support.annotation.RawRes;
+import android.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,27 +8,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 
 public class RawAssetLoader {
 
-    private String rawResourceToInputStream(@RawRes int resId) throws IOException {
-        InputStream jsonStream = VSO.getInstance().getResources().openRawResource(resId);
+    private Pair<String, String> rawResourceToInputStream(String assetName) throws IOException {
+        InputStream jsonStream = VSO.getInstance().getAssets().open(assetName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(jsonStream));
         StringBuilder sb = new StringBuilder();
         String line = null;
         while ((line = reader.readLine()) != null) {
-            sb.append(line).append("n");
+            sb.append(line).append("\n");
         }
         reader.close();
-        return sb.toString();
+        return Pair.create(assetName, sb.toString());
+
     }
 
-    protected Observable<String> loadTextFromRaw(@RawRes int resId) {
+    protected Observable<Pair> loadTextFromAsset(String assetName) {
         return Observable.create(e -> {
             try {
-                e.onNext(rawResourceToInputStream(resId));
+                e.onNext(rawResourceToInputStream(assetName));
             } catch (Exception exception) {
                 e.onError(exception);
             } finally {
