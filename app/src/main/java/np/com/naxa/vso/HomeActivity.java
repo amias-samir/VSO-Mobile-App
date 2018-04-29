@@ -3,13 +3,7 @@ package np.com.naxa.vso;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -26,15 +20,9 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.zagum.expandicon.ExpandIconView;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -42,16 +30,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.RasterLayer;
-import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.RasterSource;
 import com.mapbox.mapboxsdk.style.sources.TileSet;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,11 +44,9 @@ import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
-
 import np.com.naxa.vso.home.CategoriesDetailAdapter;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
-import np.com.naxa.vso.home.RawAssetLoader;
 import np.com.naxa.vso.home.SectionAdapter;
 import np.com.naxa.vso.home.model.CategoriesDetail;
 import pub.devrel.easypermissions.AfterPermissionGranted;
