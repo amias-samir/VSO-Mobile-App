@@ -233,7 +233,7 @@ public class HomeActivity extends AppCompatActivity {
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             showListSlider();
-            showOverlayOnMap(position);
+           //showOverlayOnMap(position);
         });
 
         CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());

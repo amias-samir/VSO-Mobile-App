@@ -11,6 +11,7 @@
     <string name="menu.icon.type">Icon Type</string>
     <string name="rationale_gps">Access to device gps is required for this feature.</string>
     <string name="access_token" translatable="false">pk.eyJ1IjoiY2FtbWFjZSIsImEiOiJjaW9vbGtydnQwMDAwdmRrcWlpdDVoM3pjIn0.Oy_gHelWnV12kJxHQWV7XQ</string>
+    <string name="browse_data_categories">Browse data categories</string>
 
 
 </resources>
