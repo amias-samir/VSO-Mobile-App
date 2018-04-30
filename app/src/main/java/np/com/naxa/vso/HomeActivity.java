@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -27,6 +28,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -34,6 +36,7 @@ import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
@@ -134,6 +137,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mapboxMapview.getMapAsync(mapboxMap -> {
             this.mapboxMap = mapboxMap;
+            mapboxMap.setStyleUrl(Style.LIGHT);
             clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
 
             mapboxMap.getUiSettings().setAllGesturesEnabled(true);
@@ -146,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
 
     protected void initCameraListener() {
         mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
-        showOverlayOnMap(1);
+        showOverlayOnMap(0);
     }
 
 
@@ -196,8 +200,6 @@ public class HomeActivity extends AppCompatActivity {
                     case EXPANDED:
                         sliderToggleList.animate().rotation(0).setDuration(500).start();
                         sliderToggleMainGrid.animate().rotation(0).setDuration(500).start();
-
-
                         break;
                 }
             }
@@ -212,8 +214,10 @@ public class HomeActivity extends AppCompatActivity {
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            showOverlayOnMap(position);
-            showListSlider();
+
+//           showOverlayOnMap(position);
+//           showListSlider();
+
         });
 
 
@@ -291,6 +295,21 @@ public class HomeActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, findViewById(R.id.fab_map_layer));
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_map_layer, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_map_satelite_layer:
+                    mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
+
+                    break;
+                case R.id.menu_map_dark_layer:
+                    mapboxMap.setStyleUrl(Style.DARK);
+                    break;
+                case R.id.menu_map_light_layer:
+                    mapboxMap.setStyleUrl(Style.LIGHT);
+                    break;
+            }
+            return false;
+        });
         popup.show();
     }
 
@@ -379,9 +398,6 @@ public class HomeActivity extends AppCompatActivity {
     private boolean hasGPSPermissions() {
         return EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
     }
-
-
-
 
 
 }

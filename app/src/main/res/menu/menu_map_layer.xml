@@ -2,7 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item  android:title="Satellite view" app:showAsAction="always"/>
-    <item  android:title="Map view" app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_map_satelite_layer"
+        android:title="Satellite streets map" app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_map_dark_layer"
+        android:title="Dark map" app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menu_map_light_layer"
+        android:title="Light Map" app:showAsAction="always"/>
 
 </menu>

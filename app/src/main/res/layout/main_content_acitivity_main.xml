@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginBottom="310dp"
+        android:layout_marginBottom="320dp"
         android:layout_marginRight="16dp"
         android:src="@drawable/ic_layers_black_24dp"
         app:fabSize="mini"
@@ -29,6 +29,7 @@
         app:layout_anchorGravity="right|bottom" />
 
     <android.support.design.widget.FloatingActionButton
+        android:padding="@dimen/spacing_xxlarge"
         android:id="@+id/fab_location_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
