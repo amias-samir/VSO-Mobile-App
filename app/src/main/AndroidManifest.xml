@@ -42,9 +42,6 @@
         <activity
             android:name=".gps.GeoPointActivity"
             android:exported="true"></activity>
-        <activity
-            android:exported="true"
-            android:name=".activity.MarkerClustersPluginActivity"></activity>
     </application>
 
 </manifest>
