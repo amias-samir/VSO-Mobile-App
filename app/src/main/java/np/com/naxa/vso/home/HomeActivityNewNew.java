@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -104,6 +105,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
         setupListRecycler();
         setupGridRecycler();
 
+        slidingPanel.setAnchorPoint(0.4f);
 
     }
 
@@ -202,8 +204,12 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
     private void switchViews(){
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        viewSwitcherSlideLayout.showNext();
-        toggleSliderHeight();
+        new Handler().postDelayed(() -> {
+            viewSwitcherSlideLayout.showNext();
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+
+        },1000);
+       // toggleSliderHeight();
     }
 
 
