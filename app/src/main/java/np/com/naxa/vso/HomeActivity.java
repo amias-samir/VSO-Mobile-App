@@ -60,6 +60,7 @@ import np.com.naxa.vso.home.SectionAdapter;
 import np.com.naxa.vso.home.model.CategoriesDetail;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
+import np.com.naxa.vso.utils.JSONParser;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
@@ -338,11 +339,13 @@ public class HomeActivity extends AppCompatActivity {
                                 feature.getGeometry().getCoordinates();
 
 
+                        JSONParser jsonParser = new JSONParser(feature.getProperties());
+
                         MapMarkerItem mapMarkerItem = new MapMarkerItemBuilder()
                                 .setLat(coordinates.getLatitude())
                                 .setLng(coordinates.getLongitude())
-                                .setTitle(assetName)
-                                .setSnippet(assetName)
+                                .setTitle(jsonParser.getName())
+                                .setSnippet(jsonParser.getAddress())
                                 .setGeoJsonProperties(feature.getProperties().entrySet())
                                 .createMapMarkerItem();
 
