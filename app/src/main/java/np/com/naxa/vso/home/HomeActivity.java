@@ -53,7 +53,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
 import timber.log.Timber;
 
-public class HomeActivityNewNew extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
@@ -87,7 +87,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
     private boolean isGridShown = true;
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, HomeActivityNewNew.class);
+        Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
     }
 
@@ -147,10 +147,10 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
             switch (item.getItemId()) {
                 case R.id.menu_ask_for_help:
-                    ReportActivity.start(HomeActivityNewNew.this);
+                    ReportActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_emergency_contacts:
-                    ExpandableUseActivity.start(HomeActivityNewNew.this);
+                    ExpandableUseActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_open_spaces:
 
@@ -200,26 +200,40 @@ public class HomeActivityNewNew extends AppCompatActivity {
         });
     }
 
+    /**
+     * 1.collapse layout
+     * 2.wait for 1 sec
+     * 3.switch view
+     * 4.anchor layout
+     */
     private void switchViews() {
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         new Handler().postDelayed(() -> {
             viewSwitcherSlideLayout.showNext();
-            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-
             int visbleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
-            switch (visbleItemIndex) {
-                case 0:
-                    tvDataSet.setText(R.string.browse_data_by_categories);
-                    break;
-                case 1:
-                    tvDataSet.setText(generateDataCardText());
-                    break;
-            }
-
-
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+            changeDataOverviewText(visbleItemIndex);
         }, 1000);
         // toggleSliderHeight();
 
+    }
+
+    private void changeDataOverviewText(int visbleItemIndex) {
+
+        switch (visbleItemIndex) {
+            case 0:
+                tvDataSet.setText(R.string.browse_data_by_categories);
+                clearClusterAndMarkers();
+                break;
+            case 1:
+                tvDataSet.setText(generateDataCardText());
+                break;
+        }
+    }
+
+    private void clearClusterAndMarkers() {
+        clusterManagerPlugin.getMarkerCollection().clear();
+        clusterManagerPlugin.getClusterMarkerCollection().clear();
     }
 
     private String generateDataCardText() {
@@ -243,8 +257,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
                 .subscribe(new Observer<Pair>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        clusterManagerPlugin.getMarkerCollection().clear();
-                        clusterManagerPlugin.getClusterMarkerCollection().clear();
+                        clearClusterAndMarkers();
                     }
 
                     @Override
@@ -257,7 +270,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(HomeActivityNewNew.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
 
                     }
@@ -332,7 +345,15 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        switchViews();
-        //super.onBackPressed();
+        int visibleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
+        if (visibleItemIndex == 0) {
+            if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                super.onBackPressed();
+            }else {
+                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        } else {
+            switchViews();
+        }
     }
 }
