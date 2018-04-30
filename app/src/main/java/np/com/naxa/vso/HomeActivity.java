@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.andrognito.flashbar.Flashbar;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
@@ -61,6 +62,7 @@ import np.com.naxa.vso.home.model.CategoriesDetail;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
+import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
@@ -120,7 +122,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void setupListRecycler() {
-        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail,null);
+        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, null);
         recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewCatDetails.setAdapter(categoriesDetailAdapter);
         categoriesDetailAdapter.setOnItemClickListener((adapter, view, position) -> Toast.makeText(HomeActivity.this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show());
@@ -180,6 +182,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupSlidingPanel() {
         sliderToggleList.animate().rotation(180).setDuration(500).start();
+
+
 
         slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -241,6 +245,12 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+        if(true){
+            viewSwitcher.showNext();
+            return;
+        }
+
         switch (viewSwitcher.getCurrentView().getId()) {
             case R.id.drag_view_main_slider:
                 super.onBackPressed();
@@ -253,16 +263,19 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showGridSlider() {
-        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         viewSwitcher.showPrevious();
-        new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
+        slidingPanel.setAnchorPoint(0.2f);
+        //slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+       // new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 1000);
 
     }
 
     private void showListSlider() {
-        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         viewSwitcher.showNext();
-        new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
+
+
+        //slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+     //   new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
 
         loadDataOnOverviewCard();
     }
@@ -368,7 +381,7 @@ public class HomeActivity extends AppCompatActivity {
                     public void onSuccess(List<MapMarkerItem> myItems) {
                         clusterManagerPlugin.addItems(myItems);
                         clusterManagerPlugin.cluster();
-                        ((CategoriesDetailAdapter)recyclerViewCatDetails.getAdapter()).replaceData(myItems);
+                        ((CategoriesDetailAdapter) recyclerViewCatDetails.getAdapter()).replaceData(myItems);
                     }
 
                     @Override

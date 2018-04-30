@@ -8,9 +8,10 @@
     sothree:umanoOverlay="true"
     sothree:umanoFlingVelocity="500"
     sothree:umanoPanelHeight="125dp"
+    sothree:umanoShadowHeight="0dp"
     sothree:umanoParallaxOffset="150dp"
-    sothree:umanoInitialState="expanded"
-    sothree:umanoScrollableView="@+id/list"
+    sothree:umanoInitialState="collapsed"
+    sothree:umanoScrollableView="@+id/recylcer_view_categories_detail"
     >
 
     <include layout="@layout/main_content_acitivity_main"/>

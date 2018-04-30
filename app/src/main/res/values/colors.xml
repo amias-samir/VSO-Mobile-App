@@ -8,5 +8,6 @@
 
     <color name="background_button_sheet">#1f2e3f</color>
     <color name="button_button_sheet">#bfcbd9</color>
+    <color name="dimBg">#bf000000</color>
 
 </resources>

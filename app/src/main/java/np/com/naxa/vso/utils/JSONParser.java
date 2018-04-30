@@ -11,6 +11,7 @@ public class JSONParser {
     }
 
     public String getName() {
+
         return properties.get("name").toString();
     }
 

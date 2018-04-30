@@ -35,13 +35,16 @@
             android:exported="true" />
         <activity
             android:name=".activity.ContactActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activity.OpenSpaceActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".gps.GeoPointActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
+        <activity
+            android:exported="true"
+            android:name=".home.HomeActivityNew"/>
     </application>
 
 </manifest>

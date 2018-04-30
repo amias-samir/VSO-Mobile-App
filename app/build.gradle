@@ -40,6 +40,8 @@ dependencies {
     implementation 'com.github.arimorty:floatingsearchview:2.1.1'
     implementation 'com.github.zagum:Android-ExpandIcon:1.2.1'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation 'com.andrognito.flashbar:flashbar:1.0.1'
+    implementation "com.github.mancj:SlideUp-Android:2.2.8"
 
     //helping libs
     implementation 'com.jakewharton:butterknife:8.8.1'
