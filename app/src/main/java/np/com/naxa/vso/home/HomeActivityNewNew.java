@@ -2,6 +2,7 @@ package np.com.naxa.vso.home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -27,6 +29,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -99,7 +103,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
-        showOverlayOnMap(1);
+
 
     }
 
@@ -113,8 +117,9 @@ public class HomeActivityNewNew extends AppCompatActivity {
             mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
             mapboxMap.getUiSettings().setAllGesturesEnabled(true);
 
-
+            showOverlayOnMap(-1);
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
+
         });
     }
 
@@ -166,8 +171,11 @@ public class HomeActivityNewNew extends AppCompatActivity {
     }
 
     private void toggleSliderHeight() {
+
+        Resources r = getResources();
+        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 325, r.getDisplayMetrics());
+
         int listHeight = SlidingUpPanelLayout.LayoutParams.MATCH_PARENT;
-        int gridHeight = 772;
         int newHeight;
 
         if (isGridShown) {
@@ -194,6 +202,11 @@ public class HomeActivityNewNew extends AppCompatActivity {
         recyclerDataCategories.setLayoutManager(mLayoutManager);
         SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, MySection.getMapDataCatergorySections());
         recyclerDataCategories.setAdapter(sectionAdapter);
+
+        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+            showOverlayOnMap(position);
+        });
+
     }
 
 
@@ -204,14 +217,15 @@ public class HomeActivityNewNew extends AppCompatActivity {
                 .subscribe(new Observer<Pair>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        clusterManagerPlugin.getMarkerCollection().clear();
+                        clusterManagerPlugin.getClusterMarkerCollection().clear();
                     }
 
                     @Override
                     public void onNext(Pair pair) {
                         String assetName = (String) pair.first;
                         String fileContent = (String) pair.second;
-
+                        loadLineLayers(assetName, fileContent);
                         loadMarkersFromGeoJson(assetName, fileContent);
                     }
 
@@ -227,8 +241,16 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
                     }
                 });
+    }
 
+    private void loadLineLayers(String assetName, String fileContent) {
 
+        if (mapboxMap.getSource(assetName) == null) {
+            GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
+            mapboxMap.addSource(source);
+            mapboxMap.addLayer(new LineLayer(assetName, assetName));
+            Timber.i("Adding source %s to map", assetName);
+        }
     }
 
     private void loadMarkersFromGeoJson(String assetName, String geojson) {
@@ -269,7 +291,8 @@ public class HomeActivityNewNew extends AppCompatActivity {
                 .subscribe(new DisposableSingleObserver<List<MapMarkerItem>>() {
                     @Override
                     public void onSuccess(List<MapMarkerItem> myItems) {
-
+                        clusterManagerPlugin.addItems(myItems);
+                        clusterManagerPlugin.cluster();
                         ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
                     }
 
