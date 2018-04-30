@@ -43,8 +43,13 @@
             android:name=".gps.GeoPointActivity"
             android:exported="true" />
         <activity
+            android:name=".home.HomeActivityNew"
+            android:exported="true" />
+        <activity
             android:exported="true"
-            android:name=".home.HomeActivityNew"/>
+            android:name=".home.HomeActivityNewNew"
+            android:label="@string/title_activity_home_new_new"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

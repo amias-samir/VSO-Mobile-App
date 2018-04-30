@@ -246,10 +246,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        if(true){
-            viewSwitcher.showNext();
-            return;
-        }
 
         switch (viewSwitcher.getCurrentView().getId()) {
             case R.id.drag_view_main_slider:
