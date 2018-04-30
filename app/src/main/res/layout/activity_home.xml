@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:umanoPanelHeight="125dp"
-    sothree:umanoInitialState="expanded"
+    sothree:umanoOverlay="true"
+    sothree:umanoFlingVelocity="500"
+    sothree:umanoPanelHeight="100dp"
     sothree:umanoParallaxOffset="150dp"
+    sothree:umanoInitialState="expanded"
     sothree:umanoScrollableView="@+id/list"
     >
 

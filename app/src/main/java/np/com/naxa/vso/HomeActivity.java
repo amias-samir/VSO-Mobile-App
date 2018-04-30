@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +21,6 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.github.zagum.expandicon.ExpandIconView;
 import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -35,7 +35,6 @@ import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -44,16 +43,12 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.WeakHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -67,7 +62,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
-public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonListener, OnMarkerEventListener {
+public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
@@ -76,9 +71,6 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
     @BindView(R.id.mapView)
     MapView mapboxMapview;
-
-    @BindView(R.id.expand_icon_view)
-    ExpandIconView expandIconView;
 
     @BindView(R.id.bnve)
     BottomNavigationViewEx bnve;
@@ -95,8 +87,6 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     @BindView(R.id.toggle_slide_panel_list_grid)
     ImageView sliderToggleList;
 
-    private static final String SRC_WARD_LAYER = "geoJsonData";
-    private int rotationAngle;
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MyItem> clusterManagerPlugin;
@@ -113,30 +103,29 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
         ButterKnife.bind(this);
         repo = new MapDataRepository();
 
-
-        setupRecyclerView();
-        setupCatDetailsRecylcerView();
         setupSlidingPanel();
         setupBottomBar();
-
         setupMapBox();
         setupViewSwitcher();
-
+        setupGridRecycler();
+        setupListRecycler();
 
     }
 
 
-    private void setupCatDetailsRecylcerView() {
+    private void setupListRecycler() {
+        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());
+        recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewCatDetails.setAdapter(categoriesDetailAdapter);
+        categoriesDetailAdapter.setOnItemClickListener((adapter, view, position) -> Toast.makeText(HomeActivity.this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show());
 
     }
 
     private void setupViewSwitcher() {
-        Animation out = AnimationUtils.loadAnimation(this, R.anim.bottom_down); // load an animation
-        Animation in = AnimationUtils.loadAnimation(this, R.anim.bottom_up); // load an animation
-        viewSwitcher.setOutAnimation(out); // set out Animation for ViewSwitcher
-        viewSwitcher.setInAnimation(in); // set out Animation for ViewSwitcher
-
-
+        Animation out = AnimationUtils.loadAnimation(this, R.anim.bottom_down);
+        Animation in = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
+        viewSwitcher.setOutAnimation(out);
+        viewSwitcher.setInAnimation(in);
     }
 
 
@@ -150,6 +139,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
             mapboxMap.getUiSettings().setAllGesturesEnabled(true);
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
             showOverlayOnMap(-1);
+            initCameraListener();
         });
     }
 
@@ -189,10 +179,11 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     }
 
     private void setupSlidingPanel() {
+        sliderToggleList.animate().rotation(180).setDuration(500).start();
+
         slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-
             }
 
             @Override
@@ -213,7 +204,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
         });
     }
 
-    private void setupRecyclerView() {
+    private void setupGridRecycler() {
         LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(mLayoutManager);
         SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, MySection.getMapDataCatergorySections());
@@ -222,24 +213,20 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             showOverlayOnMap(position);
+            showListSlider();
         });
 
 
-        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());
-        recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewCatDetails.setAdapter(categoriesDetailAdapter);
-        categoriesDetailAdapter.setOnItemClickListener((adapter, view, position) -> Toast.makeText(HomeActivity.this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show());
     }
 
 
     private void loadLineLayers(String assetName, String fileContent) {
-        mapboxMap.getSource(assetName);
 
         if (mapboxMap.getSource(assetName) == null) {
             GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
             mapboxMap.addSource(source);
             mapboxMap.addLayer(new LineLayer(assetName, assetName));
-            Timber.i("Adding source %s to map",assetName);
+            Timber.i("Adding source %s to map", assetName);
         }
     }
 
@@ -266,7 +253,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
                 break;
             case R.id.drag_view_list_slider:
                 showGridSlider();
-                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
                 break;
         }
     }
@@ -274,12 +261,14 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     private void showGridSlider() {
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         viewSwitcher.showPrevious();
+        new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
+
     }
 
     private void showListSlider() {
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         viewSwitcher.showNext();
-        //     new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
+        new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
 
     }
 
@@ -308,25 +297,20 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     @OnClick({R.id.toggle_slide_panel_list_grid, R.id.toggle_slide_panel_main_grid})
     public void toggleSlidePanel() {
         SlidingUpPanelLayout.PanelState currentState = slidingPanel.getPanelState();
-        if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+        if (currentState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         } else {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         }
-
-
     }
 
     @AfterPermissionGranted(Permissions.RC_GPS_PERM)
     public void showGPSSetting() {
         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-
     }
 
 
     private void loadMarkersFromGeoJson(String assetName, String geojson) {
-        clusterManagerPlugin.clearItems();
-
         Observable<MyItem> observable = Observable.create(e -> {
             try {
                 FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
@@ -344,20 +328,13 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
                 e.onComplete();
             }
         });
-
         observable
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MyItem>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
+                .subscribe(new DisposableObserver<MyItem>() {
                     @Override
                     public void onNext(MyItem markerItem) {
                         clusterManagerPlugin.addItem(markerItem);
-
                     }
 
                     @Override
@@ -367,15 +344,12 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
                     @Override
                     public void onComplete() {
-                        Timber.i("Nishon %s", clusterManagerPlugin.getAlgorithm().getItems().size());
                     }
                 });
     }
 
     private void showOverlayOnMap(int position) {
-
-
-        new MapDataRepository().getGeoJsonString(position)
+        repo.getGeoJsonString(position)
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
                     public void onNext(Pair pair) {
@@ -406,24 +380,8 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
         return EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
-    @Override
-    public void onPreLoading() {
 
-    }
 
-    @Override
-    public void onLoaded() {
 
-    }
 
-    @Override
-    public void onLoadFailed(Exception exception) {
-        Toast.makeText(this, "Error occur during load GeoJson data. see logcat", Toast.LENGTH_LONG).show();
-        exception.printStackTrace();
-    }
-
-    @Override
-    public void onMarkerClickListener(Marker marker, JsonObject properties) {
-
-    }
 }
