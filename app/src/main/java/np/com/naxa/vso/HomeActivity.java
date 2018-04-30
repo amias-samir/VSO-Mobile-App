@@ -19,9 +19,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.google.android.gms.common.util.CollectionUtils;
 import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -45,7 +47,9 @@ import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +59,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.CategoriesDetailAdapter;
@@ -91,6 +96,9 @@ public class HomeActivity extends AppCompatActivity {
 
     @BindView(R.id.toggle_slide_panel_list_grid)
     ImageView sliderToggleList;
+
+    @BindView(R.id.tv_list_data_set)
+    TextView tvListDataSet;
 
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
@@ -141,20 +149,13 @@ public class HomeActivity extends AppCompatActivity {
             this.mapboxMap = mapboxMap;
 
             clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
+            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
 
             mapboxMap.getUiSettings().setAllGesturesEnabled(true);
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
             showOverlayOnMap(-1);
-            initCameraListener();
         });
     }
-
-
-    protected void initCameraListener() {
-        mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
-        showOverlayOnMap(0);
-    }
-
 
     private void moveCamera(LatLng latLng) {
         if (mapboxMap != null) {
@@ -216,11 +217,8 @@ public class HomeActivity extends AppCompatActivity {
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-
-
             showOverlayOnMap(position);
-//            showListSlider();
-
+            showListSlider();
         });
 
 
@@ -277,6 +275,15 @@ public class HomeActivity extends AppCompatActivity {
         viewSwitcher.showNext();
         new Handler().postDelayed(() -> slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED), 500);
 
+        loadDataOnOverviewCard();
+    }
+
+    private void loadDataOnOverviewCard() {
+        Collection<MyItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
+        if (currentDisplayedItems != null) {
+            int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
+            tvListDataSet.setText(getString(R.string.dataset_overview, totalPOI));
+        }
     }
 
     @OnClick(R.id.fab_location_toggle)
@@ -341,7 +348,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (feature.getGeometry() instanceof Point) {
                         Position coordinates = (Position)
                                 feature.getGeometry().getCoordinates();
-                        e.onNext(new MyItem(coordinates.getLatitude(), coordinates.getLongitude()));
+                        e.onNext(new MyItem(coordinates.getLatitude(), coordinates.getLongitude(), assetName, assetName));
                     }
                 }
             } catch (Exception exception) {
@@ -353,26 +360,22 @@ public class HomeActivity extends AppCompatActivity {
         observable
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<MyItem>() {
+                .toList()
+                .subscribe(new DisposableSingleObserver<List<MyItem>>() {
                     @Override
-                    public void onNext(MyItem markerItem) {
-                        clusterManagerPlugin.addItem(markerItem);
+                    public void onSuccess(List<MyItem> myItems) {
+                        clusterManagerPlugin.addItems(myItems);
                         clusterManagerPlugin.cluster();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
 
-                    @Override
-                    public void onComplete() {
                     }
                 });
     }
 
     private void showOverlayOnMap(int position) {
-
 
 
         repo.getGeoJsonString(position)
