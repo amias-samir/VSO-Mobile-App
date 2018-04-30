@@ -35,6 +35,7 @@ import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -44,6 +45,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -143,14 +145,14 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
         mapboxMapview.getMapAsync(mapboxMap -> {
             this.mapboxMap = mapboxMap;
-            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
+            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
 
+            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
             showOverlayOnMap(-1);
-            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
-            initCameraListener();
         });
     }
+
 
     protected void initCameraListener() {
         mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
@@ -231,16 +233,14 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
 
     private void loadLineLayers(String assetName, String fileContent) {
+        mapboxMap.getSource(assetName);
 
-
-        GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
-
-        if (mapboxMap.getSource(assetName) != null) {
-            mapboxMap.removeSource(Objects.requireNonNull(mapboxMap.getSource(assetName)));
-            Timber.i("Nishon Removing %s source ", assetName);
+        if (mapboxMap.getSource(assetName) == null) {
+            GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
+            mapboxMap.addSource(source);
+            mapboxMap.addLayer(new LineLayer(assetName, assetName));
+            Timber.i("Adding source %s to map",assetName);
         }
-        mapboxMap.addSource(source);
-        mapboxMap.addLayer(new LineLayer(assetName, assetName));
     }
 
     private void addMarker(boolean animate, LatLng latLng) {
@@ -357,6 +357,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
                     @Override
                     public void onNext(MyItem markerItem) {
                         clusterManagerPlugin.addItem(markerItem);
+
                     }
 
                     @Override
@@ -366,12 +367,13 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
                     @Override
                     public void onComplete() {
-
+                        Timber.i("Nishon %s", clusterManagerPlugin.getAlgorithm().getItems().size());
                     }
                 });
     }
 
     private void showOverlayOnMap(int position) {
+
 
         new MapDataRepository().getGeoJsonString(position)
                 .subscribe(new DisposableObserver<Pair>() {
@@ -379,7 +381,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
                     public void onNext(Pair pair) {
                         String assetName = (String) pair.first;
                         String fileContent = (String) pair.second;
-                        loadLineLayers(assetName,fileContent);
+                        loadLineLayers(assetName, fileContent);
                         loadMarkersFromGeoJson(assetName, fileContent);
                     }
 
@@ -387,6 +389,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
                     public void onError(Throwable e) {
                         Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+
                     }
 
                     @Override
