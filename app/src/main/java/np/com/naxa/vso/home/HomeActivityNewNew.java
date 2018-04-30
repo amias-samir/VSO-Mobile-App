@@ -136,13 +136,6 @@ public class HomeActivityNewNew extends AppCompatActivity {
         viewSwitcherSlideLayout.setInAnimation(in);
     }
 
-    private void showCategoryList() {
-        viewSwitcherSlideLayout.showPrevious();
-    }
-
-    private void showCategoryOptionsGrid() {
-        viewSwitcherSlideLayout.showNext();
-    }
 
     private void setupBottomBar() {
         bnve.enableAnimation(false);
@@ -161,8 +154,6 @@ public class HomeActivityNewNew extends AppCompatActivity {
                     break;
                 case R.id.menu_open_spaces:
 
-                    viewSwitcherSlideLayout.showNext();
-                    toggleSliderHeight();
 
                     break;
             }
@@ -205,8 +196,14 @@ public class HomeActivityNewNew extends AppCompatActivity {
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             showOverlayOnMap(position);
+            switchViews();
         });
+    }
 
+    private void switchViews(){
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        viewSwitcherSlideLayout.showNext();
+        toggleSliderHeight();
     }
 
 
@@ -304,4 +301,9 @@ public class HomeActivityNewNew extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        switchViews();
+        //super.onBackPressed();
+    }
 }
