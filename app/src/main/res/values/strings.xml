@@ -11,11 +11,11 @@
     <string name="menu.icon.type">Icon Type</string>
     <string name="rationale_gps">Access to device gps is required for this feature.</string>
     <string name="access_token" translatable="false">pk.eyJ1IjoiY2FtbWFjZSIsImEiOiJjaW9vbGtydnQwMDAwdmRrcWlpdDVoM3pjIn0.Oy_gHelWnV12kJxHQWV7XQ</string>
-    <string name="browse_data_categories">Browse data categories</string>
     <string name="browse_data_by_categories">Browse data by categories</string>
     <string name="dataset_overview">%1$d dataset found</string>
     <string name="failed_to_load_geojson">Failed to load data on map.</string>
     <string name="title_activity_home_new_new">HomeActivityNewNew</string>
+    <string name="browse_data_category">Browse data category</string>
 
 
 </resources>

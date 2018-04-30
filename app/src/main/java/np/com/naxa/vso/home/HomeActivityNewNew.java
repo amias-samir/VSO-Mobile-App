@@ -5,16 +5,12 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.util.TypedValue;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -38,6 +34,7 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.Collection;
 import java.util.List;
 
 import butterknife.BindView;
@@ -48,7 +45,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import np.com.naxa.vso.HomeActivity;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -82,6 +78,8 @@ public class HomeActivityNewNew extends AppCompatActivity {
     @BindView(R.id.drag_view_main_slider)
     LinearLayout dragView;
 
+    @BindView(R.id.tv_data_set)
+    TextView tvDataSet;
 
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
@@ -177,7 +175,7 @@ public class HomeActivityNewNew extends AppCompatActivity {
             newHeight = gridHeight;
         }
 
-        isGridShown =!isGridShown;
+        isGridShown = !isGridShown;
 
         SlidingUpPanelLayout.LayoutParams params = new SlidingUpPanelLayout.LayoutParams(SlidingUpPanelLayout.LayoutParams.MATCH_PARENT, newHeight);
         dragView.setLayoutParams(params);
@@ -202,14 +200,39 @@ public class HomeActivityNewNew extends AppCompatActivity {
         });
     }
 
-    private void switchViews(){
+    private void switchViews() {
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         new Handler().postDelayed(() -> {
             viewSwitcherSlideLayout.showNext();
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
 
-        },1000);
-       // toggleSliderHeight();
+            int visbleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
+            switch (visbleItemIndex) {
+                case 0:
+                    tvDataSet.setText(R.string.browse_data_by_categories);
+                    break;
+                case 1:
+                    tvDataSet.setText(generateDataCardText());
+                    break;
+            }
+
+
+        }, 1000);
+        // toggleSliderHeight();
+
+    }
+
+    private String generateDataCardText() {
+
+
+        Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
+        String string = getString(R.string.browse_data_category);
+        if (currentDisplayedItems != null) {
+            int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
+            string = getString(R.string.dataset_overview, totalPOI);
+        }
+
+        return string;
     }
 
 
