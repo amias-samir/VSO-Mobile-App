@@ -51,7 +51,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -137,7 +139,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mapboxMapview.getMapAsync(mapboxMap -> {
             this.mapboxMap = mapboxMap;
-            mapboxMap.setStyleUrl(Style.LIGHT);
+
             clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
 
             mapboxMap.getUiSettings().setAllGesturesEnabled(true);
@@ -215,8 +217,9 @@ public class HomeActivity extends AppCompatActivity {
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
-//           showOverlayOnMap(position);
-//           showListSlider();
+
+            showOverlayOnMap(position);
+//            showListSlider();
 
         });
 
@@ -354,6 +357,7 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onNext(MyItem markerItem) {
                         clusterManagerPlugin.addItem(markerItem);
+                        clusterManagerPlugin.cluster();
                     }
 
                     @Override
@@ -368,8 +372,17 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showOverlayOnMap(int position) {
+
+
+
         repo.getGeoJsonString(position)
-                .subscribe(new DisposableObserver<Pair>() {
+                .subscribe(new Observer<Pair>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        clusterManagerPlugin.getMarkerCollection().clear();
+                        clusterManagerPlugin.getClusterMarkerCollection().clear();
+                    }
+
                     @Override
                     public void onNext(Pair pair) {
                         String assetName = (String) pair.first;
