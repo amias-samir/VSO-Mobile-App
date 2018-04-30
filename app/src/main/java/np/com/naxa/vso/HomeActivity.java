@@ -26,13 +26,11 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.plugins.geojson.GeoJsonPlugin;
-import com.mapbox.mapboxsdk.plugins.geojson.GeoJsonPluginBuilder;
+import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
 import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
@@ -51,11 +49,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Scheduler;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -64,9 +60,17 @@ import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
 import np.com.naxa.vso.home.SectionAdapter;
 import np.com.naxa.vso.home.model.CategoriesDetail;
+import np.com.naxa.vso.home.model.MyItem;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonListener, OnMarkerEventListener {
     @BindView(R.id.sliding_layout)
@@ -100,7 +104,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     private int rotationAngle;
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
-    private GeoJsonPlugin geoJsonPlugin;
+    private ClusterManagerPlugin<MyItem> clusterManagerPlugin;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -114,6 +118,7 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
         ButterKnife.bind(this);
         repo = new MapDataRepository();
 
+
         setupRecyclerView();
         setupCatDetailsRecylcerView();
         setupSlidingPanel();
@@ -125,15 +130,6 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
 
     }
 
-    private void setupMapBoxGeoJSON() {
-        geoJsonPlugin = new GeoJsonPluginBuilder()
-                .withContext(this)
-                .withMap(mapboxMap)
-                .withOnLoadingFileAssets(this)
-                .withMarkerClickListener(this)
-                .withRandomFillColor()
-                .build();
-    }
 
     private void setupCatDetailsRecylcerView() {
 
@@ -149,26 +145,30 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     }
 
 
-    private void moveCamera(LatLng latLng) {
-        CameraPosition position = new CameraPosition.Builder()
-                .target(latLng)
-                .zoom(11)
-                .tilt(20)
-                .build();
-
-        if (mapboxMap != null) {
-            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
-        }
-
-    }
-
     private void setupMapBox() {
         Mapbox.getInstance(this, getString(R.string.access_token));
+
         mapboxMapview.getMapAsync(mapboxMap -> {
             this.mapboxMap = mapboxMap;
+            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
+
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
             showOverlayOnMap(-1);
+            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
+            initCameraListener();
         });
+    }
+
+    protected void initCameraListener() {
+        mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
+        showOverlayOnMap(1);
+    }
+
+
+    private void moveCamera(LatLng latLng) {
+        if (mapboxMap != null) {
+            mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.8), 2800);
+        }
     }
 
     private void setupBottomBar() {
@@ -237,78 +237,11 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     }
 
 
-    private void loadMarkersFromGeoJson(String assetName, String geojson) {
-        mapboxMap.clear();
-
-        Observable<LatLng> observable = Observable.create(e -> {
-            try {
-                FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
-                List<Feature> features = featureCollection.getFeatures();
-                for (Feature feature : features) {
-                    if (feature.getGeometry() instanceof Point) {
-                        Position coordinates = (Position)
-                                feature.getGeometry().getCoordinates();
-                        e.onNext(new LatLng(coordinates.getLatitude(), coordinates.getLongitude()));
-                    }
-                }
-            } catch (Exception exception) {
-                e.onError(exception);
-            } finally {
-                e.onComplete();
-            }
-        });
-
-        observable
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<LatLng>() {
-                    @Override
-                    public void onNext(LatLng latLng) {
-                        addMarker(false, latLng);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    private void showOverlayOnMap(int position) {
-
-        repo.getGeoJsonString(position)
-                .subscribe(new DisposableObserver<Pair>() {
-                    @Override
-                    public void onNext(Pair pair) {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-                        //addlineLayers(assetName, fileContent);
-                        loadMarkersFromGeoJson(assetName, fileContent);
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+    private void loadLineLayers(String assetName, String fileContent) {
 
 
-    }
-
-    private void addlineLayers(String assetName, String fileContent) {
         GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
+
         if (mapboxMap.getSource(assetName) != null) {
             mapboxMap.removeSource(Objects.requireNonNull(mapboxMap.getSource(assetName)));
             Timber.i("Nishon Removing %s source ", assetName);
@@ -394,6 +327,81 @@ public class HomeActivity extends AppCompatActivity implements OnLoadingGeoJsonL
     @AfterPermissionGranted(Permissions.RC_GPS_PERM)
     public void showGPSSetting() {
         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+    }
+
+
+    private void loadMarkersFromGeoJson(String assetName, String geojson) {
+        clusterManagerPlugin.clearItems();
+
+        Observable<MyItem> observable = Observable.create(e -> {
+            try {
+                FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
+                List<Feature> features = featureCollection.getFeatures();
+                for (Feature feature : features) {
+                    if (feature.getGeometry() instanceof Point) {
+                        Position coordinates = (Position)
+                                feature.getGeometry().getCoordinates();
+                        e.onNext(new MyItem(coordinates.getLatitude(), coordinates.getLongitude()));
+                    }
+                }
+            } catch (Exception exception) {
+                e.onError(exception);
+            } finally {
+                e.onComplete();
+            }
+        });
+
+        observable
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MyItem>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(MyItem markerItem) {
+                        clusterManagerPlugin.addItem(markerItem);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void showOverlayOnMap(int position) {
+
+        new MapDataRepository().getGeoJsonString(position)
+                .subscribe(new DisposableObserver<Pair>() {
+                    @Override
+                    public void onNext(Pair pair) {
+                        String assetName = (String) pair.first;
+                        String fileContent = (String) pair.second;
+                        loadLineLayers(assetName,fileContent);
+                        loadMarkersFromGeoJson(assetName, fileContent);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
 
     }
 
