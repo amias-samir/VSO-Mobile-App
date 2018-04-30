@@ -4,7 +4,14 @@ import android.content.Context;
 import android.util.Pair;
 
 
+import com.mapbox.services.commons.geojson.Feature;
+import com.mapbox.services.commons.geojson.FeatureCollection;
+
+import java.util.List;
+
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 
 public class MapDataRepository extends RawAssetLoader {
 
@@ -22,8 +29,7 @@ public class MapDataRepository extends RawAssetLoader {
     }
 
 
-
-    public String getMapAssetName(int pos) {
+    private String getMapAssetName(int pos) {
         String assetName;
         switch (pos) {
             case 0:
@@ -45,4 +51,18 @@ public class MapDataRepository extends RawAssetLoader {
     }
 
 
+    private Observable<String> geoJsonPropertiesParser(FeatureCollection collection) {
+
+        return Observable.just(collection.getFeatures())
+                .flatMapIterable((Function<List<Feature>, Iterable<Feature>>) features -> features)
+                .flatMap(new Function<Feature, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(Feature feature) throws Exception {
+                        
+
+                        return Observable.just(feature.getProperties().toString());
+
+                    }
+                });
+    }
 }

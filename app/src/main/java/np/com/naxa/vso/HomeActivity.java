@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -23,11 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.google.android.gms.common.util.CollectionUtils;
-import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -35,10 +31,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
-import com.mapbox.mapboxsdk.plugins.geojson.listener.OnLoadingGeoJsonListener;
-import com.mapbox.mapboxsdk.plugins.geojson.listener.OnMarkerEventListener;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
@@ -49,7 +42,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,7 +50,6 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -67,7 +58,8 @@ import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
 import np.com.naxa.vso.home.SectionAdapter;
 import np.com.naxa.vso.home.model.CategoriesDetail;
-import np.com.naxa.vso.home.model.MyItem;
+import np.com.naxa.vso.home.model.MapMarkerItem;
+import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
@@ -102,7 +94,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
-    private ClusterManagerPlugin<MyItem> clusterManagerPlugin;
+    private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -127,7 +119,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void setupListRecycler() {
-        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, dummyCategoryData());
+        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail,null);
         recyclerViewCatDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewCatDetails.setAdapter(categoriesDetailAdapter);
         categoriesDetailAdapter.setOnItemClickListener((adapter, view, position) -> Toast.makeText(HomeActivity.this, "Clicked on position: " + position, Toast.LENGTH_SHORT).show());
@@ -242,11 +234,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private List<CategoriesDetail> dummyCategoryData() {
-        List<CategoriesDetail> list = new ArrayList<>();
-        list.add(new CategoriesDetail(0, "Ram", "Bafal", "Last fata manche"));
-        list.add(new CategoriesDetail(0, "Shyam", "Kalanki", "Last super fata manche"));
-        list.add(new CategoriesDetail(0, "Hari", "Naxal", "First fata manche"));
-        return list;
+        return new ArrayList<>();
     }
 
 
@@ -279,7 +267,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadDataOnOverviewCard() {
-        Collection<MyItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
+        Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
         if (currentDisplayedItems != null) {
             int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
             tvListDataSet.setText(getString(R.string.dataset_overview, totalPOI));
@@ -340,7 +328,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void loadMarkersFromGeoJson(String assetName, String geojson) {
-        Observable<MyItem> observable = Observable.create(e -> {
+        Observable<MapMarkerItem> observable = Observable.create(e -> {
             try {
                 FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
                 List<Feature> features = featureCollection.getFeatures();
@@ -348,7 +336,17 @@ public class HomeActivity extends AppCompatActivity {
                     if (feature.getGeometry() instanceof Point) {
                         Position coordinates = (Position)
                                 feature.getGeometry().getCoordinates();
-                        e.onNext(new MyItem(coordinates.getLatitude(), coordinates.getLongitude(), assetName, assetName));
+
+
+                        MapMarkerItem mapMarkerItem = new MapMarkerItemBuilder()
+                                .setLat(coordinates.getLatitude())
+                                .setLng(coordinates.getLongitude())
+                                .setTitle(assetName)
+                                .setSnippet(assetName)
+                                .setGeoJsonProperties(feature.getProperties().entrySet())
+                                .createMapMarkerItem();
+
+                        e.onNext(mapMarkerItem);
                     }
                 }
             } catch (Exception exception) {
@@ -357,15 +355,17 @@ public class HomeActivity extends AppCompatActivity {
                 e.onComplete();
             }
         });
+
         observable
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toList()
-                .subscribe(new DisposableSingleObserver<List<MyItem>>() {
+                .subscribe(new DisposableSingleObserver<List<MapMarkerItem>>() {
                     @Override
-                    public void onSuccess(List<MyItem> myItems) {
+                    public void onSuccess(List<MapMarkerItem> myItems) {
                         clusterManagerPlugin.addItems(myItems);
                         clusterManagerPlugin.cluster();
+                        ((CategoriesDetailAdapter)recyclerViewCatDetails.getAdapter()).replaceData(myItems);
                     }
 
                     @Override

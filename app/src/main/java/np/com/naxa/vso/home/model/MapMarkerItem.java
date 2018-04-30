@@ -1,24 +1,27 @@
 package np.com.naxa.vso.home.model;
 
+import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterItem;
 
-public class MyItem implements ClusterItem {
+import java.util.Map;
+import java.util.Set;
+
+public class MapMarkerItem implements ClusterItem {
     private final LatLng position;
     private String title;
     private String snippet;
+    private Set<Map.Entry<String, JsonElement>> geoJsonProperties;
 
-    public MyItem(double lat, double lng) {
-        position = new LatLng(lat, lng);
-        title = null;
-        snippet = null;
-    }
 
-    public MyItem(double lat, double lng, String title, String snippet) {
+
+    public MapMarkerItem(double lat, double lng, String title, String snippet,Set<Map.Entry<String, JsonElement>> geoJsonProperties) {
         position = new LatLng(lat, lng);
         this.title = title;
         this.snippet = snippet;
+        this.geoJsonProperties = geoJsonProperties;
     }
+
 
     @Override
     public LatLng getPosition() {
