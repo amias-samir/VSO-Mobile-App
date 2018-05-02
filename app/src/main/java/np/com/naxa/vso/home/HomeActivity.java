@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +35,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -54,7 +58,6 @@ import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
-import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
@@ -106,7 +109,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
-    
+
+    private PermissionsManager permissionsManager;
+//    private LocationLayerPlugin locationPlugin;
+    private LocationEngine locationEngine;
+    private Location originLocation;
+
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -436,7 +444,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.fab_location_toggle:
                 if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    EasyPermissions.requestPermissions(this, "Bro permission deu na",
+                    EasyPermissions.requestPermissions(this, "Provide location permission.",
                             RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
                 } else {
                     handleGps();
@@ -451,8 +459,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (!statusOfGPS) {
             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
-            Intent toGeoPointActivity = new Intent(HomeActivity.this, GeoPointActivity.class);
-            startActivityForResult(toGeoPointActivity, RESULT_LAT_LONG);
 
         }
     }
