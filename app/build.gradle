@@ -55,6 +55,7 @@ dependencies {
 
     //mapbox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:5.5.0'
+
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-geojson:0.1.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-cluster-utils:0.1.0'
 

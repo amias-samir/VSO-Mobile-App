@@ -1,16 +1,21 @@
 package np.com.naxa.vso.home;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -21,6 +26,7 @@ import android.widget.ViewSwitcher;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -48,12 +54,17 @@ import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
+import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
+import np.com.naxa.vso.utils.ToastUtils;
+import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
-public class HomeActivity extends AppCompatActivity {
+import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
+
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, EasyPermissions.PermissionCallbacks {
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
@@ -81,10 +92,21 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.tv_data_set)
     TextView tvDataSet;
 
+    @BindView(R.id.fab_location_toggle)
+    FloatingActionButton fabLocationToggle;
+
+    private String latitude;
+    private String longitude;
+
+    private final int RESULT_LOCATION_PERMISSION = 10;
+    private final int RESULT_LAT_LONG = 15;
+
+
     private MapDataRepository repo;
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
+    
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -98,6 +120,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home_new_new);
         ButterKnife.bind(this);
         repo = new MapDataRepository();
+
+        fabLocationToggle.setOnClickListener(this);
         setupMapBox();
         setupBottomBar();
         setupListRecycler();
@@ -342,6 +366,54 @@ public class HomeActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_LAT_LONG) {
+            String location = data.getStringExtra(LOCATION_RESULT);
+            String string = location;
+            String[] parts = string.split(" ");
+            latitude = parts[0]; // 004
+            longitude = parts[1]; // 034556
+
+
+            ToastUtils.showToast("Latitude: " + latitude + " and Longitude: " + longitude);
+
+            mapboxMapview.getMapAsync(mapboxMap -> {
+                ToastUtils.showToast("Marker Added");
+                mapboxMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)))
+                        .title("Current Location")
+
+                );
+            });
+
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        switch (requestCode) {
+            case RESULT_LOCATION_PERMISSION:
+                handleGps();
+                break;
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        switch (requestCode) {
+            case RESULT_LOCATION_PERMISSION:
+                ToastUtils.showToast("Give location permission to take full advantage.");
+                break;
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -349,11 +421,41 @@ public class HomeActivity extends AppCompatActivity {
         if (visibleItemIndex == 0) {
             if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                 super.onBackPressed();
-            }else {
+            } else {
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         } else {
             switchViews();
         }
+
     }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab_location_toggle:
+                if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    EasyPermissions.requestPermissions(this, "Bro permission deu na",
+                            RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
+                } else {
+                    handleGps();
+                }
+                break;
+        }
+    }
+
+    private void handleGps() {
+        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!statusOfGPS) {
+            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        } else {
+            Intent toGeoPointActivity = new Intent(HomeActivity.this, GeoPointActivity.class);
+            startActivityForResult(toGeoPointActivity, RESULT_LAT_LONG);
+
+        }
+    }
+
+
 }
