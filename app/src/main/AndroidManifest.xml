@@ -28,7 +28,8 @@
         <activity
             android:name=".emergencyContacts.EmergencyContactsActivity"
             android:exported="true" />
-        <activity android:name=".ReportActivity" />
+        <activity android:name=".ReportActivity"
+            android:exported="true"/>
         <activity
             android:name=".emergencyContacts.ExpandableUseActivity"
             android:exported="true" />

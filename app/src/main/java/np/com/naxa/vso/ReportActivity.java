@@ -8,8 +8,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -21,11 +23,11 @@ import np.com.naxa.vso.emergencyContacts.EmergencyContactsActivity;
 
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
-    ImageButton vCamera_Icon;
-    EditText vName;
-    EditText vMessage;
-    EditText vContactNumber;
-    ImageButton vShare;
+    Button vCamera_Icon;
+    TextInputLayout vName;
+    TextInputLayout vMessage;
+    TextInputLayout vContactNumber;
+    Button vShare;
     ImageButton vSave;
     LocationManager DcoLocationManager;
 
@@ -35,13 +37,13 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report);
+        setContentView(R.layout.activity_report_v2);
         vName = findViewById(R.id.editText);
         vMessage = findViewById(R.id.message);
         vContactNumber = findViewById(R.id.editText4);
         vCamera_Icon = findViewById(R.id.camera_icon);
         vShare = findViewById(R.id.imageButton);
-        vSave = findViewById(R.id.imageButton2);
+//        vSave = findViewById(R.id.imageButton2);
 
 //        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -57,9 +59,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         vShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = vName.getText().toString();
-                String message = vMessage.getText().toString();
-                String contact = vMessage.getText().toString();
+                String name = vName.getEditText().getText().toString();
+                String message = vMessage.getEditText().getText().toString();
+                String contact = vMessage.getEditText().getText().toString();
 //              latitude = IcLocationTracker.getLatitude();
 //              longitude = IcLocationTracker.getLongitude();
                 Toast.makeText(getApplicationContext(), latitude + "/n" + longitude, Toast.LENGTH_SHORT).show();
