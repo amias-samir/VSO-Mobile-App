@@ -10,26 +10,24 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 //import com.naxa.changunaryanapp.changunaryanmunicipality.R;
 //import com.naxa.changunaryanapp.changunaryanmunicipality.Utils.LocationTracker;
 
-import np.com.naxa.vso.emergencyContacts.EmergencyContactsActivity;
-
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
-    Button vCamera_Icon;
+    Button vCamera;
     TextInputLayout vName;
     TextInputLayout vMessage;
     TextInputLayout vContactNumber;
-    Button vShare;
-    ImageButton vSave;
+    Button vSubmit;
+    Button vSave;
     LocationManager DcoLocationManager;
+    Toolbar toolbar;
 
     double latitude;
     double longitude;
@@ -38,25 +36,23 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_v2);
-        vName = findViewById(R.id.editText);
-        vMessage = findViewById(R.id.message);
-        vContactNumber = findViewById(R.id.editText4);
-        vCamera_Icon = findViewById(R.id.camera_icon);
-        vShare = findViewById(R.id.imageButton);
-//        vSave = findViewById(R.id.imageButton2);
+
+        initUI();
+
+        initToolbar();
 
 //        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // DcoLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, ReportActivity);
 
-        vCamera_Icon.setOnClickListener(new View.OnClickListener() {
+        vCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
                 startActivityForResult(intent, 0);
             }
         });
-        vShare.setOnClickListener(new View.OnClickListener() {
+        vSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name = vName.getEditText().getText().toString();
@@ -67,6 +63,23 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 Toast.makeText(getApplicationContext(), latitude + "/n" + longitude, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void initToolbar() {
+        toolbar = findViewById(R.id.toolbar_general);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Ask a question");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private void initUI() {
+        vName = findViewById(R.id.editText);
+        vMessage = findViewById(R.id.message);
+        vContactNumber = findViewById(R.id.editText4);
+        vCamera = findViewById(R.id.camera_icon);
+        vSubmit = findViewById(R.id.imageButton);
+//        vSave = findViewById(R.id.imageButton2);
     }
 
 
