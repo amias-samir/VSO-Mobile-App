@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.entity.MultiItemEntity;
 import java.util.List;
 
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.utils.ToastUtils;
 
 /**
  * Created by luoxw on 2016/8/9.
@@ -65,6 +66,7 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                 break;
             case TYPE_LEVEL_1:
                 final Level1Item lv1 = (Level1Item) item;
+                holder.addOnClickListener(R.id.iv_call);
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -86,8 +88,8 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                         return true;
                     }
                 });
-                holder.setText(R.id.title,lv1.title);
-                holder.setText(R.id.sub_title,lv1.subTitle);
+                holder.setText(R.id.title, lv1.title);
+                holder.setText(R.id.sub_title, lv1.subTitle);
 
                 break;
             case TYPE_PERSON:
@@ -103,4 +105,5 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                 break;
         }
     }
+
 }
