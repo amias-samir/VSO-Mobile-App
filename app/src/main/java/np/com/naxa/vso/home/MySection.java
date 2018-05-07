@@ -22,21 +22,13 @@ public class MySection extends SectionEntity<MapDataCategory> {
 
     public static List<MySection> getMapDataCatergorySections() {
 
-
-
-
-
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(true, "Browse data set"));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_local_hospital_black_24dp, "Hospital")));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_transfer_within_a_station_black_24dp, "Open Spaces")));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Education")));
-
         list.add(new MySection(new MapDataCategory(R.drawable.ic_local_hospital_black_24dp, "Hospital")));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_transfer_within_a_station_black_24dp, "Open Spaces")));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Education")));
-
-
         return list;
     }
 }

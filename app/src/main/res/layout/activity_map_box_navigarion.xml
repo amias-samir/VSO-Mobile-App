@@ -27,59 +27,59 @@
         <!--app:mapbox_cameraZoom="12"-->
         <!--/>-->
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_header"
-        android:layout_above="@id/bottom_layout"
-        app:mapbox_cameraTargetLat="27.700769"
-        app:mapbox_cameraTargetLng="85.300140"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-        mapbox:mapbox_cameraZoom="12" />
+    <!--<com.mapbox.mapboxsdk.maps.MapView-->
+        <!--android:id="@+id/mapView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@id/toolbar_header"-->
+        <!--android:layout_above="@id/bottom_layout"-->
+        <!--app:mapbox_cameraTargetLat="27.700769"-->
+        <!--app:mapbox_cameraTargetLng="85.300140"-->
+        <!--mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"-->
+        <!--mapbox:mapbox_cameraZoom="12" />-->
 
-    <LinearLayout
-        android:id="@+id/bottom_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:layout_marginBottom="@dimen/spacing_large"
-        android:layout_marginLeft="@dimen/spacing_xlarge"
-        android:layout_marginRight="@dimen/spacing_xlarge"
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone">
-            <TextView
-                android:id="@+id/openspace_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="OpenSpace Name"
-                />
+    <!--<LinearLayout-->
+        <!--android:id="@+id/bottom_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_marginBottom="@dimen/spacing_large"-->
+        <!--android:layout_marginLeft="@dimen/spacing_xlarge"-->
+        <!--android:layout_marginRight="@dimen/spacing_xlarge"-->
+        <!--&gt;-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone">-->
+            <!--<TextView-->
+                <!--android:id="@+id/openspace_name"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="OpenSpace Name"-->
+                <!--/>-->
 
-            <TextView
-                android:layout_marginLeft="@dimen/spacing_large"
-                android:id="@+id/openspace_distance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="OpenSpace Name"
-                />
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:layout_marginLeft="@dimen/spacing_large"-->
+                <!--android:id="@+id/openspace_distance"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="OpenSpace Name"-->
+                <!--/>-->
+        <!--</LinearLayout>-->
 
-        <Button
-            android:id="@+id/startButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5px"
-            android:layout_margin="20px"
-            android:text="Start navigation"
-            android:background="@color/mapboxGrayLight"
-            android:textColor="@color/mapboxWhite"
-            android:enabled="false"/>
+        <!--<Button-->
+            <!--android:id="@+id/startButton"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:padding="5px"-->
+            <!--android:layout_margin="20px"-->
+            <!--android:text="Start navigation"-->
+            <!--android:background="@color/mapboxGrayLight"-->
+            <!--android:textColor="@color/mapboxWhite"-->
+            <!--android:enabled="false"/>-->
 
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 </RelativeLayout>

@@ -25,4 +25,12 @@ public class Level1Item extends AbstractExpandableItem<Person> implements MultiI
     public int getLevel() {
         return 1;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
 }

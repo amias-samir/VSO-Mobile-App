@@ -3,13 +3,13 @@ package np.com.naxa.vso.home.model;
 public class CategoriesDetail {
 
     int image;
-    String name,location,desciption;
+    String name, address, geojsonProperties;
 
-    public CategoriesDetail(int image, String name, String location, String desciption) {
+    public CategoriesDetail(int image, String name, String address, String desciption) {
         this.image = image;
         this.name = name;
-        this.location = location;
-        this.desciption = desciption;
+        this.address = address;
+        this.geojsonProperties = desciption;
     }
 
     public int getImage() {
@@ -28,19 +28,19 @@ public class CategoriesDetail {
         this.name = name;
     }
 
-    public String getLocation() {
-        return location;
+    public String getAddress() {
+        return address;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getDesciption() {
-        return desciption;
+    public String getGeojsonProperties() {
+        return geojsonProperties;
     }
 
-    public void setDesciption(String desciption) {
-        this.desciption = desciption;
+    public void setGeojsonProperties(String geojsonProperties) {
+        this.geojsonProperties = geojsonProperties;
     }
 }

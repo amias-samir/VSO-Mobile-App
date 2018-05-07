@@ -35,23 +35,26 @@
 
 
 
-    <style name="NavigationMapRoute">
-        <!-- Colors -->
-        <item name="routeColor">@color/mapboxBlue</item>
-        <item name="routeModerateCongestionColor">@color/mapboxYellow</item>
-        <item name="routeSevereCongestionColor">@color/mapboxPink</item>
-        <item name="routeShieldColor">@color/mapboxWhite</item>
-        <!-- Scales -->
-        <item name="routeScale">1.0</item>
-    </style>
+    <!--<style name="NavigationMapRoute">-->
+        <!--&lt;!&ndash; Colors &ndash;&gt;-->
+        <!--<item name="routeColor">@color/mapboxBlue</item>-->
+        <!--<item name="routeModerateCongestionColor">@color/mapboxYellow</item>-->
+        <!--<item name="routeSevereCongestionColor">@color/mapboxPink</item>-->
+        <!--<item name="routeShieldColor">@color/mapboxWhite</item>-->
+        <!--&lt;!&ndash; Scales &ndash;&gt;-->
+        <!--<item name="routeScale">1.0</item>-->
+    <!--</style>-->
 
-    <style name="NavigationView" parent="Theme.AppCompat.NoActionBar">
-        <item name="navigationViewPrimary">@color/mapboxWhite</item>
-        <item name="navigationViewSecondary">@color/mapboxBlue</item>
-        <item name="navigationViewAccent">@color/mapboxPink</item>
-    </style>
+    <!--<style name="NavigationView" parent="Theme.AppCompat.NoActionBar">-->
+        <!--<item name="navigationViewPrimary">@color/mapboxWhite</item>-->
+        <!--<item name="navigationViewSecondary">@color/mapboxBlue</item>-->
+        <!--<item name="navigationViewAccent">@color/mapboxPink</item>-->
+    <!--</style>-->
 
 
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

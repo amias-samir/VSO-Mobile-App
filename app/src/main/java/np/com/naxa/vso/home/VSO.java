@@ -3,6 +3,8 @@ package np.com.naxa.vso.home;
 import android.app.Application;
 import android.content.Context;
 
+import timber.log.Timber;
+
 public class VSO extends Application {
     private static Context context;
 
@@ -10,6 +12,7 @@ public class VSO extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
+        Timber.plant(new Timber.DebugTree());
     }
 
     public static Context getInstance() {

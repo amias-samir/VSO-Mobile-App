@@ -1,21 +1,17 @@
 package np.com.naxa.vso.home;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.RawRes;
+import android.util.Pair;
 
 
-import java.io.InputStream;
+import com.mapbox.services.commons.geojson.Feature;
+import com.mapbox.services.commons.geojson.FeatureCollection;
+
+import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import np.com.naxa.vso.R;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 
 public class MapDataRepository extends RawAssetLoader {
 
@@ -26,51 +22,47 @@ public class MapDataRepository extends RawAssetLoader {
         context = VSO.getInstance().getApplicationContext();
     }
 
-    public Observable<String> getMapLayerObserver(int pos) {
-        Observable<String> observable;
 
+    public Observable<Pair> getGeoJsonString(int pos) {
+        String assetName = getMapAssetName(pos);
+        return loadTextFromAsset(assetName);
+    }
+
+
+    private String getMapAssetName(int pos) {
+        String assetName;
         switch (pos) {
+            case 0:
+                assetName = "health_facilities.geojson";
+                break;
             case 1:
-                observable = getHealthServicesLayer();
+                assetName = "open_space.geojson";
                 break;
             case 2:
-                observable = getOpenSpacesLayer();
-                break;
-            case 3:
-                observable = getSchoolsLayer();
+                assetName = "schools.geojson";
                 break;
             default:
-                observable = getMunicipalityBorder();
+                assetName = "ward_changu.geojson";
                 break;
+
         }
-        return observable;
+
+        return assetName;
     }
 
-    private Observable<String> getMunicipalityBorder() {
-        return loadTextFromRaw(R.raw.changunarayan_boundary)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
+
+    private Observable<String> geoJsonPropertiesParser(FeatureCollection collection) {
+
+        return Observable.just(collection.getFeatures())
+                .flatMapIterable((Function<List<Feature>, Iterable<Feature>>) features -> features)
+                .flatMap(new Function<Feature, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(Feature feature) throws Exception {
+                        
+
+                        return Observable.just(feature.getProperties().toString());
+
+                    }
+                });
     }
-
-    private Observable<String> getHealthServicesLayer() {
-        return loadTextFromRaw(R.raw.health_facilities)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
-
-    private Observable<String> getSchoolsLayer() {
-        return loadTextFromRaw(R.raw.educational_institutes)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
-
-    private Observable<String> getOpenSpacesLayer() {
-        return loadTextFromRaw(R.raw.open_space)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
-
-    }
-
 }
