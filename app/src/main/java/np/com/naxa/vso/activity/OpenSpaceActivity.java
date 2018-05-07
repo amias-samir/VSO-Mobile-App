@@ -8,8 +8,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +27,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.gps.GeoPointActivity;
@@ -36,6 +41,11 @@ public class OpenSpaceActivity extends AppCompatActivity {
     @BindView(R.id.openspace_distance)
     TextView openspaceDistance;
 
+    @BindView(R.id.mapView)
+    MapView mapView;
+    @BindView(R.id.btn_start_route)
+    Button btnStartRoute;
+
     private OpenSpaceViewModel openSpaceViewModel;
     List<OpenSpace> openSpaceList = new ArrayList<>();
 
@@ -48,10 +58,17 @@ public class OpenSpaceActivity extends AppCompatActivity {
     List<OpenSpace> sortedOpenSpacesList;
     List<Float> sortedOpenSpacesDistanceList;
 
+
+
+    private Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_space);
+        Mapbox.getInstance(this, getString(R.string.access_token));
+//        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
         ButterKnife.bind(this);
 
         // Get a new or existing ViewModel from the ViewModelProvider.
@@ -74,6 +91,10 @@ public class OpenSpaceActivity extends AppCompatActivity {
                 Log.d(TAG, "onChanged: insert " + "one more new  data inserted");
             }
         });
+
+
+
+
         saveOpenSpaceDataViaRoom();
         getUserCurrenLocation();
 
@@ -222,4 +243,12 @@ public class OpenSpaceActivity extends AppCompatActivity {
 
 
     }
+
+
+
+    @OnClick(R.id.btn_start_route)
+    public void onViewClicked() {
+    }
+
+
 }

@@ -15,7 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".SpashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,23 +29,24 @@
             android:name=".emergencyContacts.EmergencyContactsActivity"
             android:exported="true" />
         <activity android:name=".ReportActivity" />
-        <activity android:name=".HomeActivity"></activity>
+        <activity android:name=".HomeActivity" />
         <activity
             android:name=".emergencyContacts.ExpandableUseActivity"
             android:exported="true" />
-
-
         <activity
             android:name=".activity.ContactActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
+        <activity
+            android:name=".activity.OpenSpaceActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".gps.GeoPointActivity"
+            android:exported="true"></activity>
 
-        <activity android:name=".activity.OpenSpaceActivity"
+        <activity android:name=".NavigationActivity"
             android:exported="true">
-        </activity>
-        <activity android:name=".gps.GeoPointActivity"
-            android:exported="true">
-        </activity>
 
+        </activity>
     </application>
+
 </manifest>

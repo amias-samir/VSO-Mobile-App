@@ -33,7 +33,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.0.8'
 
-
     //widgets libs
     implementation 'com.github.renaudcerrato:FloatingSearchView:1.0.1'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
@@ -53,10 +52,16 @@ dependencies {
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
 
     //mapbox
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1'
-   // implementation 'com.mapbox.mapboxsdk:GeoJson:v0.2.0'
-
-
+    compile 'com.mapbox.mapboxsdk:mapbox-android-core:0.2.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.0'
+    implementation('com.mapbox.mapboxsdk:mapbox-android-sdk:6.0.1') {
+        transitive = true
+    }
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.13.0'
+    implementation('com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.13.0') {
+        transitive = true
+    }
+    compile 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.13.0-SNAPSHOT'
 
     //data
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
