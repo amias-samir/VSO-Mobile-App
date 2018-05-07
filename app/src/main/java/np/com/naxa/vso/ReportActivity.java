@@ -240,15 +240,15 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         if (hasNewImage) {
 
 //            imageFile = new File(imageFilePath);
-            if (imageFile.exists()) {
+//            if (imageFile.exists()) {
                 Log.d(TAG, "sendDataToServer: image file exist");
                 RequestBody surveyBody = RequestBody.create(MediaType.parse("image/*"), imageFileToBeUploaded);
-                body = MultipartBody.Part.createFormData("photo", imageFile.getName(), surveyBody);
+                body = MultipartBody.Part.createFormData("photo", imageFileToBeUploaded.getName(), surveyBody);
 
-            } else {
+            }
+            else {
                 body = null;
             }
-        }
 
 
         RequestBody data = RequestBody.create(MediaType.parse("text/plain"), jsonData);
@@ -283,7 +283,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             }
 
 
-            private void handleSuccess(AskForHelpResponse profileUpdateResponse) {
+            private void handleSuccess(AskForHelpResponse askForHelpResponse) {
 
 
             }
@@ -298,7 +298,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     message = "slow internet connection, please try again later";
                 }
 
-                Toast.makeText(ReportActivity.this, "Failed to update ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ReportActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
