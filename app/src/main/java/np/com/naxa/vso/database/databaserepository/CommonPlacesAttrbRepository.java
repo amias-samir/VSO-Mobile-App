@@ -12,6 +12,9 @@ import np.com.naxa.vso.database.VsoRoomDatabase;
 import np.com.naxa.vso.database.dao.CommonPlacesAttrbDao;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
+/**
+ * Created by samir on 5/08/2018.
+ */
 
 public class CommonPlacesAttrbRepository {
 
@@ -25,7 +28,7 @@ public class CommonPlacesAttrbRepository {
     public CommonPlacesAttrbRepository(Application application) {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
-        mAllCommonPlacesAttrb = mCommonPlacesAttrbDao.getAlphabetizedWords();
+        mAllCommonPlacesAttrb = mCommonPlacesAttrbDao.getFirstInsertedCommonPlaces();
     }
 
     // Room executes all queries on a separate thread.

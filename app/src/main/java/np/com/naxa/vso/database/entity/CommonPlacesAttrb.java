@@ -4,6 +4,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+/**
+ * Created by samir on 5/08/2018.
+ */
+
 @Entity(tableName = "CommonPlacesAttrb" )
 public class CommonPlacesAttrb {
 

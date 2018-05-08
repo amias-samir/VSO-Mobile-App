@@ -10,6 +10,9 @@ import java.util.List;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
+/**
+ * Created by samir on 5/08/2018.
+ */
 
 public class CommonPlacesAttribViewModel extends AndroidViewModel {
     private CommonPlacesAttrbRepository mRepository;

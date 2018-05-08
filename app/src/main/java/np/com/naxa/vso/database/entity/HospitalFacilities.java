@@ -8,6 +8,10 @@ import android.arch.persistence.room.PrimaryKey;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
+/**
+ * Created by samir on 5/08/2018.
+ */
+
 @Entity(tableName = "hospital_facilities",
         foreignKeys = @ForeignKey(
                 entity = CommonPlacesAttrb.class,

@@ -10,20 +10,29 @@ import android.support.annotation.NonNull;
 
 import np.com.naxa.vso.database.dao.CommonPlacesAttrbDao;
 import np.com.naxa.vso.database.dao.ContactDao;
+import np.com.naxa.vso.database.dao.EducationalInstitutesDao;
+import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.dao.OpenSpaceDao;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.Contact;
+import np.com.naxa.vso.database.entity.EducationalInstitutes;
+import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
 /**
  * Created by samir on 4/22/2018.
  */
 
-@Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class}, version = 1, exportSchema = false)
+@Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class
+}, version = 1, exportSchema = false)
+
 public abstract class VsoRoomDatabase extends RoomDatabase {
+
     public abstract ContactDao contactDao();
     public abstract OpenSpaceDao openSpaceDao();
     public abstract CommonPlacesAttrbDao commonPlacesAttrbDao();
+    public abstract HospitalFacilitiesDao hospitalFacilitiesDao();
+    public abstract EducationalInstitutesDao educationalInstitutesDao();
 
     private static VsoRoomDatabase INSTANCE;
 
@@ -48,10 +57,10 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
      * Override the onOpen method to populate the database.
      * For this sample, we clear the database every time it is created or opened.
      */
-    private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback(){
+    private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
 
         @Override
-        public void onOpen (@NonNull SupportSQLiteDatabase db){
+        public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
             // If you want to keep the data through app restarts,
             // comment out the following line.
@@ -68,11 +77,15 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
         private final ContactDao mContactDao;
         private final OpenSpaceDao mOpenSpaceDao;
         private final CommonPlacesAttrbDao mCommonPlacesAttrbDao;
+        private final HospitalFacilitiesDao mHospitalFacilitiesDao;
+        private final EducationalInstitutesDao mEducationalInstitutesDao;
 
         PopulateDbAsync(VsoRoomDatabase db) {
             mContactDao = db.contactDao();
             mOpenSpaceDao = db.openSpaceDao();
             mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
+            mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
+            mEducationalInstitutesDao = db.educationalInstitutesDao();
 
         }
 
@@ -82,10 +95,11 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
             // Not needed if you only populate on creation.
 //            mContactDao.deleteAll();
 //            mOpenSpaceDao.deleteAll();
-           insertContact();
+            insertContact();
             return null;
         }
-        private void insertContact(){
+
+        private void insertContact() {
             Contact contact = new Contact("samir", "dangal", 40);
             mContactDao.insert(contact);
             contact = new Contact("nishon", "tandukar", 40);
