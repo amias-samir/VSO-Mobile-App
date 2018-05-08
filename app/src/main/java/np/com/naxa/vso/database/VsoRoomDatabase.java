@@ -8,8 +8,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import np.com.naxa.vso.database.dao.CommonPlacesAttrbDao;
 import np.com.naxa.vso.database.dao.ContactDao;
 import np.com.naxa.vso.database.dao.OpenSpaceDao;
+import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.Contact;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
@@ -17,10 +19,11 @@ import np.com.naxa.vso.database.entity.OpenSpace;
  * Created by samir on 4/22/2018.
  */
 
-@Database(entities = {Contact.class, OpenSpace.class}, version = 1, exportSchema = false)
+@Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class}, version = 1, exportSchema = false)
 public abstract class VsoRoomDatabase extends RoomDatabase {
     public abstract ContactDao contactDao();
     public abstract OpenSpaceDao openSpaceDao();
+    public abstract CommonPlacesAttrbDao commonPlacesAttrbDao();
 
     private static VsoRoomDatabase INSTANCE;
 
@@ -64,10 +67,13 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
 
         private final ContactDao mContactDao;
         private final OpenSpaceDao mOpenSpaceDao;
+        private final CommonPlacesAttrbDao mCommonPlacesAttrbDao;
 
         PopulateDbAsync(VsoRoomDatabase db) {
             mContactDao = db.contactDao();
             mOpenSpaceDao = db.openSpaceDao();
+            mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
+
         }
 
         @Override
