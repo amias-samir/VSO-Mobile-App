@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
  * Created by samir on 5/08/2018.
  */
 
-@Entity(tableName = "CommonPlacesAttrb" )
+@Entity(tableName = "CommonPlacesAttrb")
 public class CommonPlacesAttrb {
 
     @PrimaryKey(autoGenerate = true)
@@ -29,12 +29,16 @@ public class CommonPlacesAttrb {
     @ColumnInfo(name = "longitude")
     private Double longitude;
 
-    public CommonPlacesAttrb(String name, String address, String type, Double latitude, Double longitude) {
+    @ColumnInfo(name = "remarks")
+    private String remarks;
+
+    public CommonPlacesAttrb(String name, String address, String type, Double latitude, Double longitude, String remarks) {
         this.name = name;
         this.address = address;
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.remarks = remarks;
     }
 
     public int getUid() {
@@ -83,5 +87,13 @@ public class CommonPlacesAttrb {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

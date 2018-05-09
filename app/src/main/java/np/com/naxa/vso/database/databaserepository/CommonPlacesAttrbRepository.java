@@ -18,6 +18,8 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
 public class CommonPlacesAttrbRepository {
 
+    public static long rowID;
+
     private CommonPlacesAttrbDao mCommonPlacesAttrbDao;
     private LiveData<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
 
@@ -56,8 +58,8 @@ public class CommonPlacesAttrbRepository {
         @Override
         protected Void doInBackground(final CommonPlacesAttrb... params) {
             Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
-            mAsyncTaskDao.insert(params[0]);
-            return null;
+            rowID = mAsyncTaskDao.insert(params[0]);
+       return null;
         }
     }
 }

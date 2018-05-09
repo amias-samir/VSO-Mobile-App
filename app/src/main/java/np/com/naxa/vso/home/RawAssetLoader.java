@@ -24,7 +24,7 @@ public class RawAssetLoader {
 
     }
 
-    Observable<Pair> loadTextFromAsset(String assetName) {
+    public Observable<Pair> loadTextFromAsset(String assetName) {
         return Observable.create(e -> {
             try {
                 e.onNext(rawResourceToInputStream(assetName));

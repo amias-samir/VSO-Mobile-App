@@ -9,11 +9,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
@@ -25,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -35,7 +39,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.geojson.Feature;
@@ -44,6 +47,11 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,17 +65,24 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
+import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
+import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
+import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, EasyPermissions.PermissionCallbacks {
+
+    private static final String TAG = "HomeActivity";
+
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
@@ -111,10 +126,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isGridShown = true;
 
     private PermissionsManager permissionsManager;
-//    private LocationLayerPlugin locationPlugin;
+    //    private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
     private Location originLocation;
 
+    CommonPlacesAttribViewModel commonPlacesAttribViewModel;
+    List<CommonPlacesAttrb> commonPlacesAttrbs = new ArrayList<>();
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -136,6 +153,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupGridRecycler();
 
         slidingPanel.setAnchorPoint(0.4f);
+
+
+        try {
+
+            // Add an observer on the LiveData returned by getAlphabetizedWords.
+            // The onChanged() method fires when the observed data changes and the activity is
+            // in the foreground.
+            commonPlacesAttribViewModel.getmAllCommonPlacesAttrb().observe(this, new android.arch.lifecycle.Observer<List<CommonPlacesAttrb>>() {
+                @Override
+                public void onChanged(@Nullable final List<CommonPlacesAttrb> commonPlacesAttrbs) {
+                    // Update the cached copy of the words in the adapter.
+//                adapter.setWords(words);
+
+                    for (int i = 0; i < commonPlacesAttrbs.size(); i++) {
+                        commonPlacesAttrbs.add(commonPlacesAttrbs.get(i));
+                    }
+                    Log.d("HomeActivity", "onChanged: insert " + "one more new  data inserted");
+                }
+            });
+
+        } catch (NullPointerException e) {
+
+            Log.d(TAG, "Exception: " + e.toString());
+        }
+
 
     }
 
@@ -264,20 +306,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void clearClusterAndMarkers() {
-        clusterManagerPlugin.getMarkerCollection().clear();
-        clusterManagerPlugin.getClusterMarkerCollection().clear();
+
+        try {
+            clusterManagerPlugin.getMarkerCollection().clear();
+            clusterManagerPlugin.getClusterMarkerCollection().clear();
+        } catch (NullPointerException e) {
+
+        }
     }
 
     private String generateDataCardText() {
 
+        String string = null;
+        try {
+            Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
 
-        Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
-        String string = getString(R.string.browse_data_category);
-        if (currentDisplayedItems != null) {
-            int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
-            string = getString(R.string.dataset_overview, totalPOI);
+            string = getString(R.string.browse_data_category);
+            if (currentDisplayedItems != null) {
+                int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
+                string = getString(R.string.dataset_overview, totalPOI);
+            }
+        } catch (NullPointerException e) {
+
         }
-
         return string;
     }
 
@@ -298,6 +349,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         String fileContent = (String) pair.second;
                         loadLineLayers(assetName, fileContent);
                         loadMarkersFromGeoJson(assetName, fileContent);
+
+                        saveGeoJsonDataToDatabase(position, fileContent);
                     }
 
                     @Override
@@ -463,5 +516,69 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
+        if (pos == 0) {
+//            save hospital data
+            saveHospitalData(geoJson);
+        }
+
+        if (pos == 1) {
+//            save openspace data
+        }
+
+        if (pos == 2) {
+//            save school data
+        }
+
+    }
+
+    private void saveHospitalData(String geoJsonString) {
+
+        JSONObject jsonObject = null;
+        String name = null, address = null, type = null, remarks = null, ambulance = null, contact_no = null, contact_pe = null,
+                earthquake = null, emergency = null, fire_extin = null, icu_service = null, number_of = null, open_space = null,
+                structure = null, toilet_fac;
+        Double latitude = 0.0, longitude = 0.0;
+        try {
+            jsonObject = new JSONObject(geoJsonString);
+
+            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+
+
+                name = properties.getString("name");
+                address = properties.getString("Address");
+                type = properties.getString("Type");
+                latitude = Double.parseDouble(properties.getString("Y"));
+                longitude = Double.parseDouble(properties.getString("X"));
+                remarks = properties.getString("Remarks");
+
+                ambulance = properties.getString("Ambulance_");
+                contact_no = properties.getString("Contact_Nu");
+                contact_pe = properties.getString("Contact_Pe");
+                earthquake = properties.getString("Earthquake");
+                emergency = properties.getString("Emergency_");
+                fire_extin = properties.getString("Fire_Extin");
+                icu_service = properties.getString("ICU_Servic");
+                number_of = properties.getString("Number_of_");
+                open_space = properties.getString("Open_Space");
+                structure = properties.getString("Structure_");
+                toilet_fac = properties.getString("Toilet_Fac");
+
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
+                commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+                Log.d(TAG, "saveHospitalData: " + insertedRowId);
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 }
