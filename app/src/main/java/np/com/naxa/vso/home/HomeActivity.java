@@ -1,6 +1,7 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -74,6 +75,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
+import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
@@ -131,7 +133,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Location originLocation;
 
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
-    List<CommonPlacesAttrb> commonPlacesAttrbs = new ArrayList<>();
+    List<CommonPlacesAttrb> commonPlacesAttrbsList = new ArrayList<>();
 
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -156,7 +158,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         try {
-
+            // Get a new or existing ViewModel from the ViewModelProvider.
+            commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
             // Add an observer on the LiveData returned by getAlphabetizedWords.
             // The onChanged() method fires when the observed data changes and the activity is
             // in the foreground.
@@ -167,7 +170,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                adapter.setWords(words);
 
                     for (int i = 0; i < commonPlacesAttrbs.size(); i++) {
-                        commonPlacesAttrbs.add(commonPlacesAttrbs.get(i));
+                        commonPlacesAttrbsList.add(commonPlacesAttrbs.get(i));
                     }
                     Log.d("HomeActivity", "onChanged: insert " + "one more new  data inserted");
                 }
@@ -573,6 +576,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "saveHospitalData: " + insertedRowId);
 
             }
+
+            ArrayList<Long> insertedRowPiD = CommonPlacesAttrbRepository.pID;
+
 
         } catch (JSONException e) {
             e.printStackTrace();

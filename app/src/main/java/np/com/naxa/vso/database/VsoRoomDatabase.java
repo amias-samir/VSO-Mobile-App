@@ -24,7 +24,7 @@ import np.com.naxa.vso.database.entity.OpenSpace;
  */
 
 @Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class
-}, version = 1, exportSchema = false)
+}, version = 2, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
 
@@ -95,6 +95,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
             // Not needed if you only populate on creation.
 //            mContactDao.deleteAll();
 //            mOpenSpaceDao.deleteAll();
+            mCommonPlacesAttrbDao.deleteAll();
             insertContact();
             return null;
         }

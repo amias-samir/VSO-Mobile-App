@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import np.com.naxa.vso.database.VsoRoomDatabase;
@@ -19,6 +20,8 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 public class CommonPlacesAttrbRepository {
 
     public static long rowID;
+
+    public static ArrayList<Long> pID = new ArrayList<>();
 
     private CommonPlacesAttrbDao mCommonPlacesAttrbDao;
     private LiveData<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
@@ -59,6 +62,8 @@ public class CommonPlacesAttrbRepository {
         protected Void doInBackground(final CommonPlacesAttrb... params) {
             Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
             rowID = mAsyncTaskDao.insert(params[0]);
+            pID.add(rowID);
+
        return null;
         }
     }
