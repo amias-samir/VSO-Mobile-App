@@ -17,14 +17,13 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 entity = CommonPlacesAttrb.class,
                 parentColumns = "uid",
                 childColumns = "fk_common_places",
-                onDelete = CASCADE),
-        indices = @Index(value = "uid"))
+                onDelete = CASCADE))
 public class HospitalFacilities {
 
     @PrimaryKey(autoGenerate = true)
     private int hid;
 
-    @ColumnInfo(name = "fk_common_place")
+    @ColumnInfo(name = "fk_common_places")
     private int fk_common_places;
 
     @ColumnInfo(name = "ambulance")
