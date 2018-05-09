@@ -17,8 +17,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 entity = CommonPlacesAttrb.class,
                 parentColumns = "uid",
                 childColumns = "fk_common_places",
-                onDelete = CASCADE),
-        indices = @Index(value = "uid"))
+                onDelete = CASCADE))
 public class EducationalInstitutes {
     @PrimaryKey(autoGenerate = true)
     private int eid;
@@ -26,40 +25,40 @@ public class EducationalInstitutes {
     @ColumnInfo(name = "fk_common_places")
     private int fk_common_places;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "college_he")
     private String college_he;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "contact_no")
     private String contact_no;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "contact_pe")
     private String contact_pe;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "earthquake")
     private String earthquake;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "evacuation")
     private String evacuation;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "female_stu")
     private String female_stu;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "male_stu")
     private String male_stu;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "total_stu")
     private String total_stu;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "fire_extin")
     private String fire_extin;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "level")
     private String level;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "open_space")
     private String open_space;
 
-    @ColumnInfo(name = "ambulance")
+    @ColumnInfo(name = "structure")
     private String structure;
 
     public EducationalInstitutes(int fk_common_places, String college_he, String contact_no, String contact_pe, String earthquake, String evacuation, String female_stu, String male_stu, String total_stu, String fire_extin, String level, String open_space, String structure) {
