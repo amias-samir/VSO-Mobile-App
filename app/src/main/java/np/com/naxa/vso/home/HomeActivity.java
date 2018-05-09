@@ -44,6 +44,7 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -110,7 +111,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabLocationToggle;
 
     @BindView(R.id.map)
-    org.osmdroid.views.MapView map;
+    org.osmdroid.views.MapView mapView;
+
+    private IMapController mapController;
+    private GeoPoint centerPoint;
+    private MapDataRepository mapDataRepository;
 
     private String latitude;
     private String longitude;
@@ -157,6 +162,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupMap() {
+        mapDataRepository = new MapDataRepository();
+        centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
@@ -191,23 +198,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
-        mapDataRepository.getMunicipalityBorder(mapView)
-                .doOnNext(new Consumer<FolderOverlay>() {
-                    @Override
-                    public void accept(FolderOverlay folderOverlay) throws Exception {
-
-                        mapView.getOverlays().add(folderOverlay);
-                        mapView.invalidate();
-                        mapController.animateTo(centerPoint);
-
-                    }
-                }).doOnError(new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Exception {
-                throwable.printStackTrace();
-            }
-        })
-                .subscribe();
+        
     }
 
 
