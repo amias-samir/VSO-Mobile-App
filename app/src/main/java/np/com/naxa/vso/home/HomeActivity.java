@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +36,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.geojson.Feature;
@@ -43,6 +43,16 @@ import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +63,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
@@ -98,6 +109,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.fab_location_toggle)
     FloatingActionButton fabLocationToggle;
 
+    @BindView(R.id.map)
+    org.osmdroid.views.MapView map;
+
     private String latitude;
     private String longitude;
 
@@ -111,7 +125,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isGridShown = true;
 
     private PermissionsManager permissionsManager;
-//    private LocationLayerPlugin locationPlugin;
+    //    private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
     private Location originLocation;
 
@@ -130,13 +144,70 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         repo = new MapDataRepository();
 
         fabLocationToggle.setOnClickListener(this);
-        setupMapBox();
+
+//        setupMapBox();
+        setupMap();
+
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
 
         slidingPanel.setAnchorPoint(0.4f);
 
+    }
+
+    private void setupMap() {
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setBuiltInZoomControls(false);
+        mapView.setMultiTouchControls(true);
+        mapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                return false;
+            }
+        });
+        mapController = mapView.getController();
+        mapController.setZoom(13);
+
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                InfoWindow.closeAllInfoWindowsOn(mapView);
+                slidingPanel.setPanelHeight(110);
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        });
+
+        mapView.getOverlays().add(0, mapEventsOverlay);
+        mapController.setCenter(centerPoint);
+        mapDataRepository.getMunicipalityBorder(mapView)
+                .doOnNext(new Consumer<FolderOverlay>() {
+                    @Override
+                    public void accept(FolderOverlay folderOverlay) throws Exception {
+
+                        mapView.getOverlays().add(folderOverlay);
+                        mapView.invalidate();
+                        mapController.animateTo(centerPoint);
+
+                    }
+                }).doOnError(new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                throwable.printStackTrace();
+            }
+        })
+                .subscribe();
     }
 
 
@@ -457,7 +528,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!statusOfGPS) {
-            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
 
         }
