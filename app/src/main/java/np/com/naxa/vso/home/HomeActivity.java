@@ -68,6 +68,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
+import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
@@ -75,6 +76,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
+import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
@@ -135,6 +137,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
     List<CommonPlacesAttrb> commonPlacesAttrbsList = new ArrayList<>();
 
+    HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
+    List<HospitalFacilities> hospitalFacilitiesList = new ArrayList<>();
+
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
@@ -160,6 +165,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
+            hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
             // Add an observer on the LiveData returned by getAlphabetizedWords.
             // The onChanged() method fires when the observed data changes and the activity is
             // in the foreground.
@@ -541,6 +547,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String name = null, address = null, type = null, remarks = null, ambulance = null, contact_no = null, contact_pe = null,
                 earthquake = null, emergency = null, fire_extin = null, icu_service = null, number_of = null, open_space = null,
                 structure = null, toilet_fac;
+        Long fk_common_places = null;
         Double latitude = 0.0, longitude = 0.0;
         try {
             jsonObject = new JSONObject(geoJsonString);
@@ -549,26 +556,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-
-
                 name = properties.getString("name");
                 address = properties.getString("Address");
                 type = properties.getString("Type");
                 latitude = Double.parseDouble(properties.getString("Y"));
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
-
-                ambulance = properties.getString("Ambulance_");
-                contact_no = properties.getString("Contact_Nu");
-                contact_pe = properties.getString("Contact_Pe");
-                earthquake = properties.getString("Earthquake");
-                emergency = properties.getString("Emergency_");
-                fire_extin = properties.getString("Fire_Extin");
-                icu_service = properties.getString("ICU_Servic");
-                number_of = properties.getString("Number_of_");
-                open_space = properties.getString("Open_Space");
-                structure = properties.getString("Structure_");
-                toilet_fac = properties.getString("Toilet_Fac");
 
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
                 commonPlacesAttribViewModel.insert(commonPlacesAttrb);
@@ -578,7 +571,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             ArrayList<Long> insertedRowPiD = CommonPlacesAttrbRepository.pID;
+            if(insertedRowPiD.size() == jsonarray.length()) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
 
+                    fk_common_places = insertedRowPiD.get(i);
+                    ambulance = properties.getString("Ambulance_");
+                    contact_no = properties.getString("Contact_Nu");
+                    contact_pe = properties.getString("Contact_Pe");
+                    earthquake = properties.getString("Earthquake");
+                    emergency = properties.getString("Emergency_");
+                    fire_extin = properties.getString("Fire_Extin");
+                    icu_service = properties.getString("ICU_Servic");
+                    number_of = properties.getString("Number_of_");
+                    open_space = properties.getString("Open_Space");
+                    structure = properties.getString("Structure_");
+                    toilet_fac = properties.getString("Toilet_Fac");
+
+                    HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, ambulance, contact_no, contact_pe, earthquake, emergency,
+                            fire_extin, icu_service, number_of, open_space, structure, toilet_fac);
+                    hospitalFacilitiesVewModel.insert(hospitalFacilities);
+//                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+//                Log.d(TAG, "saveHospitalData: " + insertedRowId);
+                }
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

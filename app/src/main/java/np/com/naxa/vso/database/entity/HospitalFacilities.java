@@ -24,7 +24,7 @@ public class HospitalFacilities {
     private int hid;
 
     @ColumnInfo(name = "fk_common_places")
-    private int fk_common_places;
+    private Long fk_common_places;
 
     @ColumnInfo(name = "ambulance")
     private String ambulance;
@@ -59,7 +59,7 @@ public class HospitalFacilities {
     @ColumnInfo(name = "toilet_fac")
     private String toilet_fac;
 
-    public HospitalFacilities(int fk_common_places, String ambulance, String contact_no, String contact_pe, String earthquake, String emergency, String fire_extin, String icu_service, String number_of, String open_space, String structure, String toilet_fac) {
+    public HospitalFacilities(Long fk_common_places, String ambulance, String contact_no, String contact_pe, String earthquake, String emergency, String fire_extin, String icu_service, String number_of, String open_space, String structure, String toilet_fac) {
         this.fk_common_places = fk_common_places;
         this.ambulance = ambulance;
         this.contact_no = contact_no;
@@ -74,11 +74,11 @@ public class HospitalFacilities {
         this.toilet_fac = toilet_fac;
     }
 
-    public int getFk_common_places() {
+    public Long getFk_common_places() {
         return fk_common_places;
     }
 
-    public void setFk_common_places(int fk_common_places) {
+    public void setFk_common_places(Long fk_common_places) {
         this.fk_common_places = fk_common_places;
     }
 
