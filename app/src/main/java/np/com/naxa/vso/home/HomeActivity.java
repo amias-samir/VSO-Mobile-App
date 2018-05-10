@@ -198,6 +198,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
+
+
         
     }
 
