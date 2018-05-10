@@ -68,6 +68,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
+import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
@@ -76,6 +77,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
+import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -140,6 +142,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     List<HospitalFacilities> hospitalFacilitiesList = new ArrayList<>();
 
+    EducationalInstitutesViewModel educationalInstitutesViewModel;
+    List<EducationalInstitutes> educationalInstitutesList = new ArrayList<>();
+
+    OpenSpaceViewModel openSpaceViewModel;
+    List<OpenSpace> openSpacesList = new ArrayList<>();
+
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
@@ -166,6 +174,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
             hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
+            educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
+            openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
             // Add an observer on the LiveData returned by getAlphabetizedWords.
             // The onChanged() method fires when the observed data changes and the activity is
             // in the foreground.
@@ -533,15 +543,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         if (pos == 1) {
 //            save openspace data
+            saveOpenSpaces(geoJson);
         }
 
         if (pos == 2) {
 //            save school data
+            saveEducationalInstitutes(geoJson);
         }
 
     }
 
     private void saveHospitalData(String geoJsonString) {
+
+        CommonPlacesAttrbRepository.pID.clear();
 
         JSONObject jsonObject = null;
         String name = null, address = null, type = null, remarks = null, ambulance = null, contact_no = null, contact_pe = null,
@@ -571,7 +585,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             ArrayList<Long> insertedRowPiD = CommonPlacesAttrbRepository.pID;
-            if(insertedRowPiD.size() == jsonarray.length()) {
+            if (insertedRowPiD.size() == jsonarray.length()) {
                 for (int i = 0; i < jsonarray.length(); i++) {
                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
 
@@ -601,6 +615,133 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+    }
+
+    private void saveEducationalInstitutes(String geoJsonString) {
+
+        CommonPlacesAttrbRepository.pID.clear();
+
+        JSONObject jsonObject = null;
+
+        Double latitude = 0.0, longitude = 0.0;
+        String name = null, address = null, type = null, remarks = null;
+
+        Long fk_common_places = null;
+        String college_he = null, contact_no = null, contact_pe = null, earthquake = null, evacuation = null, fire_extin = null,
+                female_student = null, male_student = null, total_student = null, level = null, structure = null, open_space = null;
+        try {
+            jsonObject = new JSONObject(geoJsonString);
+
+            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                name = properties.getString("name");
+                address = properties.getString("Address");
+                type = properties.getString("Type");
+                latitude = Double.parseDouble(properties.getString("Y"));
+                longitude = Double.parseDouble(properties.getString("X"));
+                remarks = properties.getString("Remarks");
+
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
+                commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+                Log.d(TAG, "saveEducationalInstitutes: " + insertedRowId);
+
+            }
+
+            ArrayList<Long> insertedRowPiD = CommonPlacesAttrbRepository.pID;
+            if (insertedRowPiD.size() == jsonarray.length()) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+
+                    fk_common_places = insertedRowPiD.get(i);
+                    college_he = properties.getString("College_He");
+                    contact_no = properties.getString("Contact_Nu");
+                    contact_pe = properties.getString("Contact_Pe");
+                    earthquake = properties.getString("Earthquake");
+                    evacuation = properties.getString("Evacuation");
+                    fire_extin = properties.getString("Fire_Extin");
+                    male_student = properties.getString("Male_Stude");
+                    female_student = properties.getString("Female_Stu");
+                    total_student = properties.getString("Total_Stud");
+                    open_space = properties.getString("Open_Space");
+                    structure = properties.getString("Structure_");
+
+                    EducationalInstitutes educationalInstitutes = new EducationalInstitutes(fk_common_places, college_he, contact_no, contact_pe, earthquake,
+                            evacuation, female_student, male_student, total_student, fire_extin, level, open_space, structure);
+                    educationalInstitutesViewModel.insert(educationalInstitutes);
+//                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+//                Log.d(TAG, "saveHospitalData: " + insertedRowId);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveOpenSpaces(String geoJsonString){
+        CommonPlacesAttrbRepository.pID.clear();
+
+        JSONObject jsonObject = null;
+
+        Double latitude = 0.0, longitude = 0.0;
+        String name = null, address = null, type = null, remarks = null;
+
+        Long fk_common_places = null;
+        String access_roa = null, accommodat = null, area_sqm = null, hign_tensi = null, road_access = null, shape_area = null,
+                shape_leng = null, terrain_ty = null, toilet_fac = null, water_faci = null, wifi_facil = null;
+        try {
+            jsonObject = new JSONObject(geoJsonString);
+
+            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                name = properties.getString("name");
+                address = properties.getString("Address");
+                type = properties.getString("Type");
+                latitude = Double.parseDouble(properties.getString("Y"));
+                longitude = Double.parseDouble(properties.getString("X"));
+                remarks = properties.getString("Remarks");
+
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
+                commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+                Log.d(TAG, "saveOpenSpaces: " + insertedRowId);
+
+            }
+
+            ArrayList<Long> insertedRowPiD = CommonPlacesAttrbRepository.pID;
+            if (insertedRowPiD.size() == jsonarray.length()) {
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+
+                    fk_common_places = insertedRowPiD.get(i);
+                    access_roa = properties.getString("Access_Roa");
+                    accommodat = properties.getString("Accommodat");
+                    area_sqm = properties.getString("Area_SqM");
+                    hign_tensi = properties.getString("High_Tensi");
+                    road_access = properties.getString("Road_Acces");
+                    shape_area = properties.getString("Shape_Area");
+                    shape_leng = properties.getString("Shape_Leng");
+                    terrain_ty = properties.getString("Terrain_Ty");
+                    toilet_fac = properties.getString("Toilet_Fac");
+                    water_faci = properties.getString("Water_Faci");
+                    wifi_facil = properties.getString("Wifi_Facil");
+
+                    OpenSpace openSpace = new OpenSpace(fk_common_places, access_roa, accommodat, area_sqm, hign_tensi, road_access, shape_area,
+                            shape_leng, terrain_ty, toilet_fac, water_faci, wifi_facil);
+                    openSpaceViewModel.insert(openSpace);
+//                long insertedRowId = CommonPlacesAttrbRepository.rowID;
+//                Log.d(TAG, "saveHospitalData: " + insertedRowId);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 }

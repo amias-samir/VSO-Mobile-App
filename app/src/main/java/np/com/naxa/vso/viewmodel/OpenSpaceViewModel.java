@@ -37,7 +37,7 @@ public class OpenSpaceViewModel extends AndroidViewModel {
     }
 
     public void insert(OpenSpace openSpace) {
-        Log.d("VIewholder", "insert: " + openSpace.getName());
+        Log.d("VIewholder", "insert: " + openSpace.getAccess_roa());
         openSpaceRepository.insert(openSpace);
     }
 }

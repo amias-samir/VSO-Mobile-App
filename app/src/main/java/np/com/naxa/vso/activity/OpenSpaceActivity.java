@@ -149,8 +149,11 @@ public class OpenSpaceActivity extends AppCompatActivity {
                 if (openSpaceList.size() > 1) {
 //                    sortServiceData(servicesData, myLat, myLon);
                     for (int i = 0; i < openSpaceList.size(); i++) {
-                        double latfirst = openSpaceList.get(i).getLatitude();
-                        double longfirst = openSpaceList.get(i).getLongitude();
+
+//                        double latfirst = openSpaceList.get(i).getLatitude();
+//                        double longfirst = openSpaceList.get(i).getLongitude();
+                        double latfirst = 27.1254545;
+                        double longfirst = 85.3265655;
 
                         float[] result1 = new float[3];
                         Location.distanceBetween(myLat, myLong, latfirst, longfirst, result1);
@@ -206,7 +209,7 @@ public class OpenSpaceActivity extends AppCompatActivity {
             public void run() {
 //                initServicesList(sortedOpenSpacesList, sortedOpenSpacesDistanceList);
 
-                openspaceName.setText(sortedOpenSpacesList.get(0).getName());
+                openspaceName.setText(sortedOpenSpacesList.get(0).getAccess_roa());
                 openspaceDistance.setText(sortedOpenSpacesDistanceList.get(0).toString());
 
 
@@ -216,23 +219,23 @@ public class OpenSpaceActivity extends AppCompatActivity {
     }
 
     public void saveOpenSpaceDataViaRoom() {
-        OpenSpace openSpace = new OpenSpace("ram", 27.451, 85.24);
-        openSpaceViewModel.insert(openSpace);
-
-        openSpace = new OpenSpace("Hattisar", 27.712365, 85.327498);
-        openSpaceViewModel.insert(openSpace);
-
-        openSpace = new OpenSpace("Tudikhel", 27.700799, 85.314341);
-        openSpaceViewModel.insert(openSpace);
-
-        openSpace = new OpenSpace("Dashrath Rangasala", 27.694317, 85.315161);
-        openSpaceViewModel.insert(openSpace);
-
-        openSpace = new OpenSpace("Narayan Chaur", 27.714686, 85.325462);
-        openSpaceViewModel.insert(openSpace);
-
-        openSpace = new OpenSpace("Naxal", 27.716100, 85.325754);
-        openSpaceViewModel.insert(openSpace);
+//        OpenSpace openSpace = new OpenSpace("ram", 27.451, 85.24);
+//        openSpaceViewModel.insert(openSpace);
+//
+//        openSpace = new OpenSpace("Hattisar", 27.712365, 85.327498);
+//        openSpaceViewModel.insert(openSpace);
+//
+//        openSpace = new OpenSpace("Tudikhel", 27.700799, 85.314341);
+//        openSpaceViewModel.insert(openSpace);
+//
+//        openSpace = new OpenSpace("Dashrath Rangasala", 27.694317, 85.315161);
+//        openSpaceViewModel.insert(openSpace);
+//
+//        openSpace = new OpenSpace("Narayan Chaur", 27.714686, 85.325462);
+//        openSpaceViewModel.insert(openSpace);
+//
+//        openSpace = new OpenSpace("Naxal", 27.716100, 85.325754);
+//        openSpaceViewModel.insert(openSpace);
 
 //        for (int i = 0; i < 10; i++) {
         Log.d(TAG, "saveOpenSpaceDataViaRoom: insert inserting ");
