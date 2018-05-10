@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.Keep;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -12,7 +11,6 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
  * Created by user on 4/23/2018.
  */
 
-//@Keep
 @Entity(tableName = "OpenSpace_table",
         foreignKeys = @ForeignKey(
                 entity = CommonPlacesAttrb.class,
