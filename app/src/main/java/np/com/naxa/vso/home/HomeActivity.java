@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -28,8 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -51,6 +50,15 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,8 +100,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
 
-    @BindView(R.id.mapView)
-    MapView mapboxMapview;
+//    @BindView(R.id.mapView)
+//    MapView mapboxMapview;
 
     @BindView(R.id.bnve)
     BottomNavigationViewEx bnve;
@@ -118,6 +126,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.fab_location_toggle)
     FloatingActionButton fabLocationToggle;
+
+    @BindView(R.id.map)
+    org.osmdroid.views.MapView mapView;
+
+    private IMapController mapController;
+    private GeoPoint centerPoint;
+    private MapDataRepository mapDataRepository;
 
     private String latitude;
     private String longitude;
@@ -162,7 +177,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         repo = new MapDataRepository();
 
         fabLocationToggle.setOnClickListener(this);
-        setupMapBox();
+
+//        setupMapBox();
+        setupMap();
+
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
@@ -200,20 +218,62 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void setupMap() {
+        mapDataRepository = new MapDataRepository();
+        centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setBuiltInZoomControls(false);
+        mapView.setMultiTouchControls(true);
+        mapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                return false;
+            }
+        });
+        mapController = mapView.getController();
+        mapController.setZoom(13);
+
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                InfoWindow.closeAllInfoWindowsOn(mapView);
+                slidingPanel.setPanelHeight(110);
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        });
+
+        mapView.getOverlays().add(0, mapEventsOverlay);
+        mapController.setCenter(centerPoint);
+
+
+        
+    }
+
 
     private void setupMapBox() {
         Mapbox.getInstance(this, getString(R.string.access_token));
 
-        mapboxMapview.getMapAsync(mapboxMap -> {
-            this.mapboxMap = mapboxMap;
-            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
-            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
-            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
+//        mapboxMapview.getMapAsync(mapboxMap -> {
+//            this.mapboxMap = mapboxMap;
+//            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
+//            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
+//            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
 
             showOverlayOnMap(-1);
             moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
 
-        });
+//        });
     }
 
     private void moveCamera(LatLng latLng) {
@@ -465,14 +525,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             ToastUtils.showToast("Latitude: " + latitude + " and Longitude: " + longitude);
 
-            mapboxMapview.getMapAsync(mapboxMap -> {
-                ToastUtils.showToast("Marker Added");
-                mapboxMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)))
-                        .title("Current Location")
-
-                );
-            });
+//            mapboxMapview.getMapAsync(mapboxMap -> {
+//                ToastUtils.showToast("Marker Added");
+//                mapboxMap.addMarker(new MarkerOptions()
+//                        .position(new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)))
+//                        .title("Current Location")
+//
+//                );
+//            });
 
         }
     }
@@ -529,7 +589,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!statusOfGPS) {
-            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
 
         }
