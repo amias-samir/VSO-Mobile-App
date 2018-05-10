@@ -5,6 +5,9 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -51,12 +54,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
@@ -133,6 +139,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private IMapController mapController;
     private GeoPoint centerPoint;
     private MapDataRepository mapDataRepository;
+    FolderOverlay myOverLay;
 
     private String latitude;
     private String longitude;
@@ -219,6 +226,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupMap() {
+        myOverLay = new FolderOverlay();
+
         mapDataRepository = new MapDataRepository();
         centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -256,8 +265,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
 
+        showOverlayOnMap(-1);
 
-        
+
     }
 
 
@@ -270,8 +280,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
 //            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
 
-            showOverlayOnMap(-1);
-            moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
+        showOverlayOnMap(-1);
+        moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
 
 //        });
     }
@@ -426,8 +436,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Pair pair) {
                         String assetName = (String) pair.first;
                         String fileContent = (String) pair.second;
-                        loadLineLayers(assetName, fileContent);
-                        loadMarkersFromGeoJson(assetName, fileContent);
+//                        loadLineLayers(assetName, fileContent);
+//                        loadMarkersFromGeoJson(assetName, fileContent);
 
                         saveGeoJsonDataToDatabase(position, fileContent);
                     }
@@ -599,16 +609,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (pos == 0) {
 //            save hospital data
             saveHospitalData(geoJson);
+            loadlayerToMap(geoJson);
         }
 
         if (pos == 1) {
 //            save openspace data
             saveOpenSpaces(geoJson);
+            loadlayerToMap(geoJson);
+
         }
 
         if (pos == 2) {
 //            save school data
             saveEducationalInstitutes(geoJson);
+            loadlayerToMap(geoJson);
+
         }
 
     }
@@ -741,7 +756,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void saveOpenSpaces(String geoJsonString){
+    private void saveOpenSpaces(String geoJsonString) {
         CommonPlacesAttrbRepository.pID.clear();
 
         JSONObject jsonObject = null;
@@ -802,6 +817,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void loadlayerToMap(String geoJson) {
+
+        mapView.getOverlays().clear();
+
+        final KmlDocument kmlDocument = new KmlDocument();
+        kmlDocument.parseGeoJSON(geoJson);
+
+        Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+        final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+
+        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+        mapView.getOverlays().add(myOverLay);
+        mapView.invalidate();
     }
 
 }
