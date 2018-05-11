@@ -65,4 +65,5 @@ public class MapDataRepository extends RawAssetLoader {
                     }
                 });
     }
+
 }

@@ -27,7 +27,10 @@ public interface CommonPlacesAttrbDao {
     // add two items with the same primary key to the database. If the table has more than one
     // column, you can use @Insert(onConflict = OnConflictStrategy.REPLACE) to update a row.
     @Insert
-    void insert(CommonPlacesAttrb commonPlacesAttrb);
+    long insert(CommonPlacesAttrb commonPlacesAttrb);
+
+    @Insert
+    Long insertWithReturnID(CommonPlacesAttrb commonPlacesAttrb);
 
     @Query("DELETE FROM commonplacesattrb")
     void deleteAll();

@@ -40,7 +40,7 @@ public class OpenSpaceRepository {
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
     public void insert (OpenSpace openSpace) {
-        Log.d("ContactRepository", "insert: "+ openSpace.getName());
+        Log.d("ContactRepository", "insert: "+ openSpace.getAccess_roa());
         new OpenSpaceRepository.insertAsyncTask(mOpenSpaceDao).execute(openSpace);
     }
 
@@ -54,7 +54,7 @@ public class OpenSpaceRepository {
 
         @Override
         protected Void doInBackground(final OpenSpace... params) {
-            Log.d("ContactRepository", "doInBackground: "+ params[0].getLatitude());
+            Log.d("ContactRepository", "doInBackground: "+ params[0].getAccommodat());
             mAsyncTaskDao.insert(params[0]);
             return null;
         }

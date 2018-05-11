@@ -28,13 +28,16 @@ public class CommonPlacesAttribViewModel extends AndroidViewModel {
 
         mAllCommonPlacesAttrb = mRepository.getAllCommonPlacesAttrb();
     }
+
     //    contact
-    public LiveData<List<CommonPlacesAttrb>> getmAllCommonPlacesAttrb() { return mAllCommonPlacesAttrb; }
+    public LiveData<List<CommonPlacesAttrb>> getmAllCommonPlacesAttrb() {
+        return mAllCommonPlacesAttrb;
+    }
 
     public void insert(CommonPlacesAttrb commonPlacesAttrb) {
-        Log.d("VIewholder", "insert: "+commonPlacesAttrb.getName());
-        mRepository.insert(commonPlacesAttrb); }
+       mRepository.insert(commonPlacesAttrb);
 
+    }
 
 
 }

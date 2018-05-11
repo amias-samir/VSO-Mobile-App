@@ -23,7 +23,7 @@ public class EducationalInstitutes {
     private int eid;
 
     @ColumnInfo(name = "fk_common_places")
-    private int fk_common_places;
+    private Long fk_common_places;
 
     @ColumnInfo(name = "college_he")
     private String college_he;
@@ -61,7 +61,7 @@ public class EducationalInstitutes {
     @ColumnInfo(name = "structure")
     private String structure;
 
-    public EducationalInstitutes(int fk_common_places, String college_he, String contact_no, String contact_pe, String earthquake, String evacuation, String female_stu, String male_stu, String total_stu, String fire_extin, String level, String open_space, String structure) {
+    public EducationalInstitutes(Long fk_common_places, String college_he, String contact_no, String contact_pe, String earthquake, String evacuation, String female_stu, String male_stu, String total_stu, String fire_extin, String level, String open_space, String structure) {
         this.fk_common_places = fk_common_places;
         this.college_he = college_he;
         this.contact_no = contact_no;
@@ -85,11 +85,11 @@ public class EducationalInstitutes {
         this.eid = eid;
     }
 
-    public int getFk_common_places() {
+    public Long getFk_common_places() {
         return fk_common_places;
     }
 
-    public void setFk_common_places(int fk_common_places) {
+    public void setFk_common_places(Long fk_common_places) {
         this.fk_common_places = fk_common_places;
     }
 
