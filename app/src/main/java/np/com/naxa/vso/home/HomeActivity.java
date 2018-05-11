@@ -32,12 +32,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
@@ -62,6 +62,7 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
@@ -78,6 +79,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
@@ -134,7 +136,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabLocationToggle;
 
     @BindView(R.id.map)
-    org.osmdroid.views.MapView mapView;
+    MapView mapView;
+
+    @BindView(R.id.floating_search_view)
+    FloatingSearchView floatingSearchView;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -187,7 +192,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        setupMapBox();
         setupMap();
-
+        setupFloatingToolbar();
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
@@ -223,6 +228,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+    }
+
+    private void setupFloatingToolbar() {
+        floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, String newQuery) {
+                List<FloatingSuggestion> suggestionList=new ArrayList<>();
+                suggestionList.add(new FloatingSuggestion("Bafal"));
+                suggestionList.add(new FloatingSuggestion("Kalanki"));
+                suggestionList.add(new FloatingSuggestion("Naxal"));
+                suggestionList.add(new FloatingSuggestion("Kathmandu"));
+                floatingSearchView.swapSuggestions(suggestionList);
+//                ToastUtils.showToast("Query Has Been Changes");
+            }
+        });
     }
 
     private void setupMap() {
