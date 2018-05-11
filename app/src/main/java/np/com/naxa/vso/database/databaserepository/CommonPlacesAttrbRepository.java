@@ -19,6 +19,8 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
 public class CommonPlacesAttrbRepository {
 
+    private static final String TAG = "CommonPlacesAttrb";
+
     public static long rowID;
 
     public static ArrayList<Long> pID = new ArrayList<>();
@@ -63,6 +65,10 @@ public class CommonPlacesAttrbRepository {
             Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
             rowID = mAsyncTaskDao.insert(params[0]);
             pID.add(rowID);
+
+            Log.d(TAG, "saveHospitalData: id " + rowID);
+//
+//            pID.add(mAsyncTaskDao.insert(params[0]));
 
        return null;
         }
