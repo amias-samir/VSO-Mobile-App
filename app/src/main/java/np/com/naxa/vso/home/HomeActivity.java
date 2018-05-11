@@ -33,6 +33,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -243,6 +244,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                ToastUtils.showToast("Query Has Been Changes");
             }
         });
+
+        floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
+            @Override
+            public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, SearchSuggestion item, int itemPosition) {
+               textView.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View view) {
+                       Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
+                   }
+               });
+            }
+        });
+
+        floatingSearchView.setDimBackground(true);
+
     }
 
     private void setupMap() {
