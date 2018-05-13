@@ -45,26 +45,36 @@ public class CommonPlacesAttrbRepository {
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public void insert (CommonPlacesAttrb commonPlacesAttrb) {
+    public long insert (CommonPlacesAttrb commonPlacesAttrb) {
         Log.d("CommonPlacesRepository", "insert: "+ commonPlacesAttrb.getName());
-        new CommonPlacesAttrbRepository.insertAsyncTask(mCommonPlacesAttrbDao).execute(commonPlacesAttrb);
+
+        rowID = mCommonPlacesAttrbDao.insert(commonPlacesAttrb);
+
+//        new CommonPlacesAttrbRepository.insertAsyncTask(mCommonPlacesAttrbDao).execute(commonPlacesAttrb);
+
+        return rowID;
     }
 
-    private static class insertAsyncTask extends AsyncTask<CommonPlacesAttrb, Void, Void> {
-
-        private CommonPlacesAttrbDao mAsyncTaskDao;
-
-        insertAsyncTask(CommonPlacesAttrbDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final CommonPlacesAttrb... params) {
-            Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
-            rowID = mAsyncTaskDao.insert(params[0]);
-            pID.add(rowID);
-
-       return null;
-        }
-    }
+//    private static class insertAsyncTask extends AsyncTask<CommonPlacesAttrb, Void, Void> {
+//
+//        private CommonPlacesAttrbDao mAsyncTaskDao;
+//
+//        insertAsyncTask(CommonPlacesAttrbDao dao) {
+//            mAsyncTaskDao = dao;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(final CommonPlacesAttrb... params) {
+//            Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
+//            rowID = mAsyncTaskDao.insert(params[0]);
+//            pID.add(rowID);
+//
+//       return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+//        }
+//    }
 }

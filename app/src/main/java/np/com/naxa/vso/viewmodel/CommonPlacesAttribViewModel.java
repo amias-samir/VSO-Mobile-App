@@ -34,9 +34,9 @@ public class CommonPlacesAttribViewModel extends AndroidViewModel {
         return mAllCommonPlacesAttrb;
     }
 
-    public void insert(CommonPlacesAttrb commonPlacesAttrb) {
-       mRepository.insert(commonPlacesAttrb);
-
+    public Long insert(CommonPlacesAttrb commonPlacesAttrb) {
+       long rowID = mRepository.insert(commonPlacesAttrb);
+       return rowID;
     }
 
 
