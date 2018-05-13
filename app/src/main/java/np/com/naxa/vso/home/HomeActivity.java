@@ -895,11 +895,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 
                 final Style defaultStyle = new Style(null, 0x901010AA, 3f, 0x20AA1010);
+                myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        Log.d(TAG, "run: load boarder");
                         mapView.getOverlays().add(myOverLayBoarder);
                         mapView.invalidate();
                         mapController.animateTo(centerPoint);
