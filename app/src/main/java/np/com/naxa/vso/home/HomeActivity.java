@@ -32,12 +32,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
+import com.google.gson.JsonArray;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
@@ -54,6 +56,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.events.MapEventsReceiver;
@@ -62,10 +65,13 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -78,6 +84,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
@@ -98,6 +105,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
+
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, EasyPermissions.PermissionCallbacks {
 
@@ -134,12 +142,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabLocationToggle;
 
     @BindView(R.id.map)
-    org.osmdroid.views.MapView mapView;
+    MapView mapView;
+
+    @BindView(R.id.floating_search_view)
+    FloatingSearchView floatingSearchView;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
     private MapDataRepository mapDataRepository;
     FolderOverlay myOverLay;
+    FolderOverlay myOverLayBoarder;
+    RadiusMarkerClusterer poiMarkers ;
 
     private String latitude;
     private String longitude;
@@ -187,7 +200,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        setupMapBox();
         setupMap();
-
+        setupFloatingToolbar();
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
@@ -225,8 +238,39 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void setupFloatingToolbar() {
+        floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, String newQuery) {
+                List<FloatingSuggestion> suggestionList=new ArrayList<>();
+                suggestionList.add(new FloatingSuggestion("Bafal"));
+                suggestionList.add(new FloatingSuggestion("Kalanki"));
+                suggestionList.add(new FloatingSuggestion("Naxal"));
+                suggestionList.add(new FloatingSuggestion("Kathmandu"));
+                floatingSearchView.swapSuggestions(suggestionList);
+//                ToastUtils.showToast("Query Has Been Changes");
+            }
+        });
+
+        floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
+            @Override
+            public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, SearchSuggestion item, int itemPosition) {
+               textView.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View view) {
+                       Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
+                   }
+               });
+            }
+        });
+
+        floatingSearchView.setDimBackground(true);
+
+    }
+
     private void setupMap() {
         myOverLay = new FolderOverlay();
+        myOverLayBoarder = new FolderOverlay();
 
         mapDataRepository = new MapDataRepository();
         centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
@@ -245,7 +289,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         mapController = mapView.getController();
-        mapController.setZoom(13);
+        mapController.setZoom(12);
+        poiMarkers = new RadiusMarkerClusterer(this);
+
+        loadMunicipalityBoarder();
 
 
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
@@ -721,7 +768,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
-                Log.d(TAG, "saveHospitalData: " + fk_common_places);
+                Log.d(TAG, "saveEducationalInstitutes: " + fk_common_places);
 
                 college_he = properties.getString("College_He");
                 contact_no = properties.getString("Contact_Nu");
@@ -771,7 +818,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
-                Log.d(TAG, "saveHospitalData: " + fk_common_places);
+                Log.d(TAG, "saveOpenSpaces: " + fk_common_places);
 
                 access_roa = properties.getString("Access_Roa");
                 accommodat = properties.getString("Accommodat");
@@ -798,13 +845,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void loadlayerToMap(String geoJson) {
 
         mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+
 
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
         Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+        poiMarkers.setIcon(defaultBitmap);
 
         final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
 
@@ -812,5 +861,55 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(myOverLay);
         mapView.invalidate();
     }
+
+    private void loadMunicipalityBoarder() {
+        mapView.getOverlays().clear();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                Log.d(TAG, "loadMunicipalityBoarder: ");
+//            vMapView.getOverlays().clear();
+
+                String jsonString = null;
+                try {
+//                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
+                    InputStream jsonStream =  VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+                    jsonString = new String(buffer, "UTF-8");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                final KmlDocument kmlDocument = new KmlDocument();
+                kmlDocument.parseGeoJSON(jsonString);
+
+                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+                final Style defaultStyle = new Style(null, 0x901010AA, 3f, 0x20AA1010);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+                        mapView.getOverlays().add(myOverLayBoarder);
+                        mapView.invalidate();
+                        mapController.animateTo(centerPoint);
+                    }
+                });
+
+
+            }
+        }).start();
+    }
+
 
 }

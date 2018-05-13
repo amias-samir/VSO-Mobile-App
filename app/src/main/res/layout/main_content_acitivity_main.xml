@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/search_toolbar" />
+    <!--<include layout="@layout/search_toolbar" />-->
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"
@@ -13,13 +13,16 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <include layout="@layout/search_toolbar_v2" />
+
+
     <!--<com.mapbox.mapboxsdk.maps.MapView-->
-        <!--android:id="@+id/mapView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:visibility="gone"-->
-        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-        <!--mapbox:mapbox_cameraZoom="2" />-->
+    <!--android:id="@+id/mapView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:visibility="gone"-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+    <!--mapbox:mapbox_cameraZoom="2" />-->
 
 
     <android.support.design.widget.FloatingActionButton

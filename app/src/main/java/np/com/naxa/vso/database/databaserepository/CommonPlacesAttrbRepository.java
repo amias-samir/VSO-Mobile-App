@@ -19,6 +19,8 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
 public class CommonPlacesAttrbRepository {
 
+    private static final String TAG = "CommonPlacesAttrb";
+
     public static long rowID;
 
     public static ArrayList<Long> pID = new ArrayList<>();
@@ -51,7 +53,6 @@ public class CommonPlacesAttrbRepository {
         rowID = mCommonPlacesAttrbDao.insert(commonPlacesAttrb);
 
 //        new CommonPlacesAttrbRepository.insertAsyncTask(mCommonPlacesAttrbDao).execute(commonPlacesAttrb);
-
         return rowID;
     }
 

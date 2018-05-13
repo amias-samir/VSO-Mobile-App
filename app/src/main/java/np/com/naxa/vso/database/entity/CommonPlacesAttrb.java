@@ -2,13 +2,18 @@ package np.com.naxa.vso.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Keep;
 
 /**
  * Created by samir on 5/08/2018.
  */
 
-@Entity(tableName = "CommonPlacesAttrb")
+@Keep
+@Entity(tableName = "CommonPlacesAttrb",
+        indices = {@Index(value = "latitude", unique = true),
+                @Index(value = "longitude", unique = true)})
 public class CommonPlacesAttrb {
 
     @PrimaryKey(autoGenerate = true)

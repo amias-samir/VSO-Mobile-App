@@ -42,7 +42,8 @@ public class HospitalFacilitiesRepository{
     // thread, blocking the UI.
     public void insert (HospitalFacilities hospitalFacilities) {
         Log.d("HospitalRepository", "insert: "+ hospitalFacilities.getContact_no());
-        new HospitalFacilitiesRepository.insertAsyncTask(mHospitalFacilitiesDao).execute(hospitalFacilities);
+        mHospitalFacilitiesDao.insert(hospitalFacilities);
+//        new HospitalFacilitiesRepository.insertAsyncTask(mHospitalFacilitiesDao).execute(hospitalFacilities);
     }
 
     private static class insertAsyncTask extends AsyncTask<HospitalFacilities, Void, Void> {
