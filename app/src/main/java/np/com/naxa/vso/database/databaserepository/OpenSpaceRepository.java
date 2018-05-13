@@ -41,7 +41,8 @@ public class OpenSpaceRepository {
     // thread, blocking the UI.
     public void insert (OpenSpace openSpace) {
         Log.d("ContactRepository", "insert: "+ openSpace.getAccess_roa());
-        new OpenSpaceRepository.insertAsyncTask(mOpenSpaceDao).execute(openSpace);
+        mOpenSpaceDao.insert(openSpace);
+//        new OpenSpaceRepository.insertAsyncTask(mOpenSpaceDao).execute(openSpace);
     }
 
     private static class insertAsyncTask extends AsyncTask<OpenSpace, Void, Void> {

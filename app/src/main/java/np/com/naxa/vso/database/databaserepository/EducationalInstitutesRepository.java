@@ -41,7 +41,8 @@ public class EducationalInstitutesRepository {
     // thread, blocking the UI.
     public void insert (EducationalInstitutes educationalInstitutes) {
         Log.d("EducationalRepository", "insert: "+ educationalInstitutes.getContact_no());
-        new EducationalInstitutesRepository.insertAsyncTask(mEducationalInstitutesDao).execute(educationalInstitutes);
+        mEducationalInstitutesDao.insert(educationalInstitutes);
+//        new EducationalInstitutesRepository.insertAsyncTask(mEducationalInstitutesDao).execute(educationalInstitutes);
     }
 
     private static class insertAsyncTask extends AsyncTask<EducationalInstitutes, Void, Void> {
