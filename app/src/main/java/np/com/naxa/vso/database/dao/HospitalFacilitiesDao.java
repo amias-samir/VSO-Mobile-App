@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import np.com.naxa.vso.database.entity.HospitalFacilities;
+import retrofit2.http.Url;
 
 
 /**
@@ -33,4 +34,6 @@ public interface HospitalFacilitiesDao {
 
     @Query("DELETE FROM hospital_facilities")
     void deleteAll();
+
+
 }
