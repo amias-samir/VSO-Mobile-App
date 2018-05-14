@@ -21,11 +21,12 @@ public class CommonPlacesAttribViewModel extends AndroidViewModel {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     private LiveData<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
+    private List<CommonPlacesAttrb> placesAttrbList;
 
     public CommonPlacesAttribViewModel(Application application) {
         super(application);
         mRepository = new CommonPlacesAttrbRepository(application);
-
+//        placesAttrbList = mRepository.getAllPlaces();
         mAllCommonPlacesAttrb = mRepository.getAllCommonPlacesAttrb();
     }
 
@@ -35,8 +36,13 @@ public class CommonPlacesAttribViewModel extends AndroidViewModel {
     }
 
     public Long insert(CommonPlacesAttrb commonPlacesAttrb) {
-       long rowID = mRepository.insert(commonPlacesAttrb);
-       return rowID;
+        long rowID = mRepository.insert(commonPlacesAttrb);
+        return rowID;
+    }
+
+    public List<CommonPlacesAttrb> getAllCommonplaces() {
+        return mRepository.getAllPlaces();
+//        return placesAttrbList;
     }
 
 

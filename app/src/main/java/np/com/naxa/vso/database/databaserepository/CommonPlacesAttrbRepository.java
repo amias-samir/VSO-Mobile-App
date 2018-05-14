@@ -27,6 +27,7 @@ public class CommonPlacesAttrbRepository {
 
     private CommonPlacesAttrbDao mCommonPlacesAttrbDao;
     private LiveData<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
+    private List<CommonPlacesAttrb> mCommonPlacesList;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -36,6 +37,7 @@ public class CommonPlacesAttrbRepository {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
         mAllCommonPlacesAttrb = mCommonPlacesAttrbDao.getFirstInsertedCommonPlaces();
+//        mCommonPlacesList = mCommonPlacesAttrbDao.getAllCommonPlaces();
     }
 
     // Room executes all queries on a separate thread.
@@ -47,13 +49,18 @@ public class CommonPlacesAttrbRepository {
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public long insert (CommonPlacesAttrb commonPlacesAttrb) {
-        Log.d("CommonPlacesRepository", "insert: "+ commonPlacesAttrb.getName());
+    public long insert(CommonPlacesAttrb commonPlacesAttrb) {
+        Log.d("CommonPlacesRepository", "insert: " + commonPlacesAttrb.getName());
 
         rowID = mCommonPlacesAttrbDao.insert(commonPlacesAttrb);
 
 //        new CommonPlacesAttrbRepository.insertAsyncTask(mCommonPlacesAttrbDao).execute(commonPlacesAttrb);
         return rowID;
+    }
+
+    public List<CommonPlacesAttrb> getAllPlaces() {
+        return mCommonPlacesAttrbDao.getAllCommonPlaces();
+//        return mCommonPlacesList;
     }
 
 //    private static class insertAsyncTask extends AsyncTask<CommonPlacesAttrb, Void, Void> {

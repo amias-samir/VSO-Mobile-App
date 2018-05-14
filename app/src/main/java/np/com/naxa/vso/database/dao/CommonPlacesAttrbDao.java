@@ -35,4 +35,7 @@ public interface CommonPlacesAttrbDao {
 
     @Query("DELETE FROM commonplacesattrb")
     void deleteAll();
+
+    @Query("SELECT * from commonplacesattrb ORDER BY uid ASC")
+    List<CommonPlacesAttrb> getAllCommonPlaces();
 }

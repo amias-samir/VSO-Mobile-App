@@ -1,6 +1,7 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +36,6 @@ import android.widget.ViewSwitcher;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
-import com.google.gson.JsonArray;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -79,11 +79,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
@@ -152,7 +158,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapDataRepository mapDataRepository;
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
-    RadiusMarkerClusterer poiMarkers ;
+    RadiusMarkerClusterer poiMarkers;
 
     private String latitude;
     private String longitude;
@@ -198,15 +204,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         fabLocationToggle.setOnClickListener(this);
 
+
 //        setupMapBox();
         setupMap();
-        setupFloatingToolbar();
+
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
 
         slidingPanel.setAnchorPoint(0.4f);
-
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -235,32 +241,50 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-
+        setupFloatingToolbar();
     }
 
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @SuppressLint("CheckResult")
             @Override
             public void onSearchTextChanged(String oldQuery, String newQuery) {
-                List<FloatingSuggestion> suggestionList=new ArrayList<>();
-                suggestionList.add(new FloatingSuggestion("Bafal"));
-                suggestionList.add(new FloatingSuggestion("Kalanki"));
-                suggestionList.add(new FloatingSuggestion("Naxal"));
-                suggestionList.add(new FloatingSuggestion("Kathmandu"));
+                List<FloatingSuggestion> suggestionList = new ArrayList<>();
+
+//                suggestionList.add(new FloatingSuggestion("Bafal"));
+//                suggestionList.add(new FloatingSuggestion("Kalanki"));
+//                suggestionList.add(new FloatingSuggestion("Naxal"));
+//                suggestionList.add(new FloatingSuggestion("Kathmandu"));
+//                suggestionList.add(new FloatingSuggestion("Nagarkot"));
+//                suggestionList.add(new FloatingSuggestion("Papali"));
+//                suggestionList.add(new FloatingSuggestion("Narayanhiti"));
+//                suggestionList.add(new FloatingSuggestion("Jamal"));
+
+                commonPlacesAttribViewModel.getmAllCommonPlacesAttrb().observe(HomeActivity.this, new android.arch.lifecycle.Observer<List<CommonPlacesAttrb>>() {
+                    @Override
+                    public void onChanged(@Nullable List<CommonPlacesAttrb> commonPlacesAttrbs) {
+                        for (CommonPlacesAttrb commonPlacesAttrb : commonPlacesAttrbs) {
+                            Log.i("Shree","Value id: "+commonPlacesAttrb.getName());
+                            if(commonPlacesAttrb.getName().contains(oldQuery.toLowerCase())){
+                                suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
+                            }
+                        }
+                    }
+                });
+
                 floatingSearchView.swapSuggestions(suggestionList);
-//                ToastUtils.showToast("Query Has Been Changes");
             }
         });
 
         floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
             @Override
             public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, SearchSuggestion item, int itemPosition) {
-               textView.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View view) {
-                       Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
-                   }
-               });
+                textView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -876,7 +900,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 String jsonString = null;
                 try {
 //                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
-                    InputStream jsonStream =  VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
                     int size = jsonStream.available();
                     byte[] buffer = new byte[size];
                     jsonStream.read(buffer);
