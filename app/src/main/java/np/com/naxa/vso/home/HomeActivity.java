@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -79,14 +78,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
@@ -204,7 +199,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         fabLocationToggle.setOnClickListener(this);
 
-
 //        setupMapBox();
         setupMap();
 
@@ -220,27 +214,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
-            // Add an observer on the LiveData returned by getAlphabetizedWords.
-            // The onChanged() method fires when the observed data changes and the activity is
-            // in the foreground.
-            commonPlacesAttribViewModel.getmAllCommonPlacesAttrb().observe(this, new android.arch.lifecycle.Observer<List<CommonPlacesAttrb>>() {
-                @Override
-                public void onChanged(@Nullable final List<CommonPlacesAttrb> commonPlacesAttrbs) {
-                    // Update the cached copy of the words in the adapter.
-//                adapter.setWords(words);
-
-                    for (int i = 0; i < commonPlacesAttrbs.size(); i++) {
-                        commonPlacesAttrbsList.add(commonPlacesAttrbs.get(i));
-                    }
-                    Log.d("HomeActivity", "onChanged: insert " + "one more new  data inserted");
-                }
-            });
-
         } catch (NullPointerException e) {
 
             Log.d(TAG, "Exception: " + e.toString());
         }
-
         setupFloatingToolbar();
     }
 
@@ -250,29 +227,32 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onSearchTextChanged(String oldQuery, String newQuery) {
                 List<FloatingSuggestion> suggestionList = new ArrayList<>();
-
-//                suggestionList.add(new FloatingSuggestion("Bafal"));
-//                suggestionList.add(new FloatingSuggestion("Kalanki"));
-//                suggestionList.add(new FloatingSuggestion("Naxal"));
-//                suggestionList.add(new FloatingSuggestion("Kathmandu"));
-//                suggestionList.add(new FloatingSuggestion("Nagarkot"));
-//                suggestionList.add(new FloatingSuggestion("Papali"));
-//                suggestionList.add(new FloatingSuggestion("Narayanhiti"));
-//                suggestionList.add(new FloatingSuggestion("Jamal"));
-
-                commonPlacesAttribViewModel.getmAllCommonPlacesAttrb().observe(HomeActivity.this, new android.arch.lifecycle.Observer<List<CommonPlacesAttrb>>() {
-                    @Override
-                    public void onChanged(@Nullable List<CommonPlacesAttrb> commonPlacesAttrbs) {
-                        for (CommonPlacesAttrb commonPlacesAttrb : commonPlacesAttrbs) {
-                            Log.i("Shree","Value id: "+commonPlacesAttrb.getName());
-                            if(commonPlacesAttrb.getName().contains(oldQuery.toLowerCase())){
-                                suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
-                            }
-                        }
-                    }
-                });
-
                 floatingSearchView.swapSuggestions(suggestionList);
+
+                commonPlacesAttribViewModel.getPlacesContaining(newQuery)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .flatMapIterable((Function<List<CommonPlacesAttrb>, Iterable<CommonPlacesAttrb>>) commonPlacesAttrbs -> commonPlacesAttrbs)
+                        .subscribe(new DisposableSubscriber<CommonPlacesAttrb>() {
+                            @Override
+                            public void onNext(CommonPlacesAttrb commonPlacesAttrb) {
+                                Log.i("Shree",commonPlacesAttrb.getName());
+                                suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
+                                floatingSearchView.swapSuggestions(suggestionList);
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
+
             }
         });
 
@@ -289,7 +269,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         floatingSearchView.setDimBackground(true);
-
     }
 
     private void setupMap() {

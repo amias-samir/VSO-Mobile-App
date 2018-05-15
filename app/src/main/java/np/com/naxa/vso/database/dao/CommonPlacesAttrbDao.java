@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
 /**
@@ -22,7 +23,7 @@ public interface CommonPlacesAttrbDao {
     // data has changed. Since we are getting all the contents of the database,
     // we are notified whenever any of the database contents have changed.
     @Query("SELECT * from commonplacesattrb ORDER BY uid ASC")
-    LiveData<List<CommonPlacesAttrb>> getFirstInsertedCommonPlaces();
+    Flowable<List<CommonPlacesAttrb>> getFirstInsertedCommonPlaces();
 
     // We do not need a conflict strategy, because the word is our primary key, and you cannot
     // add two items with the same primary key to the database. If the table has more than one
@@ -36,6 +37,6 @@ public interface CommonPlacesAttrbDao {
     @Query("DELETE FROM commonplacesattrb")
     void deleteAll();
 
-    @Query("SELECT * from commonplacesattrb ORDER BY uid ASC")
-    List<CommonPlacesAttrb> getAllCommonPlaces();
+    @Query("SELECT * from commonplacesattrb WHERE name LIKE '%'||:value||'%'")
+    Flowable<List<CommonPlacesAttrb>> getPlacesContaining(String value);
 }

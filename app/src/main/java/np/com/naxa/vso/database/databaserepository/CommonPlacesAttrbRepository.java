@@ -2,13 +2,12 @@ package np.com.naxa.vso.database.databaserepository;
 
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.VsoRoomDatabase;
 import np.com.naxa.vso.database.dao.CommonPlacesAttrbDao;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
@@ -26,7 +25,7 @@ public class CommonPlacesAttrbRepository {
     public static ArrayList<Long> pID = new ArrayList<>();
 
     private CommonPlacesAttrbDao mCommonPlacesAttrbDao;
-    private LiveData<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
+    private Flowable<List<CommonPlacesAttrb>> mAllCommonPlacesAttrb;
     private List<CommonPlacesAttrb> mCommonPlacesList;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
@@ -37,12 +36,11 @@ public class CommonPlacesAttrbRepository {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
         mAllCommonPlacesAttrb = mCommonPlacesAttrbDao.getFirstInsertedCommonPlaces();
-//        mCommonPlacesList = mCommonPlacesAttrbDao.getAllCommonPlaces();
     }
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    public LiveData<List<CommonPlacesAttrb>> getAllCommonPlacesAttrb() {
+    public Flowable<List<CommonPlacesAttrb>> getAllCommonPlacesAttrb() {
         return mAllCommonPlacesAttrb;
     }
 
@@ -53,15 +51,15 @@ public class CommonPlacesAttrbRepository {
         Log.d("CommonPlacesRepository", "insert: " + commonPlacesAttrb.getName());
 
         rowID = mCommonPlacesAttrbDao.insert(commonPlacesAttrb);
-
 //        new CommonPlacesAttrbRepository.insertAsyncTask(mCommonPlacesAttrbDao).execute(commonPlacesAttrb);
         return rowID;
     }
 
-    public List<CommonPlacesAttrb> getAllPlaces() {
-        return mCommonPlacesAttrbDao.getAllCommonPlaces();
-//        return mCommonPlacesList;
+    public Flowable<List<CommonPlacesAttrb>> getPlacesContaining(String value) {
+        return mCommonPlacesAttrbDao.getPlacesContaining(value);
     }
+
+
 
 //    private static class insertAsyncTask extends AsyncTask<CommonPlacesAttrb, Void, Void> {
 //
