@@ -231,8 +231,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
-            floatingSearchView.swapSuggestions(suggestionList);
-
+            if (suggestionList.size() == 0 || newQuery.length()==0) {
+                floatingSearchView.swapSuggestions(suggestionList);
+            }
             commonPlacesAttribViewModel.getPlacesContaining(newQuery)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -259,17 +260,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         });
 
-        floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
+        floatingSearchView.setOnBindSuggestionCallback((suggestionView, leftIcon, textView, item, itemPosition) -> textView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, SearchSuggestion item, int itemPosition) {
-                textView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onClick(View view) {
+                Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
             }
-        });
+        }));
 
         floatingSearchView.setDimBackground(true);
     }
@@ -659,29 +655,33 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, location -> {
                         if (location != null) {
-                            ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-                            items.add(new OverlayItem("Title", "Current Location", new GeoPoint(location.getLatitude(), location.getLongitude())));
-
-                            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
-                                    this, items,
-                                    new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                                        @Override
-                                        public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                                            return false;
-                                        }
-
-                                        @Override
-                                        public boolean onItemLongPress(final int index, final OverlayItem item) {
-                                            return false;
-                                        }
-                                    });
-                            mOverlay.setFocusItemsOnTap(true);
-
-                            mapView.getOverlays().add(mOverlay);
-                            ToastUtils.showToast(location.getLatitude() + ", " + location.getLongitude());
+                            addMarkerToMap(location);
+                        } else {
+                            ToastUtils.showToast("Try again in a while");
                         }
                     });
         }
+    }
+
+    private void addMarkerToMap(Location location) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        items.add(new OverlayItem("", "", new GeoPoint(location.getLatitude(), location.getLongitude())));
+
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
+                this, items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                });
+        mOverlay.setFocusItemsOnTap(true);
+        mapView.getOverlays().add(mOverlay);
     }
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
