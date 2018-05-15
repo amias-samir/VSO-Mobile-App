@@ -95,7 +95,8 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
             // Not needed if you only populate on creation.
 //            mContactDao.deleteAll();
 //            mOpenSpaceDao.deleteAll();
-            mCommonPlacesAttrbDao.deleteAll();
+//            mCommonPlacesAttrbDao.deleteAll();
+            mContactDao.deleteAll();
             insertContact();
             return null;
         }

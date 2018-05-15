@@ -23,6 +23,7 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
+    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
 
     public HospitalFacilitiesVewModel(Application application) {
         super(application);
@@ -31,12 +32,19 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
         mAllHospitalFacilities = mRepository.getAllHospitalFacilities();
     }
     //    contact
-    public LiveData<List<HospitalFacilities>> getmAllCommonPlacesAttrb() { return mAllHospitalFacilities; }
 
     public void insert(HospitalFacilities hospitalFacilities) {
-        Log.d("VIewholder", "insert: "+hospitalFacilities.getContact_no());
-        mRepository.insert(hospitalFacilities); }
+        Log.d("VIewholder", "insert: " + hospitalFacilities.getContact_no());
+        mRepository.insert(hospitalFacilities);
+    }
 
+
+    public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type, String bed_capcity, String available_facilities,
+                                                              String building_structure, String excavation_plans) {
+        mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, bed_capcity, available_facilities, building_structure, excavation_plans);
+
+        return mAllFilteredHospitalFacilities;
+    }
 
 
 }

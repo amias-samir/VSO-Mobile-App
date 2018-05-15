@@ -16,10 +16,11 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
  * Created by samir on 5/08/2018.
  */
 
-public class HospitalFacilitiesRepository{
+public class HospitalFacilitiesRepository {
 
     private HospitalFacilitiesDao mHospitalFacilitiesDao;
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
+    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -29,6 +30,7 @@ public class HospitalFacilitiesRepository{
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
         mAllHospitalFacilities = mHospitalFacilitiesDao.getFirstInsertedHospital();
+//        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList("", "");
     }
 
     // Room executes all queries on a separate thread.
@@ -37,11 +39,18 @@ public class HospitalFacilitiesRepository{
         return mAllHospitalFacilities;
     }
 
+    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type, String bed_capacity,
+                                                                               String building_structure, String available_facilities, String excavation_plans) {
+
+        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, bed_capacity, building_structure, available_facilities, excavation_plans);
+        return mAllFilteredHospitalFacilities;
+    }
+
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public void insert (HospitalFacilities hospitalFacilities) {
-        Log.d("HospitalRepository", "insert: "+ hospitalFacilities.getContact_no());
+    public void insert(HospitalFacilities hospitalFacilities) {
+        Log.d("HospitalRepository", "insert: " + hospitalFacilities.getContact_no());
         mHospitalFacilitiesDao.insert(hospitalFacilities);
 //        new HospitalFacilitiesRepository.insertAsyncTask(mHospitalFacilitiesDao).execute(hospitalFacilities);
     }
@@ -56,7 +65,7 @@ public class HospitalFacilitiesRepository{
 
         @Override
         protected Void doInBackground(final HospitalFacilities... params) {
-            Log.d("HospitalRepository", "doInBackground: "+ params[0].getContact_no());
+            Log.d("HospitalRepository", "doInBackground: " + params[0].getContact_no());
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
