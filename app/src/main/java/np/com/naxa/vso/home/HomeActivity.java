@@ -35,6 +35,9 @@ import android.widget.ViewSwitcher;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -66,7 +69,10 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
 import java.io.IOException;
@@ -163,6 +169,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private MapDataRepository repo;
+    private FusedLocationProviderClient mFusedLocationClient;
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
@@ -222,38 +229,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupFloatingToolbar() {
-        floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @SuppressLint("CheckResult")
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-                List<FloatingSuggestion> suggestionList = new ArrayList<>();
-                floatingSearchView.swapSuggestions(suggestionList);
+        floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
+            List<FloatingSuggestion> suggestionList = new ArrayList<>();
+            floatingSearchView.swapSuggestions(suggestionList);
 
-                commonPlacesAttribViewModel.getPlacesContaining(newQuery)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .flatMapIterable((Function<List<CommonPlacesAttrb>, Iterable<CommonPlacesAttrb>>) commonPlacesAttrbs -> commonPlacesAttrbs)
-                        .subscribe(new DisposableSubscriber<CommonPlacesAttrb>() {
-                            @Override
-                            public void onNext(CommonPlacesAttrb commonPlacesAttrb) {
-                                Log.i("Shree",commonPlacesAttrb.getName());
-                                suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
-                                floatingSearchView.swapSuggestions(suggestionList);
-                            }
+            commonPlacesAttribViewModel.getPlacesContaining(newQuery)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMapIterable((Function<List<CommonPlacesAttrb>, Iterable<CommonPlacesAttrb>>) commonPlacesAttrbs -> commonPlacesAttrbs)
+                    .subscribe(new DisposableSubscriber<CommonPlacesAttrb>() {
+                        @Override
+                        public void onNext(CommonPlacesAttrb commonPlacesAttrb) {
+                            Log.i("Shree", commonPlacesAttrb.getName());
+                            suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
+                            floatingSearchView.swapSuggestions(suggestionList);
+                        }
 
-                            @Override
-                            public void onError(Throwable t) {
+                        @Override
+                        public void onError(Throwable t) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onComplete() {
+                        @Override
+                        public void onComplete() {
 
-                            }
-                        });
+                        }
+                    });
 
 
-            }
         });
 
         floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
@@ -473,8 +476,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
-
-
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
                     @Override
@@ -582,7 +583,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             latitude = parts[0]; // 004
             longitude = parts[1]; // 034556
 
-
             ToastUtils.showToast("Latitude: " + latitude + " and Longitude: " + longitude);
 
 //            mapboxMapview.getMapAsync(mapboxMap -> {
@@ -635,6 +635,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
+
                 if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     EasyPermissions.requestPermissions(this, "Provide location permission.",
                             RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -645,13 +646,41 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void handleGps() {
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!statusOfGPS) {
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
+//            ToastUtils.showToast("Awesome for now");
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                            items.add(new OverlayItem("Title", "Current Location", new GeoPoint(location.getLatitude(), location.getLongitude())));
+
+                            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
+                                    this, items,
+                                    new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                        @Override
+                                        public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public boolean onItemLongPress(final int index, final OverlayItem item) {
+                                            return false;
+                                        }
+                                    });
+                            mOverlay.setFocusItemsOnTap(true);
+
+                            mapView.getOverlays().add(mOverlay);
+                            ToastUtils.showToast(location.getLatitude() + ", " + location.getLongitude());
+                        }
+                    });
         }
     }
 
