@@ -250,11 +250,12 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
         Log.d("HospitalFilter", "getFormData: "+ward +" , "+ bed_capacity + " , "+excavation_plans_list);
 
-        int bedRange[] = QueryBuildWithSplitter.dynamicStringSplitterWithRangeQueryBuild(bed_capacity);
+        int bedRange[] = QueryBuildWithSplitter.dynamicStringSplitterWithRangeQueryBuild("10-20, 20-30");
         int lowestBedValue = bedRange[0];
         int highestBedValue = bedRange[1];
 
-        searchDataFromDatabase(ward, hospital_type, bed_capacity,
+        searchDataFromDatabase(ward, hospital_type,
+                QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("number_of_bed", bed_capacity),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("structure", building_structure_list),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("available_facilities", available_facilities_list),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("evacuation", excavation_plans_list));

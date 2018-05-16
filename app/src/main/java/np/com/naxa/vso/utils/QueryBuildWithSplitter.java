@@ -1,8 +1,11 @@
 package np.com.naxa.vso.utils;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 public class QueryBuildWithSplitter {
+
+    private static final String TAG = "QueryBuildWithSplitter";
 
     public static String dynamicStringSplitterWithColumnCheckQuery(String columnName, String rawStringData){
 
@@ -23,7 +26,7 @@ public class QueryBuildWithSplitter {
                     splittedStringWithOR = splitted_string[i].trim();
                 }else {
 //                    query build with column name
-                    splittedStringWithOR = splittedStringWithOR + "OR "+columnName +" LIKE :"+ splitted_string[i];
+                    splittedStringWithOR = splittedStringWithOR + " OR "+columnName +" LIKE :"+ splitted_string[i];
                 }
             }
         }else {
@@ -31,6 +34,7 @@ public class QueryBuildWithSplitter {
         }
         }
 
+        Log.d(TAG, "dynamicStringSplitterWithColumnCheckQuery: "+ splittedStringWithOR);
 
         return splittedStringWithOR;
     }
@@ -50,21 +54,17 @@ public static int[] dynamicStringSplitterWithRangeQueryBuild( String rawStringDa
             String trunk = rawStringData;
             String temp = trunk.replaceAll("\\s+", "");
             String[] splitted_string = temp.split("\\,");
-            String dial = "";
-            String[] innerData = new String[splitted_string.length];
             for (int i = 0; i < splitted_string.length; i++) {
 
                 if(i == 0){
                     String firstSplittedData = splitted_string[i].trim();
                     lowestVal = Integer.parseInt(firstSplittedData.substring(0,2));
-
                     range[0] = lowestVal;
                 }
                 if(i == splitted_string.length-1){
                     String LastSplittedData = splitted_string[i].trim();
-                    highestVal = Integer.parseInt(LastSplittedData.substring(3,2));
-
-                    range[0] = highestVal;
+                    highestVal = Integer.parseInt(LastSplittedData.substring(Math.max(LastSplittedData.length() - 2, 0)));
+                    range[i] = highestVal;
                 }
             }
 //            range query
@@ -78,7 +78,7 @@ public static int[] dynamicStringSplitterWithRangeQueryBuild( String rawStringDa
             highestVal = Integer.parseInt(rawData.substring(3,2));
 
             range[0] = lowestVal;
-            range[0] = highestVal;
+            range[1] = highestVal;
 
 //            range query
 //            splittedStringWithRange = columnName+" BETWEEN "+lowestVal+" AND "+highestVal;
@@ -87,6 +87,8 @@ public static int[] dynamicStringSplitterWithRangeQueryBuild( String rawStringDa
     }
 
 //    return splittedStringWithRange;
+    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: lowest "+range[0]);
+    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: highest "+range[1]);
     return range;
 }
 
