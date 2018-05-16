@@ -1,4 +1,4 @@
-package np.com.naxa.vso;
+package np.com.naxa.vso.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.SocketTimeoutException;
 
+import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;

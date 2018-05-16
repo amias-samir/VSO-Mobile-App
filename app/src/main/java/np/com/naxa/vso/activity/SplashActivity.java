@@ -1,9 +1,10 @@
-package np.com.naxa.vso;
+package np.com.naxa.vso.activity;
 
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import np.com.naxa.vso.R;
 import np.com.naxa.vso.home.HomeActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -15,7 +16,8 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             finish();
-            HomeActivity.start(SplashActivity.this);
+            LoadingActivity.start(SplashActivity.this);
+//            HomeActivity.start(SplashActivity.this);
         }, 2000);
     }
 }
