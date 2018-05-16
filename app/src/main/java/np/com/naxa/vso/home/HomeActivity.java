@@ -234,7 +234,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
-            if (suggestionList.size() == 0 || newQuery.length()==0) {
+            if (suggestionList.size() == 0 || newQuery.length() == 0) {
                 floatingSearchView.swapSuggestions(suggestionList);
             }
             commonPlacesAttribViewModel.getPlacesContaining(newQuery)
@@ -657,22 +657,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
             myLocationNewOverlay.enableMyLocation();
             mapView.getOverlays().add(myLocationNewOverlay);
-
-
-//            ToastUtils.showToa
-// st("Awesome for now");
-
-//            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, location -> {
-//                        if (location != null) {
-//
-//                            addMarkerToMap(location);
-//                        } else {
-//                            ToastUtils.showToast("Try again in a while");
-//                        }
-//                    });
         }
     }
 
