@@ -823,6 +823,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 fire_extin = properties.getString("Fire_Extin");
                 icu_service = properties.getString("ICU_Servic");
                 number_of = properties.getString("Number_of_");
+//                int bedCapacity = Integer.parseInt(number_of);
                 open_space = properties.getString("Open_Space");
                 structure = properties.getString("Structure_");
                 toilet_fac = properties.getString("Toilet_Fac");
