@@ -87,8 +87,8 @@ public static int[] dynamicStringSplitterWithRangeQueryBuild( String rawStringDa
     }
 
 //    return splittedStringWithRange;
-    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: "+range[0]);
-    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: "+range[1]);
+    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: lowest "+range[0]);
+    Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: highest "+range[1]);
     return range;
 }
 
