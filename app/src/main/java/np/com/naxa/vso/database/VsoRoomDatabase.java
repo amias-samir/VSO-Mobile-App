@@ -24,7 +24,7 @@ import np.com.naxa.vso.database.entity.OpenSpace;
  */
 
 @Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class
-}, version = 5, exportSchema = false)
+}, version = 6, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
 
@@ -93,10 +93,9 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
         protected Void doInBackground(final Void... params) {
             // Start the app with a clean database every time.
             // Not needed if you only populate on creation.
-//            mContactDao.deleteAll();
-//            mOpenSpaceDao.deleteAll();
-//            mCommonPlacesAttrbDao.deleteAll();
             mContactDao.deleteAll();
+//            mCommonPlacesAttrbDao.deleteAll();
+//            mHospitalFacilitiesDao.deleteAll();
             insertContact();
             return null;
         }

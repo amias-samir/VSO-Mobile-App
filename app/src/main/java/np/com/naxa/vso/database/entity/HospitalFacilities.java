@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.Keep;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -48,7 +49,7 @@ public class HospitalFacilities {
     private String icu_service;
 
     @ColumnInfo(name = "number_of_bed")
-    private int number_of_bed;
+    private String number_of_bed;
 
     @ColumnInfo(name = "open_space")
     private String open_space;
@@ -59,7 +60,8 @@ public class HospitalFacilities {
     @ColumnInfo(name = "toilet_fac")
     private String toilet_fac;
 
-    public HospitalFacilities(Long fk_common_places, String ambulance, String contact_no, String contact_pe, String earthquake, String emergency, String fire_extin, String icu_service, String number_of, String open_space, String structure, String toilet_fac) {
+    @Keep
+    public HospitalFacilities(Long fk_common_places, String ambulance, String contact_no, String contact_pe, String earthquake, String emergency, String fire_extin, String icu_service, String number_of_bed, String open_space, String structure, String toilet_fac) {
         this.fk_common_places = fk_common_places;
         this.ambulance = ambulance;
         this.contact_no = contact_no;
@@ -68,7 +70,7 @@ public class HospitalFacilities {
         this.emergency = emergency;
         this.fire_extin = fire_extin;
         this.icu_service = icu_service;
-        this.number_of_bed = Integer.parseInt(number_of);
+        this.number_of_bed = number_of_bed;
         this.open_space = open_space;
         this.structure = structure;
         this.toilet_fac = toilet_fac;
@@ -138,13 +140,6 @@ public class HospitalFacilities {
         this.icu_service = icu_service;
     }
 
-    public int getNumber_of() {
-        return number_of_bed;
-    }
-
-    public void setNumber_of(int number_of) {
-        this.number_of_bed = number_of;
-    }
 
     public String getOpen_space() {
         return open_space;
@@ -176,5 +171,13 @@ public class HospitalFacilities {
 
     public void setHid(int hid) {
         this.hid = hid;
+    }
+
+    public String getNumber_of_bed() {
+        return number_of_bed;
+    }
+
+    public void setNumber_of_bed(String number_of_bed) {
+        this.number_of_bed = number_of_bed;
     }
 }

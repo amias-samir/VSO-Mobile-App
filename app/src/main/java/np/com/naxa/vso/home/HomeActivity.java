@@ -1,6 +1,7 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +15,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,7 +36,9 @@ import android.widget.ViewSwitcher;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
-import com.google.gson.JsonArray;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -67,8 +70,13 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,11 +87,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.ReportActivity;
@@ -152,7 +163,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapDataRepository mapDataRepository;
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
-    RadiusMarkerClusterer poiMarkers ;
+    RadiusMarkerClusterer poiMarkers;
 
     private String latitude;
     private String longitude;
@@ -162,6 +173,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private MapDataRepository repo;
+    private FusedLocationProviderClient mFusedLocationClient;
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
@@ -200,13 +212,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        setupMapBox();
         setupMap();
-        setupFloatingToolbar();
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
 
         slidingPanel.setAnchorPoint(0.4f);
-
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -214,58 +224,54 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
-            // Add an observer on the LiveData returned by getAlphabetizedWords.
-            // The onChanged() method fires when the observed data changes and the activity is
-            // in the foreground.
-            commonPlacesAttribViewModel.getmAllCommonPlacesAttrb().observe(this, new android.arch.lifecycle.Observer<List<CommonPlacesAttrb>>() {
-                @Override
-                public void onChanged(@Nullable final List<CommonPlacesAttrb> commonPlacesAttrbs) {
-                    // Update the cached copy of the words in the adapter.
-//                adapter.setWords(words);
-
-                    for (int i = 0; i < commonPlacesAttrbs.size(); i++) {
-                        commonPlacesAttrbsList.add(commonPlacesAttrbs.get(i));
-                    }
-                    Log.d("HomeActivity", "onChanged: insert " + "one more new  data inserted");
-                }
-            });
-
         } catch (NullPointerException e) {
 
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-
+        setupFloatingToolbar();
     }
 
     private void setupFloatingToolbar() {
-        floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-                List<FloatingSuggestion> suggestionList=new ArrayList<>();
-                suggestionList.add(new FloatingSuggestion("Bafal"));
-                suggestionList.add(new FloatingSuggestion("Kalanki"));
-                suggestionList.add(new FloatingSuggestion("Naxal"));
-                suggestionList.add(new FloatingSuggestion("Kathmandu"));
+        floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
+            List<FloatingSuggestion> suggestionList = new ArrayList<>();
+            if (suggestionList.size() == 0 || newQuery.length()==0) {
                 floatingSearchView.swapSuggestions(suggestionList);
-//                ToastUtils.showToast("Query Has Been Changes");
             }
+            commonPlacesAttribViewModel.getPlacesContaining(newQuery)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMapIterable((Function<List<CommonPlacesAttrb>, Iterable<CommonPlacesAttrb>>) commonPlacesAttrbs -> commonPlacesAttrbs)
+                    .subscribe(new DisposableSubscriber<CommonPlacesAttrb>() {
+                        @Override
+                        public void onNext(CommonPlacesAttrb commonPlacesAttrb) {
+                            Log.i("Shree", commonPlacesAttrb.getName());
+                            suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
+                            floatingSearchView.swapSuggestions(suggestionList);
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+
         });
 
-        floatingSearchView.setOnBindSuggestionCallback(new SearchSuggestionsAdapter.OnBindSuggestionCallback() {
+        floatingSearchView.setOnBindSuggestionCallback((suggestionView, leftIcon, textView, item, itemPosition) -> textView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onBindSuggestion(View suggestionView, ImageView leftIcon, TextView textView, SearchSuggestion item, int itemPosition) {
-               textView.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View view) {
-                       Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
-                   }
-               });
+            public void onClick(View view) {
+                Toast.makeText(HomeActivity.this, textView.getText(), Toast.LENGTH_SHORT).show();
             }
-        });
+        }));
 
         floatingSearchView.setDimBackground(true);
-
     }
 
     private void setupMap() {
@@ -470,8 +476,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
-
-
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
                     @Override
@@ -579,7 +583,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             latitude = parts[0]; // 004
             longitude = parts[1]; // 034556
 
-
             ToastUtils.showToast("Latitude: " + latitude + " and Longitude: " + longitude);
 
 //            mapboxMapview.getMapAsync(mapboxMap -> {
@@ -632,6 +635,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
+
                 if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     EasyPermissions.requestPermissions(this, "Provide location permission.",
                             RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -642,14 +646,56 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void handleGps() {
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!statusOfGPS) {
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
+            GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+            provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+            MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+            myLocationNewOverlay.enableMyLocation();
+            mapView.getOverlays().add(myLocationNewOverlay);
 
+
+//            ToastUtils.showToa
+// st("Awesome for now");
+
+//            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, location -> {
+//                        if (location != null) {
+//
+//                            addMarkerToMap(location);
+//                        } else {
+//                            ToastUtils.showToast("Try again in a while");
+//                        }
+//                    });
         }
+    }
+
+    private void addMarkerToMap(Location location) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        items.add(new OverlayItem("", "", new GeoPoint(location.getLatitude(), location.getLongitude())));
+
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
+                this, items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                });
+        mOverlay.setFocusItemsOnTap(true);
+        mapView.getOverlays().add(mOverlay);
     }
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
@@ -725,6 +771,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 fire_extin = properties.getString("Fire_Extin");
                 icu_service = properties.getString("ICU_Servic");
                 number_of = properties.getString("Number_of_");
+//                int bedCapacity = Integer.parseInt(number_of);
                 open_space = properties.getString("Open_Space");
                 structure = properties.getString("Structure_");
                 toilet_fac = properties.getString("Toilet_Fac");
@@ -876,7 +923,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 String jsonString = null;
                 try {
 //                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
-                    InputStream jsonStream =  VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
                     int size = jsonStream.available();
                     byte[] buffer = new byte[size];
                     jsonStream.read(buffer);

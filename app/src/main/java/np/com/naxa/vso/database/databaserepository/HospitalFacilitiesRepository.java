@@ -21,6 +21,7 @@ public class HospitalFacilitiesRepository {
     private HospitalFacilitiesDao mHospitalFacilitiesDao;
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
     private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
+    private LiveData<List<String>> mAllBedCapacityList;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -30,6 +31,7 @@ public class HospitalFacilitiesRepository {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
         mAllHospitalFacilities = mHospitalFacilitiesDao.getFirstInsertedHospital();
+        mAllBedCapacityList = mHospitalFacilitiesDao.getBedCapacityList();
 //        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList("", "");
     }
 
@@ -39,10 +41,14 @@ public class HospitalFacilitiesRepository {
         return mAllHospitalFacilities;
     }
 
-    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  int lowestBedVal, int highestBedVal,
+    public LiveData<List<String>> getmAllBedCapacityList() {
+        return mAllBedCapacityList;
+    }
+
+    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
 
-        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, lowestBedVal, highestBedVal, building_structure, available_facilities, excavation_plans);
+        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
         return mAllFilteredHospitalFacilities;
     }
 

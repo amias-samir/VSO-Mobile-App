@@ -1,7 +1,10 @@
 package np.com.naxa.vso.hospitalfilter;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -131,13 +134,15 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
         FormHeader headerBedCapacity = FormHeader.createInstance("Bed Capacity");
 //        FormElementSwitch bedCapacitySwitcher = FormElementSwitch.createInstance().setTag(TAG_BED).setTitle("Bed").setSwitchTexts("Yes", "No");
-        List<String> bedCapacity = new ArrayList<>();
-        bedCapacity.add("0-10");
-        bedCapacity.add("11-20");
-        bedCapacity.add("21-30");
-        bedCapacity.add("31-40");
-        bedCapacity.add("41-50");
-        bedCapacity.add("50+");
+
+
+        List<String> bedCapacity = getBedCapacityList();
+//        bedCapacity.add("0-10");
+//        bedCapacity.add("11-20");
+//        bedCapacity.add("21-30");
+//        bedCapacity.add("31-40");
+//        bedCapacity.add("41-50");
+//        bedCapacity.add("50+");
         FormElementPickerMulti bedCapacityElement = FormElementPickerMulti.createInstance().setTag(TAG_BED_CAPACITY).setTitle("Bed Capacity").setOptions(bedCapacity).setPickerTitle("Choose one or more bed capacity").setNegativeText("reset");
 
         FormHeader headerBuildingStructure = FormHeader.createInstance("Structure");
@@ -195,6 +200,19 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         mFormBuilder.addFormElements(formItems);
     }
 
+    private List<String> getBedCapacityList(){
+        List<String> bedCapacity = new ArrayList<String>();
+
+        hospitalFacilitiesVewModel.getmAllBedCapacityList().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@NonNull final List<String> bedCapacityList) {
+                bedCapacity.addAll(bedCapacityList);
+            }
+        });
+
+        return bedCapacity;
+    }
+
 
     @Override
     public void onValueChanged(BaseFormElement formElement) {
@@ -236,7 +254,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         int lowestBedValue = bedRange[0];
         int highestBedValue = bedRange[1];
 
-        searchDataFromDatabase(ward, hospital_type,lowestBedValue,highestBedValue,
+        searchDataFromDatabase(ward, hospital_type, bed_capacity,
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("structure", building_structure_list),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("available_facilities", available_facilities_list),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("evacuation", excavation_plans_list));
@@ -244,9 +262,9 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     }
 
 
-    private void searchDataFromDatabase(String ward,String hospital_type, int lowestBedVal, int highestBedVal, String building_structure, String available_facilities, String excavation_plans){
+    private void searchDataFromDatabase(String ward,String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans){
 try{
-        hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, lowestBedVal, highestBedVal, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
+        hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
             @Override
             public void onChanged(@Nullable final List<HospitalFacilities> hospitalFacilities) {
                 // Update the cached copy of the words in the adapter.
