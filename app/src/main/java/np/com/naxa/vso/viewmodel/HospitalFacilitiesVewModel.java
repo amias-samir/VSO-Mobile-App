@@ -39,9 +39,9 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type, String bed_capcity, String available_facilities,
+    public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type,  int lowestBedVal, int highestBedVal, String available_facilities,
                                                               String building_structure, String excavation_plans) {
-        mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, bed_capcity, available_facilities, building_structure, excavation_plans);
+        mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, lowestBedVal, highestBedVal, available_facilities, building_structure, excavation_plans);
 
         return mAllFilteredHospitalFacilities;
     }

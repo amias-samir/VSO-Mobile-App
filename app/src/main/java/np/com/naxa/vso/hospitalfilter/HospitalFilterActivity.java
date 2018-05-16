@@ -26,6 +26,7 @@ import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
+import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 
 public class HospitalFilterActivity extends AppCompatActivity implements OnFormElementValueChangedListener {
@@ -231,14 +232,21 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
         Log.d("HospitalFilter", "getFormData: "+ward +" , "+ bed_capacity + " , "+excavation_plans_list);
 
-        searchDataFromDatabase(ward, hospital_type, bed_capacity, building_structure_list, available_facilities_list, excavation_plans_list);
+        int bedRange[] = QueryBuildWithSplitter.dynamicStringSplitterWithRangeQueryBuild(bed_capacity);
+        int lowestBedValue = bedRange[0];
+        int highestBedValue = bedRange[1];
+
+        searchDataFromDatabase(ward, hospital_type,lowestBedValue,highestBedValue,
+                QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("structure", building_structure_list),
+                QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("available_facilities", available_facilities_list),
+                QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("evacuation", excavation_plans_list));
 
     }
 
 
-    private void searchDataFromDatabase(String ward,String hospital_type, String bed_capacity, String building_structure, String available_facilities, String excavation_plans){
+    private void searchDataFromDatabase(String ward,String hospital_type, int lowestBedVal, int highestBedVal, String building_structure, String available_facilities, String excavation_plans){
 try{
-        hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bed_capacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
+        hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, lowestBedVal, highestBedVal, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
             @Override
             public void onChanged(@Nullable final List<HospitalFacilities> hospitalFacilities) {
                 // Update the cached copy of the words in the adapter.
@@ -255,6 +263,8 @@ try{
     }
 
     }
+
+
 
 
 }

@@ -47,8 +47,8 @@ public class HospitalFacilities {
     @ColumnInfo(name = "icu_service")
     private String icu_service;
 
-    @ColumnInfo(name = "number_of")
-    private String number_of;
+    @ColumnInfo(name = "number_of_bed")
+    private int number_of_bed;
 
     @ColumnInfo(name = "open_space")
     private String open_space;
@@ -68,7 +68,7 @@ public class HospitalFacilities {
         this.emergency = emergency;
         this.fire_extin = fire_extin;
         this.icu_service = icu_service;
-        this.number_of = number_of;
+        this.number_of_bed = Integer.parseInt(number_of);
         this.open_space = open_space;
         this.structure = structure;
         this.toilet_fac = toilet_fac;
@@ -138,12 +138,12 @@ public class HospitalFacilities {
         this.icu_service = icu_service;
     }
 
-    public String getNumber_of() {
-        return number_of;
+    public int getNumber_of() {
+        return number_of_bed;
     }
 
-    public void setNumber_of(String number_of) {
-        this.number_of = number_of;
+    public void setNumber_of(int number_of) {
+        this.number_of_bed = number_of;
     }
 
     public String getOpen_space() {

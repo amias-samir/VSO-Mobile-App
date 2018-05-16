@@ -26,10 +26,9 @@ public interface HospitalFacilitiesDao {
     @Query("SELECT * from hospital_facilities ORDER BY hid ASC")
     LiveData<List<HospitalFacilities>> getFirstInsertedHospital();
 
-
-    @Query("SELECT * FROM hospital_facilities WHERE number_of LIKE :ward OR structure LIKE :hospital_type OR structure LIKE :bed_capacity" +
-            " OR structure LIKE :building_structure OR structure LIKE :available_facilities OR structure LIKE :excavation_plans")
-    public abstract LiveData<List<HospitalFacilities>> getAllFilteredList(String ward, String hospital_type, String bed_capacity,
+    @Query("SELECT * FROM hospital_facilities WHERE number_of_bed LIKE :ward OR structure LIKE :hospital_type OR number_of_bed BETWEEN :lowestBedVal" +
+            " AND structure LIKE :building_structure OR structure LIKE :available_facilities OR structure LIKE :excavation_plans")
+    public abstract LiveData<List<HospitalFacilities>> getAllFilteredList(String ward, String hospital_type,  int lowestBedVal, int highestBedVal,
                                                                           String building_structure, String available_facilities, String excavation_plans);
 
     // We do not need a conflict strategy, because the word is our primary key, and you cannot

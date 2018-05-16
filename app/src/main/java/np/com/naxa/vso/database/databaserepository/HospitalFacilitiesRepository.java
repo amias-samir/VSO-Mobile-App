@@ -39,10 +39,10 @@ public class HospitalFacilitiesRepository {
         return mAllHospitalFacilities;
     }
 
-    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type, String bed_capacity,
+    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  int lowestBedVal, int highestBedVal,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
 
-        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, bed_capacity, building_structure, available_facilities, excavation_plans);
+        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, lowestBedVal, highestBedVal, building_structure, available_facilities, excavation_plans);
         return mAllFilteredHospitalFacilities;
     }
 
