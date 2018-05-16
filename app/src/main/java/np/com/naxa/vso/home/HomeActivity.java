@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,11 +33,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
-import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter;
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -81,6 +76,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -92,12 +88,13 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
-import np.com.naxa.vso.ReportActivity;
+import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -168,6 +165,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private String latitude;
     private String longitude;
 
+    private ArrayList<String> assetList;
+    private ArrayList<String> contentList;
+
     private final int RESULT_LOCATION_PERMISSION = 10;
     private final int RESULT_LAT_LONG = 15;
 
@@ -200,6 +200,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+    public static void start(Context context, List<String> assetsList, List<String> contentlist) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.putStringArrayListExtra("asset", (ArrayList<String>) assetsList);
+        intent.putStringArrayListExtra("content", (ArrayList<String>) contentlist);
+        context.startActivity(intent);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +217,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         fabLocationToggle.setOnClickListener(this);
 
+        try {
+            assetList = getIntent().getStringArrayListExtra(("asset"));
+            contentList = getIntent().getStringArrayListExtra(("content"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 //        setupMapBox();
+
         setupMap();
         setupBottomBar();
         setupListRecycler();
@@ -230,12 +245,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         setupFloatingToolbar();
+
+        for (int i = 0; i < contentList.size(); i++) {
+            saveGeoJsonDataToDatabase(i, contentList.get(i));
+        }
     }
 
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
-            if (suggestionList.size() == 0 || newQuery.length()==0) {
+            if (suggestionList.size() == 0 || newQuery.isEmpty() || oldQuery.isEmpty()) {
                 floatingSearchView.swapSuggestions(suggestionList);
             }
             commonPlacesAttribViewModel.getPlacesContaining(newQuery)
@@ -245,7 +264,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     .subscribe(new DisposableSubscriber<CommonPlacesAttrb>() {
                         @Override
                         public void onNext(CommonPlacesAttrb commonPlacesAttrb) {
-                            Log.i("Shree", commonPlacesAttrb.getName());
                             suggestionList.add(new FloatingSuggestion(commonPlacesAttrb.getName()));
                             floatingSearchView.swapSuggestions(suggestionList);
                         }
@@ -319,8 +337,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapController.setCenter(centerPoint);
 
         showOverlayOnMap(-1);
-
-
     }
 
 
@@ -476,6 +492,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
+
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
                     @Override
@@ -505,6 +522,57 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 });
+    }
+
+
+    private void showAllOverlayInMap() {
+
+        repo.getGeoJsonString(0)
+                .flatMap(new Function<Pair, ObservableSource<Pair>>() {
+                    @Override
+                    public ObservableSource<Pair> apply(Pair pair) throws Exception {
+                        String assetName = (String) pair.first;
+                        String fileContent = (String) pair.second;
+                        saveGeoJsonDataToDatabase(0, fileContent);
+                        return repo.getGeoJsonString(1);
+                    }
+                })
+                .flatMap(new Function<Pair, ObservableSource<Pair>>() {
+                    @Override
+                    public ObservableSource<Pair> apply(Pair pair) throws Exception {
+                        String assetName = (String) pair.first;
+                        String fileContent = (String) pair.second;
+                        saveGeoJsonDataToDatabase(1, fileContent);
+                        return repo.getGeoJsonString(2);
+                    }
+                })
+                .flatMap(save())
+                .subscribe(new DisposableObserver<Pair>() {
+                    @Override
+                    public void onNext(Pair pair) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        ;
+    }
+
+    private Function<Pair, ObservableSource<Pair>> save() {
+        return pair -> {
+            String assetName = (String) pair.first;
+            String fileContent = (String) pair.second;
+            saveGeoJsonDataToDatabase(2, fileContent);
+            return null;
+        };
     }
 
     private void loadLineLayers(String assetName, String fileContent) {
@@ -658,22 +726,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
             myLocationNewOverlay.enableMyLocation();
             mapView.getOverlays().add(myLocationNewOverlay);
-
-
-//            ToastUtils.showToa
-// st("Awesome for now");
-
-//            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, location -> {
-//                        if (location != null) {
-//
-//                            addMarkerToMap(location);
-//                        } else {
-//                            ToastUtils.showToast("Try again in a while");
-//                        }
-//                    });
         }
     }
 

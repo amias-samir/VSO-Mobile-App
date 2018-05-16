@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity">
+        <activity android:name=".activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,8 +42,9 @@
             android:name=".emergencyContacts.EmergencyContactsActivity"
             android:exported="true" />
         <activity
-            android:name=".ReportActivity"
+            android:name=".activity.ReportActivity"
             android:exported="true" />
+        <activity android:name=".activity.LoadingActivity" />
         <activity
             android:name=".home.HomeActivity"
             android:exported="true"
@@ -66,9 +67,9 @@
         <!-- android:exported="true"> -->
         <!-- </activity> -->
 
-        <activity android:name=".hospitalfilter.HospitalFilterActivity"
-            android:exported="true">
-        </activity>
+        <activity
+            android:name=".hospitalfilter.HospitalFilterActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>
