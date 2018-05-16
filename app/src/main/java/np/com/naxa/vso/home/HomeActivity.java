@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -74,6 +75,8 @@ import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -208,7 +211,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        setupMapBox();
         setupMap();
-
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler();
@@ -225,6 +227,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             Log.d(TAG, "Exception: " + e.toString());
         }
+
         setupFloatingToolbar();
     }
 
@@ -649,17 +652,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (!statusOfGPS) {
             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
-//            ToastUtils.showToast("Awesome for now");
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+            provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+            MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+            myLocationNewOverlay.enableMyLocation();
+            mapView.getOverlays().add(myLocationNewOverlay);
 
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, location -> {
-                        if (location != null) {
-                            addMarkerToMap(location);
-                        } else {
-                            ToastUtils.showToast("Try again in a while");
-                        }
-                    });
+
+//            ToastUtils.showToa
+// st("Awesome for now");
+
+//            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, location -> {
+//                        if (location != null) {
+//
+//                            addMarkerToMap(location);
+//                        } else {
+//                            ToastUtils.showToast("Try again in a while");
+//                        }
+//                    });
         }
     }
 

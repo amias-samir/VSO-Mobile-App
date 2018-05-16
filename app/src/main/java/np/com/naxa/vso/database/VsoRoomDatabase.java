@@ -96,6 +96,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
 //            mContactDao.deleteAll();
 //            mOpenSpaceDao.deleteAll();
             mCommonPlacesAttrbDao.deleteAll();
+            mHospitalFacilitiesDao.deleteAll();
             insertContact();
             return null;
         }
