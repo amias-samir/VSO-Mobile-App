@@ -40,15 +40,14 @@ public class LoadingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
 
-        ToastUtils.showToast("Awesome Toast");
 
-        progressDialog = new ProgressDialogUtils().getProgressDialog(LoadingActivity.this, "Loading");
-        progressDialog.show();
 
         loadDataAndCallHomeActivity();
     }
 
     private void loadDataAndCallHomeActivity() {
+        progressDialog = new ProgressDialogUtils().getProgressDialog(LoadingActivity.this, "Loading");
+        progressDialog.show();
 
         repository = new MapDataRepository();
 
