@@ -108,13 +108,14 @@ import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
+import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, EasyPermissions.PermissionCallbacks {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "HomeActivity";
 
@@ -215,7 +216,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         repo = new MapDataRepository();
 
-        checkStoragePermission();
+        handleStoragePermission();
 
         fabLocationToggle.setOnClickListener(this);
 
@@ -255,13 +256,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         contentList = getIntent().getStringArrayListExtra(("content"));
         for (int i = 0; i < contentList.size(); i++) {
             saveGeoJsonDataToDatabase(i, contentList.get(i));
-        }
-    }
-
-    private void checkStoragePermission() {
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
-                    RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
 
@@ -382,12 +376,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         viewSwitcherSlideLayout.setInAnimation(in);
     }
 
-
     private void setupBottomBar() {
         bnve.enableAnimation(false);
         bnve.enableShiftingMode(false);
         bnve.enableItemShiftingMode(false);
-
 
         bnve.setOnNavigationItemSelectedListener(item -> {
 
@@ -538,57 +530,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-
-    private void showAllOverlayInMap() {
-
-        repo.getGeoJsonString(0)
-                .flatMap(new Function<Pair, ObservableSource<Pair>>() {
-                    @Override
-                    public ObservableSource<Pair> apply(Pair pair) throws Exception {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-                        saveGeoJsonDataToDatabase(0, fileContent);
-                        return repo.getGeoJsonString(1);
-                    }
-                })
-                .flatMap(new Function<Pair, ObservableSource<Pair>>() {
-                    @Override
-                    public ObservableSource<Pair> apply(Pair pair) throws Exception {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-                        saveGeoJsonDataToDatabase(1, fileContent);
-                        return repo.getGeoJsonString(2);
-                    }
-                })
-                .flatMap(save())
-                .subscribe(new DisposableObserver<Pair>() {
-                    @Override
-                    public void onNext(Pair pair) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                })
-        ;
-    }
-
-    private Function<Pair, ObservableSource<Pair>> save() {
-        return pair -> {
-            String assetName = (String) pair.first;
-            String fileContent = (String) pair.second;
-            saveGeoJsonDataToDatabase(2, fileContent);
-            return null;
-        };
-    }
-
     private void loadLineLayers(String assetName, String fileContent) {
 
         if (mapboxMap.getSource(assetName) == null) {
@@ -679,27 +620,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        switch (requestCode) {
-            case RESULT_LOCATION_PERMISSION:
-                handleGps();
-                break;
-            case RESULT_STORAGE_PERMISSION:
-                finish();
-                startActivity(getIntent());
+    @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
+    private void handleStoragePermission() {
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+        } else {
+            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
+                    RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
         }
     }
 
-    @Override
-    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        switch (requestCode) {
-            case RESULT_LOCATION_PERMISSION:
-                ToastUtils.showToast("Location permission is required to show current location.");
-                break;
-            case RESULT_STORAGE_PERMISSION:
-                ToastUtils.showToast("Storage permission is required to load map.");
-                break;
+    @AfterPermissionGranted(RESULT_LOCATION_PERMISSION)
+    private void handleLocationPermission(){
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (!statusOfGPS) {
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            } else {
+                GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+                provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+                MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+                myLocationNewOverlay.enableMyLocation();
+                mapView.getOverlays().add(myLocationNewOverlay);
+            }
+        } else {
+            EasyPermissions.requestPermissions(this, "Provide location permission.",
+                    RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
@@ -723,13 +671,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-
-                if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    EasyPermissions.requestPermissions(this, "Provide location permission.",
-                            RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
-                } else {
-                    handleGps();
-                }
+                handleLocationPermission();
                 break;
         }
     }
