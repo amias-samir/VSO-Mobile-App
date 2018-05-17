@@ -76,7 +76,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -168,8 +167,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<String> assetList;
     private ArrayList<String> contentList;
 
-    private final int RESULT_LOCATION_PERMISSION = 10;
-    private final int RESULT_LAT_LONG = 15;
+    private final int RESULT_STORAGE_PERMISSION = 50;
+    private final int RESULT_LOCATION_PERMISSION = 100;
+    private final int RESULT_LAT_LONG = 150;
 
 
     private MapDataRepository repo;
@@ -215,14 +215,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         repo = new MapDataRepository();
 
-        fabLocationToggle.setOnClickListener(this);
+        checkStoragePermission();
 
-        try {
-            assetList = getIntent().getStringArrayListExtra(("asset"));
-            contentList = getIntent().getStringArrayListExtra(("content"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        fabLocationToggle.setOnClickListener(this);
 
 //        setupMapBox();
 
@@ -246,8 +241,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
+        try {
+            checkIntentAndLoadMarkers();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void checkIntentAndLoadMarkers() throws Exception {
+        assetList = getIntent().getStringArrayListExtra(("asset"));
+        contentList = getIntent().getStringArrayListExtra(("content"));
         for (int i = 0; i < contentList.size(); i++) {
             saveGeoJsonDataToDatabase(i, contentList.get(i));
+        }
+    }
+
+    private void checkStoragePermission() {
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
+                    RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
 
@@ -671,6 +685,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case RESULT_LOCATION_PERMISSION:
                 handleGps();
                 break;
+            case RESULT_STORAGE_PERMISSION:
+                finish();
+                startActivity(getIntent());
         }
     }
 
@@ -678,7 +695,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
         switch (requestCode) {
             case RESULT_LOCATION_PERMISSION:
-                ToastUtils.showToast("Give location permission to take full advantage.");
+                ToastUtils.showToast("Location permission is required to show current location.");
+                break;
+            case RESULT_STORAGE_PERMISSION:
+                ToastUtils.showToast("Storage permission is required to load map.");
                 break;
         }
     }
