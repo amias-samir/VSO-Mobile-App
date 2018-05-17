@@ -201,14 +201,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
-    public static void start(Context context, List<String> assetsList, List<String> contentlist) {
-        Intent intent = new Intent(context, HomeActivity.class);
-        intent.putStringArrayListExtra("asset", (ArrayList<String>) assetsList);
-        intent.putStringArrayListExtra("content", (ArrayList<String>) contentlist);
-        context.startActivity(intent);
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -242,22 +234,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
-        try {
-            checkIntentAndLoadMarkers();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
 
     }
 
-    private void checkIntentAndLoadMarkers() throws Exception {
-        assetList = getIntent().getStringArrayListExtra(("asset"));
-        contentList = getIntent().getStringArrayListExtra(("content"));
-        for (int i = 0; i < contentList.size(); i++) {
-            saveGeoJsonDataToDatabase(i, contentList.get(i));
-        }
-    }
+
 
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
@@ -326,7 +306,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         loadMunicipalityBoarder();
 
-
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
@@ -391,8 +370,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ExpandableUseActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_open_spaces:
-
-
                     break;
             }
             return true;
@@ -666,28 +643,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
                 handleLocationPermission();
                 break;
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void handleGps() {
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!statusOfGPS) {
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-        } else {
-            GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
-            provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-            MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-            myLocationNewOverlay.enableMyLocation();
-            mapView.getOverlays().add(myLocationNewOverlay);
         }
     }
 
