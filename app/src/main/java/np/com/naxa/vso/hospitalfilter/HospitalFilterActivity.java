@@ -137,15 +137,15 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         FormElementPickerSingle wardListElement = FormElementPickerSingle.createInstance().setTag(TAG_WARD).setTitle("Select Ward").setOptions(wardList).setPickerTitle("Pick any ward");
 
         FormHeader headerHospitalType = FormHeader.createInstance("Hospital Facilities");
-        List<String> hospitalTypeList =  getDistinctValuesListFromColumn("Type");
+//        List<String> hospitalTypeList =  getDistinctValuesListFromColumn("Type");
 //        List<String> hospitalTypeList =  GetDataFromDatabase.geTypeListDistinct(hospitalFacilitiesVewModel, this);
-//        List<String> hospitalTypeList =new ArrayList<>();
-//        hospitalTypeList.add("Type 1");
-//        hospitalTypeList.add("Type 2");
-//        hospitalTypeList.add("Type 3");
-//        hospitalTypeList.add("Type 4");
-//        hospitalTypeList.add("Type 5");
-//        hospitalTypeList.add("Type 6");
+        List<String> hospitalTypeList =new ArrayList<>();
+        hospitalTypeList.add("Type 1");
+        hospitalTypeList.add("Type 2");
+        hospitalTypeList.add("Type 3");
+        hospitalTypeList.add("Type 4");
+        hospitalTypeList.add("Type 5");
+        hospitalTypeList.add("Type 6");
         FormElementPickerSingle hospitalTypeElement = FormElementPickerSingle.createInstance().setTag(TAG_HOSPITAL_TYPE).setTitle("Hospital Type").setOptions(hospitalTypeList).setPickerTitle("Pick any type");
 
 
@@ -153,15 +153,15 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 //        FormElementSwitch bedCapacitySwitcher = FormElementSwitch.createInstance().setTag(TAG_BED).setTitle("Bed").setSwitchTexts("Yes", "No");
 
 
-//        List<String> bedCapacity = getDistinctValuesListFromColumn("Number_of_Beds");
+        List<String> bedCapacity = getDistinctValuesListFromColumn("Number_of_Beds");
 //        List<String> bedCapacity = GetDataFromDatabase.getBedListDistinct(hospitalFacilitiesVewModel, this);
-        List<String> bedCapacity = new ArrayList<>();
-        bedCapacity.add("0-10");
-        bedCapacity.add("11-20");
-        bedCapacity.add("21-30");
-        bedCapacity.add("31-40");
-        bedCapacity.add("41-50");
-        bedCapacity.add("50+");
+//        List<String> bedCapacity = new ArrayList<>();
+//        bedCapacity.add("0-10");
+//        bedCapacity.add("11-20");
+//        bedCapacity.add("21-30");
+//        bedCapacity.add("31-40");
+//        bedCapacity.add("41-50");
+//        bedCapacity.add("50+");
         FormElementPickerMulti bedCapacityElement = FormElementPickerMulti.createInstance().setTag(TAG_BED_CAPACITY).setTitle("Bed Capacity").setOptions(bedCapacity).setPickerTitle("Choose one or more bed capacity").setNegativeText("reset");
 
         FormHeader headerBuildingStructure = FormHeader.createInstance("Structure");
@@ -225,9 +225,9 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     private List<String> getDistinctValuesListFromColumn(String columnName){
         List<String> distinctValuesList = new ArrayList<String>();
          Log.d(TAG, "getDistinctValuesFromColumn: "+columnName);
-            hospitalFacilitiesVewModel.getAllTypeList().observe(this, new Observer<List<String>>() {
+            hospitalFacilitiesVewModel.getAllBedCapacityList().observe(this, new Observer<List<String>>() {
                 @Override
-                public void onChanged(@NonNull final List<String> distinctValuesList) {
+                public void onChanged(@NonNull List<String> distinctValuesList) {
                     distinctValuesList.addAll(distinctValuesList);
                 }
             });

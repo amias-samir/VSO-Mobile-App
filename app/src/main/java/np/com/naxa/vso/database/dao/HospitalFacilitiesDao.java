@@ -34,13 +34,13 @@ public interface HospitalFacilitiesDao  {
     @Query("SELECT DISTINCT type FROM hospital_facilities ")
     LiveData<List<String>> getDistinctTypeList();
 
-    @Query("SELECT DISTINCT number_of_beds FROM hospital_facilities")
+    @Query("SELECT DISTINCT number_of_beds FROM hospital_facilities ")
     LiveData<List<String>> getDistinctBedCapacityList();
 
-    @Query("SELECT DISTINCT structure_type FROM hospital_facilities")
+    @Query("SELECT DISTINCT structure_type FROM hospital_facilities ")
     LiveData<List<String>> getDistinctStructureTypeList();
 
-    @Query("SELECT DISTINCT evacuation_plan FROM hospital_facilities")
+    @Query("SELECT DISTINCT evacuation_plan FROM hospital_facilities ")
     LiveData<List<String>> getDistinctEvacuationPlanList();
 
 
