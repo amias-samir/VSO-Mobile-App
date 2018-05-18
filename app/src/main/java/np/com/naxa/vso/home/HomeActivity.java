@@ -234,9 +234,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
+//        commonPlacesAttribViewModel
+//                .getmAllCommonPlacesAttrb()
 
     }
-
 
 
     private void setupFloatingToolbar() {
@@ -609,7 +610,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @AfterPermissionGranted(RESULT_LOCATION_PERMISSION)
-    private void handleLocationPermission(){
+    private void handleLocationPermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -865,10 +866,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadlayerToMap(String geoJson) {
-
+        Log.i("Shree", geoJson);
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
-
 
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
