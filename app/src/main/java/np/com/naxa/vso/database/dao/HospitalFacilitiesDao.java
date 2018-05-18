@@ -31,7 +31,7 @@ public interface HospitalFacilitiesDao  {
 //    @Query("SELECT DISTINCT :columnName FROM hospital_facilities")
 //    LiveData<List<String>> getDistinctValuesFromColumn(String columnName);
 
-    @Query("SELECT DISTINCT type FROM hospital_facilities")
+    @Query("SELECT DISTINCT type FROM hospital_facilities ")
     LiveData<List<String>> getDistinctTypeList();
 
     @Query("SELECT DISTINCT number_of_beds FROM hospital_facilities")

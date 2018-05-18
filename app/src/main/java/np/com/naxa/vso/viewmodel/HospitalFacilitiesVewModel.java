@@ -59,7 +59,6 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
 
     public LiveData<List<String>> getAllTypeList() {
         mAllDistinctTypeList = mRepository.getmAllTypeList();
-
         return mAllDistinctTypeList;
     }
 
