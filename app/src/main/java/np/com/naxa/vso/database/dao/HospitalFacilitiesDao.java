@@ -18,7 +18,7 @@ import retrofit2.http.Url;
  */
 
 @Dao
-public interface HospitalFacilitiesDao {
+public interface HospitalFacilitiesDao  {
 
     // LiveData is a data holder class that can be observed within a given lifecycle.
     // Always holds/caches latest version of data. Notifies its active observers when the
@@ -27,12 +27,27 @@ public interface HospitalFacilitiesDao {
     @Query("SELECT * from hospital_facilities ORDER BY hid ASC")
     LiveData<List<HospitalFacilities>> getFirstInsertedHospital();
 
-    @Query("SELECT DISTINCT number_of_bed from hospital_facilities ")
-    LiveData<List<String>> getBedCapacityList();
 
-    @Query("SELECT * FROM hospital_facilities WHERE number_of_bed LIKE :ward OR structure LIKE :hospital_type OR number_of_bed LIKE :bedCapacity" +
-            " AND structure LIKE :building_structure OR structure LIKE :available_facilities OR structure LIKE :excavation_plans")
-    public abstract LiveData<List<HospitalFacilities>> getAllFilteredList(String ward, String hospital_type,  String bedCapacity, String building_structure,
+//    @Query("SELECT DISTINCT :columnName FROM hospital_facilities")
+//    LiveData<List<String>> getDistinctValuesFromColumn(String columnName);
+
+    @Query("SELECT DISTINCT type FROM hospital_facilities")
+    LiveData<List<String>> getDistinctTypeList();
+
+    @Query("SELECT DISTINCT number_of_beds FROM hospital_facilities")
+    LiveData<List<String>> getDistinctBedCapacityList();
+
+    @Query("SELECT DISTINCT structure_type FROM hospital_facilities")
+    LiveData<List<String>> getDistinctStructureTypeList();
+
+    @Query("SELECT DISTINCT evacuation_plan FROM hospital_facilities")
+    LiveData<List<String>> getDistinctEvacuationPlanList();
+
+
+
+    @Query("SELECT * FROM hospital_facilities WHERE number_of_beds LIKE :ward OR type LIKE :hospital_type OR number_of_beds LIKE :bedCapacity" +
+            " AND structure_type LIKE :building_structure OR emergency_service LIKE :available_facilities OR evacuation_plan LIKE :excavation_plans")
+    LiveData<List<HospitalFacilities>> getAllFilteredList(String ward, String hospital_type,  String bedCapacity, String building_structure,
                                                                           String available_facilities, String excavation_plans);
 
     // We do not need a conflict strategy, because the word is our primary key, and you cannot

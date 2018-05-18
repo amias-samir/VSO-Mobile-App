@@ -21,7 +21,12 @@ public class HospitalFacilitiesRepository {
     private HospitalFacilitiesDao mHospitalFacilitiesDao;
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
     private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
-    private LiveData<List<String>> mAllBedCapacityList;
+    private LiveData<List<String>> mAllDistinctValuesList;
+
+    private LiveData<List<String>> mAllDistinctTypeList;
+    private LiveData<List<String>> mAllDistinctStructureTypeList;
+    private LiveData<List<String>> mAllDistinctBedCapacityList;
+    private LiveData<List<String>> mAllDistinctEvacuationPlanList;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -31,7 +36,7 @@ public class HospitalFacilitiesRepository {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
         mAllHospitalFacilities = mHospitalFacilitiesDao.getFirstInsertedHospital();
-        mAllBedCapacityList = mHospitalFacilitiesDao.getBedCapacityList();
+
 //        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList("", "");
     }
 
@@ -42,8 +47,35 @@ public class HospitalFacilitiesRepository {
     }
 
     public LiveData<List<String>> getmAllBedCapacityList() {
-        return mAllBedCapacityList;
+        mAllDistinctBedCapacityList = mHospitalFacilitiesDao.getDistinctBedCapacityList();
+
+        return mAllDistinctBedCapacityList;
     }
+
+    public LiveData<List<String>> getmAllTypeList() {
+        mAllDistinctTypeList = mHospitalFacilitiesDao.getDistinctTypeList();
+        return mAllDistinctTypeList;
+    }
+
+    public LiveData<List<String>> getmAllStructureTypeList() {
+        mAllDistinctStructureTypeList = mHospitalFacilitiesDao.getDistinctStructureTypeList();
+
+        return mAllDistinctStructureTypeList;
+    }
+
+    public LiveData<List<String>> getmAllEvacuationPlanList() {
+        mAllDistinctEvacuationPlanList = mHospitalFacilitiesDao.getDistinctEvacuationPlanList();
+
+        return mAllDistinctEvacuationPlanList;
+    }
+
+
+//    public LiveData<List<String >> getDistinctValuesFromColumn(String columnName){
+//        Log.d("repo", "getDistinctValuesFromColumn: "+columnName);
+//        mAllDistinctValuesList = mHospitalFacilitiesDao.getDistinctValuesFromColumn(columnName);
+////        Log.d("", "getDistinctValuesFromColumn: value "+mAllDistinctValuesList.getValue().get(1));
+//        return mAllDistinctValuesList;
+//    }
 
     public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
@@ -56,7 +88,7 @@ public class HospitalFacilitiesRepository {
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
     public void insert(HospitalFacilities hospitalFacilities) {
-        Log.d("HospitalRepository", "insert: " + hospitalFacilities.getContact_no());
+        Log.d("HospitalRepository", "insert: " + hospitalFacilities.getContact_Number());
         mHospitalFacilitiesDao.insert(hospitalFacilities);
 //        new HospitalFacilitiesRepository.insertAsyncTask(mHospitalFacilitiesDao).execute(hospitalFacilities);
     }
@@ -71,7 +103,7 @@ public class HospitalFacilitiesRepository {
 
         @Override
         protected Void doInBackground(final HospitalFacilities... params) {
-            Log.d("HospitalRepository", "doInBackground: " + params[0].getContact_no());
+            Log.d("HospitalRepository", "doInBackground: " + params[0].getContact_Number());
             mAsyncTaskDao.insert(params[0]);
             return null;
         }

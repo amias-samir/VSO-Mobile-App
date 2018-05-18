@@ -25,26 +25,69 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
     // - Repository is completely separated from the UI through the ViewModel.
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
     private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
-    private LiveData<List<String>> mAllBedCapacityList;
+    private LiveData<List<String>> mAllDistinctValuesList;
+
+    private LiveData<List<String>> mAllDistinctTypeList;
+    private LiveData<List<String>> mAllDistinctStructureTypeList;
+    private LiveData<List<String>> mAllDistinctBedCapacityList;
+    private LiveData<List<String>> mAllDistinctEvacuationPlanList;
 
     public HospitalFacilitiesVewModel(Application application) {
         super(application);
         mRepository = new HospitalFacilitiesRepository(application);
 
         mAllHospitalFacilities = mRepository.getAllHospitalFacilities();
-        mAllBedCapacityList = mRepository.getmAllBedCapacityList();
+
+
     }
     public LiveData<List<HospitalFacilities>> getmAllHospitalFacilities() {
         return mAllHospitalFacilities;
     }
 
-    public LiveData<List<String>> getmAllBedCapacityList() {
-        return mAllBedCapacityList;
+//    public LiveData<List<String>> getAllDistinctValuesListFromColumn(String columnName) {
+//        Log.d("viewmodel", "getDistinctValuesFromColumn: "+columnName);
+//        mAllDistinctValuesList = mRepository.getDistinctValuesFromColumn(columnName);
+//        return mAllDistinctValuesList;
+//    }
+
+
+    public LiveData<List<String>> getAllBedCapacityList() {
+        mAllDistinctBedCapacityList = mRepository.getmAllBedCapacityList();
+
+        return mAllDistinctBedCapacityList;
     }
+
+    public LiveData<List<String>> getAllTypeList() {
+        mAllDistinctTypeList = mRepository.getmAllTypeList();
+
+        return mAllDistinctTypeList;
+    }
+
+    public LiveData<List<String>> getAllStructureTypeList() {
+        mAllDistinctStructureTypeList = mRepository.getmAllStructureTypeList();
+
+        return mAllDistinctStructureTypeList;
+    }
+
+    public LiveData<List<String>> getAllEvacuationPlanList() {
+        mAllDistinctEvacuationPlanList = mRepository.getmAllEvacuationPlanList();
+
+        return mAllDistinctEvacuationPlanList;
+    }
+
+
+
+
+
+
+
+
+
     public void insert(HospitalFacilities hospitalFacilities) {
-        Log.d("VIewholder", "insert: " + hospitalFacilities.getContact_no());
+        Log.d("VIewholder", "insert: " + hospitalFacilities.getAmbulance_Service());
         mRepository.insert(hospitalFacilities);
     }
+
 
 
     public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type, String bedCapacity, String available_facilities,
