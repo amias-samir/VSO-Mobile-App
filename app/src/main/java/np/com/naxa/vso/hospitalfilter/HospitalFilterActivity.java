@@ -31,10 +31,8 @@ import me.riddhimanadib.formmaster.model.FormElementPickerMulti;
 import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
-import np.com.naxa.vso.activity.LoadingActivity;
-import np.com.naxa.vso.activity.SplashActivity;
+
 import np.com.naxa.vso.database.entity.HospitalFacilities;
-import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 
