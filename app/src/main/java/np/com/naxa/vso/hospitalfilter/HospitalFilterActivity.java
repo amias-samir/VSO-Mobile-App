@@ -175,22 +175,22 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         FormElementPickerMulti excavationPlansElement = FormElementPickerMulti.createInstance().setTag(TAG_EXCAVATION_PLANS_LIST).setTitle("Evacuation Plans List").setOptions(evacuationPlansList).setPickerTitle("Choose one or more evacuation plan").setNegativeText("reset");
 
         List<BaseFormElement> formItems = new ArrayList<>();
-        formItems.add(headerWard);
+//        formItems.add(headerWard);
         formItems.add(wardListElement);
 
-        formItems.add(headerHospitalType);
+//        formItems.add(headerHospitalType);
         formItems.add(hospitalTypeElement);
 
-        formItems.add(headerBedCapacity);
+//        formItems.add(headerBedCapacity);
         formItems.add(bedCapacityElement);
 
-        formItems.add(headerBuildingStructure);
+//        formItems.add(headerBuildingStructure);
         formItems.add(buildingStructureElement);
 
-        formItems.add(headerAvailiableFacilities);
+//        formItems.add(headerAvailiableFacilities);
         formItems.add(availiableFaclitieseElement);
 
-        formItems.add(headerBuildingExcavation);
+//        formItems.add(headerBuildingExcavation);
         formItems.add(excavationPlansElement);
 
         mFormBuilder.addFormElements(formItems);
