@@ -5,8 +5,8 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -31,10 +31,8 @@ import me.riddhimanadib.formmaster.model.FormElementPickerMulti;
 import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
-import np.com.naxa.vso.activity.LoadingActivity;
-import np.com.naxa.vso.activity.SplashActivity;
+import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
-import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 
@@ -63,7 +61,14 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     List<HospitalFacilities> hospitalFacilitiesList = new ArrayList<>();
 
+    HospitalFacilitiesDao hospitalFacilitiesDao;
+
     LifecycleOwner owner = this;
+
+    List<String> hospitalTypeList = new ArrayList<String>();
+    List<String> bedCapacityList = new ArrayList<String>();
+    List<String> buildingStructureList = new ArrayList<String>();
+    List<String> evacuationPlansList = new ArrayList<String>();
 
 
     public static void start(Context context) {
@@ -81,18 +86,27 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
         initRoomDatabase();
 
-        setupForm();
-
+        initUIOptionData();
 
 
 
     }
 
-    private void initRoomDatabase (){
+    private void initRoomDatabase() {
 
         hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
 
     }
+
+    private void initUIOptionData (){
+
+        PostTask postTask = new PostTask();
+        postTask.execute();
+
+
+    }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -137,48 +151,16 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         FormElementPickerSingle wardListElement = FormElementPickerSingle.createInstance().setTag(TAG_WARD).setTitle("Select Ward").setOptions(wardList).setPickerTitle("Pick any ward");
 
         FormHeader headerHospitalType = FormHeader.createInstance("Hospital Facilities");
-//        List<String> hospitalTypeList =  getDistinctValuesListFromColumn("Type");
-//        List<String> hospitalTypeList =  GetDataFromDatabase.geTypeListDistinct(hospitalFacilitiesVewModel, this);
-        List<String> hospitalTypeList =new ArrayList<>();
-        hospitalTypeList.add("Type 1");
-        hospitalTypeList.add("Type 2");
-        hospitalTypeList.add("Type 3");
-        hospitalTypeList.add("Type 4");
-        hospitalTypeList.add("Type 5");
-        hospitalTypeList.add("Type 6");
         FormElementPickerSingle hospitalTypeElement = FormElementPickerSingle.createInstance().setTag(TAG_HOSPITAL_TYPE).setTitle("Hospital Type").setOptions(hospitalTypeList).setPickerTitle("Pick any type");
 
 
         FormHeader headerBedCapacity = FormHeader.createInstance("Bed Capacity");
-//        FormElementSwitch bedCapacitySwitcher = FormElementSwitch.createInstance().setTag(TAG_BED).setTitle("Bed").setSwitchTexts("Yes", "No");
-
-
-        List<String> bedCapacity = getDistinctValuesListFromColumn("Number_of_Beds");
-//        List<String> bedCapacity = GetDataFromDatabase.getBedListDistinct(hospitalFacilitiesVewModel, this);
-//        List<String> bedCapacity = new ArrayList<>();
-//        bedCapacity.add("0-10");
-//        bedCapacity.add("11-20");
-//        bedCapacity.add("21-30");
-//        bedCapacity.add("31-40");
-//        bedCapacity.add("41-50");
-//        bedCapacity.add("50+");
-        FormElementPickerMulti bedCapacityElement = FormElementPickerMulti.createInstance().setTag(TAG_BED_CAPACITY).setTitle("Bed Capacity").setOptions(bedCapacity).setPickerTitle("Choose one or more bed capacity").setNegativeText("reset");
+        FormElementPickerMulti bedCapacityElement = FormElementPickerMulti.createInstance().setTag(TAG_BED_CAPACITY).setTitle("Bed Capacity").setOptions(bedCapacityList).setPickerTitle("Choose one or more bed capacity").setNegativeText("reset");
 
         FormHeader headerBuildingStructure = FormHeader.createInstance("Structure");
-//        FormElementSwitch buildingStructureSwitcher = FormElementSwitch.createInstance().setTag(TAG_BUILDING_STRUCTURE).setTitle("Building Structure").setSwitchTexts("Yes", "No");
-//        List<String> buildingStructure =  getDistinctValuesListFromColumn("Structure_Type");
-//        List<String> buildingStructure =  GetDataFromDatabase.getStructureTypeListDistinct(hospitalFacilitiesVewModel, this);
-        List<String> buildingStructure =new ArrayList<>();
-        buildingStructure.add("Structure 1");
-        buildingStructure.add("Structure 2");
-        buildingStructure.add("Structure 3");
-        buildingStructure.add("Structure 4");
-        buildingStructure.add("Structure 5");
-        buildingStructure.add("Structure 6");
-        FormElementPickerMulti buildingStructureElement = FormElementPickerMulti.createInstance().setTag(TAG_BUILDING_STRUCTURE_LIST).setTitle("Building Structure Module").setOptions(buildingStructure).setPickerTitle("Choose one or more building structure").setNegativeText("reset");
+        FormElementPickerMulti buildingStructureElement = FormElementPickerMulti.createInstance().setTag(TAG_BUILDING_STRUCTURE_LIST).setTitle("Building Structure Module").setOptions(buildingStructureList).setPickerTitle("Choose one or more building structure").setNegativeText("reset");
 
         FormHeader headerAvailiableFacilities = FormHeader.createInstance("Facilities");
-//        FormElementSwitch availiableFacilitiesSwitcher = FormElementSwitch.createInstance().setTag(TAG_AVAILABLE_FACILITIES).setTitle("Available Facilities").setSwitchTexts("Yes", "No");
         List<String> availiableFaclities = new ArrayList<>();
         availiableFaclities.add("Emergency_Service");
         availiableFaclities.add("ICU_Service");
@@ -188,17 +170,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         FormElementPickerMulti availiableFaclitieseElement = FormElementPickerMulti.createInstance().setTag(TAG_AVAILABLE_FACILITIES_LIST).setTitle("Available Facilities List").setOptions(availiableFaclities).setPickerTitle("Choose one or more available facilities").setNegativeText("reset");
 
         FormHeader headerBuildingExcavation = FormHeader.createInstance("Building Evacuation");
-//        FormElementSwitch availiableBuildingExcavationSwitcher = FormElementSwitch.createInstance().setTag(TAG_EXCAVATION_PLANS).setTitle(" Available building excavation plans").setSwitchTexts("Yes", "No");
-//        List<String> excavationPlans = getDistinctValuesListFromColumn("Evacuation_Plan");
-//        List<String> excavationPlans = GetDataFromDatabase.getEvacuationPlanListDistinct(hospitalFacilitiesVewModel, this);
-        List<String> excavationPlans = new ArrayList<>();
-        excavationPlans.add("Plan 1");
-        excavationPlans.add("Plan 2");
-        excavationPlans.add("Plan 3");
-        excavationPlans.add("Plan 4");
-        excavationPlans.add("Plan 5");
-        excavationPlans.add("Plan 6");
-        FormElementPickerMulti excavationPlansElement = FormElementPickerMulti.createInstance().setTag(TAG_EXCAVATION_PLANS_LIST).setTitle("Evacuation Plans List").setOptions(excavationPlans).setPickerTitle("Choose one or more evacuation plan").setNegativeText("reset");
+        FormElementPickerMulti excavationPlansElement = FormElementPickerMulti.createInstance().setTag(TAG_EXCAVATION_PLANS_LIST).setTitle("Evacuation Plans List").setOptions(evacuationPlansList).setPickerTitle("Choose one or more evacuation plan").setNegativeText("reset");
 
         List<BaseFormElement> formItems = new ArrayList<>();
         formItems.add(headerWard);
@@ -222,15 +194,17 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         mFormBuilder.addFormElements(formItems);
     }
 
-    private List<String> getDistinctValuesListFromColumn(String columnName){
+    private List<String> getDistinctValuesListFromColumn(String columnName) {
         List<String> distinctValuesList = new ArrayList<String>();
-         Log.d(TAG, "getDistinctValuesFromColumn: "+columnName);
-            hospitalFacilitiesVewModel.getAllBedCapacityList().observe(this, new Observer<List<String>>() {
-                @Override
-                public void onChanged(@NonNull List<String> distinctValuesList) {
-                    distinctValuesList.addAll(distinctValuesList);
-                }
-            });
+        Log.d(TAG, "getDistinctValuesFromColumn: " + columnName);
+        hospitalFacilitiesVewModel.getAllDistinctValuesListFromColumn(columnName).observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@NonNull List<String> distinctValuesList) {
+                Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
+
+                distinctValuesList.addAll(distinctValuesList);
+            }
+        });
         return distinctValuesList;
     }
 
@@ -250,9 +224,9 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     }
 
 
-    private void getFormData (){
+    private void getFormData() {
 
-        String ward,hospital_type, bed, bed_capacity, building_structure,building_structure_list, available_facilities, available_facilities_list,
+        String ward, hospital_type, bed, bed_capacity, building_structure, building_structure_list, available_facilities, available_facilities_list,
                 excavation_plans, excavation_plans_list;
 
         BaseFormElement wardElement = mFormBuilder.getFormElement(TAG_WARD);
@@ -269,7 +243,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         available_facilities_list = availableFacilitiesElementList.getValue();
         excavation_plans_list = excavationPlansElementList.getValue();
 
-        Log.d("HospitalFilter", "getFormData: "+ward +" , "+ bed_capacity + " , "+excavation_plans_list);
+        Log.d("HospitalFilter", "getFormData: " + ward + " , " + bed_capacity + " , " + excavation_plans_list);
 
         int bedRange[] = QueryBuildWithSplitter.dynamicStringSplitterWithRangeQueryBuild("10-20, 20-30");
         int lowestBedValue = bedRange[0];
@@ -284,27 +258,85 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     }
 
 
-    private void searchDataFromDatabase(String ward,String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans){
-try{
-        hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
-            @Override
-            public void onChanged(@Nullable final List<HospitalFacilities> hospitalFacilities) {
-                // Update the cached copy of the words in the adapter.
+    private void searchDataFromDatabase(String ward, String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans) {
+        try {
+            hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
+                @Override
+                public void onChanged(@Nullable final List<HospitalFacilities> hospitalFacilities) {
+                    // Update the cached copy of the words in the adapter.
 //                adapter.setWords(words);
 
-              hospitalFacilitiesList.addAll(hospitalFacilities);
-                Log.d("HospitalFiltered", "onChanged: data retrieved ");
-            }
-        });
+                    hospitalFacilitiesList.addAll(hospitalFacilities);
+                    Log.d("HospitalFiltered", "onChanged: data retrieved ");
+                }
+            });
 
-    } catch (NullPointerException e) {
+        } catch (NullPointerException e) {
 
-        Log.d(TAG, "Exception: " + e.toString());
+            Log.d(TAG, "Exception: " + e.toString());
+        }
+
     }
 
+
+
+    // The definition of our task class
+    private class PostTask extends AsyncTask<List<String>, Integer, List<String>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<String> doInBackground(List<String>... params) {
+
+
+            hospitalFacilitiesVewModel.getAllTypeList().observe(owner, new Observer<List<String>>() {
+                @Override
+                public void onChanged(@NonNull final List<String> distinctValuesList) {
+                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+
+                    hospitalTypeList.addAll(distinctValuesList);
+                }
+            });
+
+
+            hospitalFacilitiesVewModel.getAllStructureTypeList().observe(owner, new Observer<List<String>>() {
+                @Override
+                public void onChanged(@NonNull final List<String> distinctValuesList) {
+                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+
+                    buildingStructureList.addAll(distinctValuesList);
+                }
+            });
+
+            hospitalFacilitiesVewModel.getAllBedCapacityList().observe(owner, new Observer<List<String>>() {
+                @Override
+                public void onChanged(@NonNull final List<String> distinctValuesList) {
+                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+                    bedCapacityList.addAll(distinctValuesList);
+                }
+            });
+
+
+            hospitalFacilitiesVewModel.getAllEvacuationPlanList().observe(owner, new Observer<List<String>>() {
+                @Override
+                public void onChanged(@NonNull final List<String> distinctValuesList) {
+                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+
+                    evacuationPlansList.addAll(distinctValuesList);
+                }
+            });
+
+           return hospitalTypeList;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> result) {
+            setupForm();
+//            super.onPostExecute(result);
+        }
     }
-
-
 
 
 }

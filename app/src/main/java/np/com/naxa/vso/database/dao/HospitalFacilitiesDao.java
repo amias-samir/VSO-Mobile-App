@@ -28,8 +28,13 @@ public interface HospitalFacilitiesDao  {
     LiveData<List<HospitalFacilities>> getFirstInsertedHospital();
 
 
-//    @Query("SELECT DISTINCT :columnName FROM hospital_facilities")
-//    LiveData<List<String>> getDistinctValuesFromColumn(String columnName);
+
+    @Query("SELECT DISTINCT :columnName FROM hospital_facilities")
+    List<String> getDistinctColumnValues(String columnName);
+
+
+    @Query("SELECT DISTINCT :columnName FROM hospital_facilities")
+    LiveData<List<String>> getDistinctValuesFromColumn(String columnName);
 
     @Query("SELECT DISTINCT type FROM hospital_facilities ")
     LiveData<List<String>> getDistinctTypeList();

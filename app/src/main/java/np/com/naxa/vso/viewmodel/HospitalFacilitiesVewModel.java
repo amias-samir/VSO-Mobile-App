@@ -38,17 +38,16 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
 
         mAllHospitalFacilities = mRepository.getAllHospitalFacilities();
 
-
     }
     public LiveData<List<HospitalFacilities>> getmAllHospitalFacilities() {
         return mAllHospitalFacilities;
     }
 
-//    public LiveData<List<String>> getAllDistinctValuesListFromColumn(String columnName) {
-//        Log.d("viewmodel", "getDistinctValuesFromColumn: "+columnName);
-//        mAllDistinctValuesList = mRepository.getDistinctValuesFromColumn(columnName);
-//        return mAllDistinctValuesList;
-//    }
+        public LiveData<List<String>> getAllDistinctValuesListFromColumn(String columnName) {
+        Log.d("viewmodel", "getDistinctValuesFromColumn: "+columnName);
+        mAllDistinctValuesList = mRepository.getDistinctValuesFromColumn(columnName);
+        return mAllDistinctValuesList;
+    }
 
 
     public LiveData<List<String>> getAllBedCapacityList() {
