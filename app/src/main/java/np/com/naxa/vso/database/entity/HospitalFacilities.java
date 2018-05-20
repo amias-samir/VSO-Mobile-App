@@ -124,7 +124,6 @@ public class HospitalFacilities {
         this.ICT_Grading_A_B_C_D = ICT_Grading_A_B_C_D;
     }
 
-
     public int getHid() {
         return hid;
     }

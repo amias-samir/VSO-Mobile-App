@@ -140,9 +140,13 @@ public class SplashActivity extends AppCompatActivity {
 
         CommonPlacesAttrbRepository.pID.clear();
         JSONObject jsonObject = null;
-        String name = null, address = null, type = null, remarks = null, ambulance = null, contact_no = null, contact_pe = null,
-                earthquake = null, emergency = null, fire_extin = null, icu_service = null, number_of = null, open_space = null,
-                structure = null, toilet_fac;
+        String name = null, address = null,  remarks = null;
+
+        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null,emergency_service = null, icu_service = null,
+                ambulance = null ,number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
+                fire_extingiusher = null, evacuation_plan = null, alternative_route = null, no_of_doctors = null, no_of_nurse = null,
+                no_of_health_assistent = null, total_no_of_employees= null, water_storage = null, emergency_stock_capcity = null, ict_grading = null ;
+
         Long fk_common_places = null;
         Double latitude = 0.0, longitude = 0.0;
         try {
@@ -153,31 +157,44 @@ public class SplashActivity extends AppCompatActivity {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                 name = properties.getString("name");
                 address = properties.getString("Address");
-                type = properties.getString("Type");
                 latitude = Double.parseDouble(properties.getString("Y"));
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
 
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, "hospital", latitude, longitude, remarks);
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveHospitalData: " + fk_common_places);
 
-                ambulance = properties.getString("Ambulance_");
-                contact_no = properties.getString("Contact_Nu");
-                contact_pe = properties.getString("Contact_Pe");
-                earthquake = properties.getString("Earthquake");
-                emergency = properties.getString("Emergency_");
-                fire_extin = properties.getString("Fire_Extin");
-                icu_service = properties.getString("ICU_Servic");
-                number_of = properties.getString("Number_of_");
-//                int bedCapacity = Integer.parseInt(number_of);
+                category = properties.getString("Category");
+                type = properties.getString("Type");
                 open_space = properties.getString("Open_Space");
-                structure = properties.getString("Structure_");
-                toilet_fac = properties.getString("Toilet_Fac");
+                contact_no = properties.getString("Contact_Number");
+                contact_pe = properties.getString("Contact_Person");
+                emergency_service = properties.getString("Emergency_Service");
+                icu_service = properties.getString("ICU_Service");
+                ambulance = properties.getString("Ambulance_Service");
+                number_of_beds = properties.getString("Number_of_Beds");
+                structure_type = properties.getString("Structure_Type");
+                earthquake_damage = properties.getString("Earthquake_Damage");
+                toilet_facility = properties.getString("Toilet_Facility");
+                fire_extingiusher = properties.getString("Fire_Extinguisher");
+                evacuation_plan = properties.getString("Evacuation_Plan");
+                alternative_route = properties.getString("Alternatice_Route");
+                no_of_doctors = properties.getString("No_of_Doctors");
+                no_of_nurse = properties.getString("No_of_Nurses");
+                no_of_health_assistent = properties.getString("No_of_Health_Assistant");
+                total_no_of_employees = properties.getString("Total_No_of_Employees");
+                water_storage = properties.getString("Water_Storage_Capacity_Litre_");
+                emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
+                ict_grading = properties.getString("ICT_Grading_A_B_C_D");
 
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, ambulance, contact_no, contact_pe, earthquake, emergency,
-                        fire_extin, icu_service, number_of, open_space, structure, toilet_fac);
+                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,category,type, open_space, contact_no,
+                        contact_pe,emergency_service,icu_service,ambulance,number_of_beds, structure_type,earthquake_damage,toilet_facility,
+                        fire_extingiusher,evacuation_plan,alternative_route, no_of_doctors,no_of_nurse,no_of_health_assistent,total_no_of_employees,
+                        water_storage, emergency_stock_capcity,ict_grading);
+
+
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }
 

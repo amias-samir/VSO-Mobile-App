@@ -656,25 +656,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-<<<<<<< HEAD
-=======
-
-    @SuppressLint("MissingPermission")
-    private void handleGps() {
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!statusOfGPS) {
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-        } else {
-            GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
-            provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-            MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-            myLocationNewOverlay.enableMyLocation();
-            mapView.getOverlays().add(myLocationNewOverlay);
-        }
-    }
-
->>>>>>> ec5cfd7cb5dd3e6473a00de5ece89bc199a857bf
     private void addMarkerToMap(Location location) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         items.add(new OverlayItem("", "", new GeoPoint(location.getLatitude(), location.getLongitude())));
