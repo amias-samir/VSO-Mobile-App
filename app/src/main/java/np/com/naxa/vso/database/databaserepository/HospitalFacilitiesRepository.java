@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.List;
 
 import np.com.naxa.vso.database.VsoRoomDatabase;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 
@@ -20,7 +21,8 @@ public class HospitalFacilitiesRepository {
 
     private HospitalFacilitiesDao mHospitalFacilitiesDao;
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
-    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
+//    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
+    private LiveData<List<HospitalAndCommon>> mAllFilteredHospitalFacilities;
     private LiveData<List<String>> mAllDistinctValuesList;
 
     private LiveData<List<String>> mAllDistinctTypeList;
@@ -79,7 +81,14 @@ public class HospitalFacilitiesRepository {
         return mAllDistinctValuesList;
     }
 
-    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
+//    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
+//                                                                               String building_structure, String available_facilities, String excavation_plans) {
+//
+//        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList( hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
+//        return mAllFilteredHospitalFacilities;
+//    }
+
+    public LiveData<List<HospitalAndCommon>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
 
         mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList( hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);

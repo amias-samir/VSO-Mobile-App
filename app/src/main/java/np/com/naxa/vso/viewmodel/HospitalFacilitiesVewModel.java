@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.databaserepository.HospitalFacilitiesRepository;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
@@ -24,7 +25,8 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
-    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
+//    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
+    private LiveData<List<HospitalAndCommon>> mAllFilteredHospitalFacilities;
     private LiveData<List<String>> mAllDistinctValuesList;
 
     private LiveData<List<String>> mAllDistinctTypeList;
@@ -88,7 +90,14 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
 
 
 
-    public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type, String bedCapacity, String available_facilities,
+//    public LiveData<List<HospitalFacilities>> getFilteredList(String ward, String hospital_type, String bedCapacity, String available_facilities,
+//                                                              String building_structure, String excavation_plans) {
+//        mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, bedCapacity, available_facilities, building_structure, excavation_plans);
+//
+//        return mAllFilteredHospitalFacilities;
+//    }
+
+    public LiveData<List<HospitalAndCommon>> getFilteredList(String ward, String hospital_type, String bedCapacity, String available_facilities,
                                                               String building_structure, String excavation_plans) {
         mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, bedCapacity, available_facilities, building_structure, excavation_plans);
 

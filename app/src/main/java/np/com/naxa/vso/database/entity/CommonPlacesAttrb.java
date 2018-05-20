@@ -25,7 +25,7 @@ public class CommonPlacesAttrb {
     @ColumnInfo(name = "address")
     private String address;
 
-    @ColumnInfo(name = "type")
+    @ColumnInfo(name = "places_type")
     private String type;
 
     @ColumnInfo(name = "latitude")

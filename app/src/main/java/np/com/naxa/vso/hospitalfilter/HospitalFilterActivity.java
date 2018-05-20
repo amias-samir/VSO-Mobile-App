@@ -32,6 +32,7 @@ import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
 
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
@@ -61,6 +62,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     List<HospitalFacilities> hospitalFacilitiesList = new ArrayList<>();
+    List<HospitalAndCommon> hospitalFacilitiesWithCommonList = new ArrayList<>();
 
     HospitalFacilitiesDao hospitalFacilitiesDao;
 
@@ -220,6 +222,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     public void onViewClicked() {
 
         getFormData();
+
     }
 
 
@@ -254,13 +257,15 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     private void searchDataFromDatabase(String ward, String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans) {
         try {
-            hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalFacilities>>() {
+            hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalAndCommon>>() {
                 @Override
-                public void onChanged(@Nullable final List<HospitalFacilities> hospitalFacilities) {
+                public void onChanged(@Nullable final List<HospitalAndCommon> hospitalFacilities) {
                     // Update the cached copy of the words in the adapter.
 //                adapter.setWords(words);
 
-                    hospitalFacilitiesList.addAll(hospitalFacilities);
+                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
+                    Log.d(TAG, "onChanged: data retrieved "+hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
+                    Log.d(TAG, "onChanged: data retrieved "+hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
                     Log.d("HospitalFiltered", "onChanged: data retrieved "+hospitalFacilities.size());
                 }
             });
