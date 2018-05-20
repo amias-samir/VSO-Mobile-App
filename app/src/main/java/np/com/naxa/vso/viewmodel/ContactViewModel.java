@@ -36,7 +36,4 @@ public class ContactViewModel extends AndroidViewModel {
     public void insert(Contact contact) {
         Log.d("VIewholder", "insert: "+contact.getFirstName());
         mRepository.insert(contact); }
-
-
-
 }

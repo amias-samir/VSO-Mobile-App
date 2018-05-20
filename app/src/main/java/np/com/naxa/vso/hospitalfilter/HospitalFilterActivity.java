@@ -32,6 +32,7 @@ import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
+
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -211,8 +212,8 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     @Override
     public void onValueChanged(BaseFormElement formElement) {
-        Log.d("formListner", "onValueChanged: " + formElement.getTitle());
-        Toast.makeText(this, formElement.getValue(), Toast.LENGTH_SHORT).show();
+//        Log.d("formListner", "onValueChanged: " + formElement.getTitle());
+//        Toast.makeText(this, formElement.getValue(), Toast.LENGTH_SHORT).show();
 
 
     }
