@@ -82,7 +82,7 @@ public class HospitalFacilitiesRepository {
     public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
 
-        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
+        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList( hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
         return mAllFilteredHospitalFacilities;
     }
 

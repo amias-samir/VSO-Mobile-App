@@ -50,9 +50,9 @@ public interface HospitalFacilitiesDao  {
 
 
 
-    @Query("SELECT * FROM hospital_facilities WHERE number_of_beds LIKE :ward OR type LIKE :hospital_type OR number_of_beds LIKE :bedCapacity" +
+    @Query("SELECT * FROM hospital_facilities WHERE type LIKE :hospital_type OR number_of_beds LIKE :bedCapacity" +
             " AND structure_type LIKE :building_structure OR emergency_service LIKE :available_facilities OR evacuation_plan LIKE :excavation_plans")
-    LiveData<List<HospitalFacilities>> getAllFilteredList(String ward, String hospital_type,  String bedCapacity, String building_structure,
+    LiveData<List<HospitalFacilities>> getAllFilteredList(String hospital_type,  String bedCapacity, String building_structure,
                                                                           String available_facilities, String excavation_plans);
 
     // We do not need a conflict strategy, because the word is our primary key, and you cannot
