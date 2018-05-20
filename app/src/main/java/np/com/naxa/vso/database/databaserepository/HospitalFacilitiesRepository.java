@@ -36,6 +36,7 @@ public class HospitalFacilitiesRepository {
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(application);
         mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
         mAllHospitalFacilities = mHospitalFacilitiesDao.getFirstInsertedHospital();
+        mAllDistinctTypeList = mHospitalFacilitiesDao.getDistinctTypeList();
 
 //        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList("", "");
     }
@@ -70,12 +71,13 @@ public class HospitalFacilitiesRepository {
     }
 
 
-//    public LiveData<List<String >> getDistinctValuesFromColumn(String columnName){
-//        Log.d("repo", "getDistinctValuesFromColumn: "+columnName);
-//        mAllDistinctValuesList = mHospitalFacilitiesDao.getDistinctValuesFromColumn(columnName);
-////        Log.d("", "getDistinctValuesFromColumn: value "+mAllDistinctValuesList.getValue().get(1));
-//        return mAllDistinctValuesList;
-//    }
+
+        public LiveData<List<String >> getDistinctValuesFromColumn(String columnName){
+        Log.d("repo", "getDistinctValuesFromColumn: "+columnName);
+        mAllDistinctValuesList = mHospitalFacilitiesDao.getDistinctValuesFromColumn(columnName);
+//        Log.d("", "getDistinctValuesFromColumn: value "+mAllDistinctValuesList.getValue().get(1));
+        return mAllDistinctValuesList;
+    }
 
     public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
