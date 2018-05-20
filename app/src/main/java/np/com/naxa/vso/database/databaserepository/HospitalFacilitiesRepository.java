@@ -21,7 +21,6 @@ public class HospitalFacilitiesRepository {
 
     private HospitalFacilitiesDao mHospitalFacilitiesDao;
     private LiveData<List<HospitalFacilities>> mAllHospitalFacilities;
-//    private LiveData<List<HospitalFacilities>> mAllFilteredHospitalFacilities;
     private LiveData<List<HospitalAndCommon>> mAllFilteredHospitalFacilities;
     private LiveData<List<String>> mAllDistinctValuesList;
 
@@ -40,7 +39,6 @@ public class HospitalFacilitiesRepository {
         mAllHospitalFacilities = mHospitalFacilitiesDao.getFirstInsertedHospital();
         mAllDistinctTypeList = mHospitalFacilitiesDao.getDistinctTypeList();
 
-//        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList("", "");
     }
 
     // Room executes all queries on a separate thread.
@@ -73,7 +71,6 @@ public class HospitalFacilitiesRepository {
     }
 
 
-
         public LiveData<List<String >> getDistinctValuesFromColumn(String columnName){
         Log.d("repo", "getDistinctValuesFromColumn: "+columnName);
         mAllDistinctValuesList = mHospitalFacilitiesDao.getDistinctValuesFromColumn(columnName);
@@ -81,12 +78,6 @@ public class HospitalFacilitiesRepository {
         return mAllDistinctValuesList;
     }
 
-//    public LiveData<List<HospitalFacilities>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
-//                                                                               String building_structure, String available_facilities, String excavation_plans) {
-//
-//        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList( hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
-//        return mAllFilteredHospitalFacilities;
-//    }
 
     public LiveData<List<HospitalAndCommon>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
                                                                                String building_structure, String available_facilities, String excavation_plans) {
@@ -101,22 +92,6 @@ public class HospitalFacilitiesRepository {
     public void insert(HospitalFacilities hospitalFacilities) {
         Log.d("HospitalRepository", "insert: " + hospitalFacilities.getContact_Number());
         mHospitalFacilitiesDao.insert(hospitalFacilities);
-//        new HospitalFacilitiesRepository.insertAsyncTask(mHospitalFacilitiesDao).execute(hospitalFacilities);
     }
 
-    private static class insertAsyncTask extends AsyncTask<HospitalFacilities, Void, Void> {
-
-        private HospitalFacilitiesDao mAsyncTaskDao;
-
-        insertAsyncTask(HospitalFacilitiesDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final HospitalFacilities... params) {
-            Log.d("HospitalRepository", "doInBackground: " + params[0].getContact_Number());
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
-    }
 }

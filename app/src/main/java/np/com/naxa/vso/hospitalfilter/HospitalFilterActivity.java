@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,8 +102,8 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     private void initUIOptionData (){
 
-        PostTask postTask = new PostTask();
-        postTask.execute();
+        InitUIOptionDataPostTask initUIOptionDataPostTask = new InitUIOptionDataPostTask();
+        initUIOptionDataPostTask.execute();
 
 
     }
@@ -197,20 +196,6 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         mFormBuilder.addFormElements(formItems);
     }
 
-    private List<String> getDistinctValuesListFromColumn(String columnName) {
-        List<String> distinctValuesList = new ArrayList<String>();
-        Log.d(TAG, "getDistinctValuesFromColumn: " + columnName);
-        hospitalFacilitiesVewModel.getAllDistinctValuesListFromColumn(columnName).observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(@NonNull List<String> distinctValuesList) {
-                Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
-
-                distinctValuesList.addAll(distinctValuesList);
-            }
-        });
-        return distinctValuesList;
-    }
-
 
     @Override
     public void onValueChanged(BaseFormElement formElement) {
@@ -279,8 +264,8 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
 
 
-    // The definition of our task class
-    private class PostTask extends AsyncTask<List<String>, Integer, List<String>> {
+    // Filter option initialize
+    private class InitUIOptionDataPostTask extends AsyncTask<List<String>, Integer, List<String>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
