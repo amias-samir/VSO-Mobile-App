@@ -12,8 +12,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.DatabaseDataSPClass;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
@@ -70,8 +72,8 @@ public class SplashActivity extends AppCompatActivity {
     private void loadDataAndCallHomeActivity() {
         int position = 0;
         repository.getGeoJsonString(position)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(readGeoJason(position++))
                 .flatMap(readGeoJason(position++))
                 .flatMap(readGeoJason(position))

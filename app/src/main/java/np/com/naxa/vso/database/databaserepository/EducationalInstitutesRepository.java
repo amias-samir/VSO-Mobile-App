@@ -7,7 +7,9 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.VsoRoomDatabase;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.dao.EducationalInstitutesDao;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 
@@ -45,6 +47,10 @@ public class EducationalInstitutesRepository {
 //        new EducationalInstitutesRepository.insertAsyncTask(mEducationalInstitutesDao).execute(educationalInstitutes);
     }
 
+    public Flowable<List<EducationAndCommon>> getAll(){
+        return mEducationalInstitutesDao.getAllDetail();
+    }
+
     private static class insertAsyncTask extends AsyncTask<EducationalInstitutes, Void, Void> {
 
         private EducationalInstitutesDao mAsyncTaskDao;
@@ -60,4 +66,5 @@ public class EducationalInstitutesRepository {
             return null;
         }
     }
+
 }
