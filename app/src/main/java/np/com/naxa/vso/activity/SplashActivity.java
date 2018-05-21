@@ -47,6 +47,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spash);
+        repository = new MapDataRepository();
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -65,9 +66,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void loadDataAndCallHomeActivity() {
-
-        repository = new MapDataRepository();
-
         int position = 0;
         repository.getGeoJsonString(position)
 //                .subscribeOn(Schedulers.io())
@@ -91,7 +89,6 @@ public class SplashActivity extends AppCompatActivity {
                         HomeActivity.start(SplashActivity.this);
                     }
                 });
-
     }
 
     private Function<Pair, ObservableSource<Pair>> readGeoJason(int position) {
@@ -99,7 +96,6 @@ public class SplashActivity extends AppCompatActivity {
             String assetName = (String) pair.first;
             String fileContent = (String) pair.second;
             saveGeoJsonDataToDatabase(position, fileContent);
-            Log.i("Shree", "Position is: " + position);
             return repository.getGeoJsonString(position + 1);
         };
     }
@@ -140,12 +136,12 @@ public class SplashActivity extends AppCompatActivity {
 
         CommonPlacesAttrbRepository.pID.clear();
         JSONObject jsonObject = null;
-        String name = null, address = null,  remarks = null;
+        String name = null, address = null, remarks = null;
 
-        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null,emergency_service = null, icu_service = null,
-                ambulance = null ,number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
+        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null, emergency_service = null, icu_service = null,
+                ambulance = null, number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
                 fire_extingiusher = null, evacuation_plan = null, alternative_route = null, no_of_doctors = null, no_of_nurse = null,
-                no_of_health_assistent = null, total_no_of_employees= null, water_storage = null, emergency_stock_capcity = null, ict_grading = null ;
+                no_of_health_assistent = null, total_no_of_employees = null, water_storage = null, emergency_stock_capcity = null, ict_grading = null;
 
         Long fk_common_places = null;
         Double latitude = 0.0, longitude = 0.0;
@@ -189,11 +185,10 @@ public class SplashActivity extends AppCompatActivity {
                 emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
                 ict_grading = properties.getString("ICT_Grading_A_B_C_D");
 
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,category,type, open_space, contact_no,
-                        contact_pe,emergency_service,icu_service,ambulance,number_of_beds, structure_type,earthquake_damage,toilet_facility,
-                        fire_extingiusher,evacuation_plan,alternative_route, no_of_doctors,no_of_nurse,no_of_health_assistent,total_no_of_employees,
-                        water_storage, emergency_stock_capcity,ict_grading);
-
+                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, category, type, open_space, contact_no,
+                        contact_pe, emergency_service, icu_service, ambulance, number_of_beds, structure_type, earthquake_damage, toilet_facility,
+                        fire_extingiusher, evacuation_plan, alternative_route, no_of_doctors, no_of_nurse, no_of_health_assistent, total_no_of_employees,
+                        water_storage, emergency_stock_capcity, ict_grading);
 
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }
