@@ -2,6 +2,7 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -82,6 +84,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
@@ -96,6 +99,7 @@ import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.activity.SplashActivity;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -204,6 +208,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+    public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("data", hospitalAndCommonList);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -237,7 +249,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
-        loadAllMarker();
+//        loadAllMarker();
+        try {
+            List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
+            loadFilteredHospitalMarker(hospitalAndCommonList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -253,7 +271,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onError(Throwable e) {e.printStackTrace();
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
 
                     }
 
@@ -304,7 +323,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         floatingSearchView.setDimBackground(true);
 
-        
+
     }
 
     private void setupMap() {
@@ -673,7 +692,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-                handleLocationPermission();
+
+//                handleLocationPermission();
                 break;
         }
     }
@@ -780,5 +800,94 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    private void loadFilteredHospitalMarker(List<HospitalAndCommon> filteredHospitalList) {
+        mapView.getOverlays().clear();
+        Observable.just(filteredHospitalList)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommons) throws Exception {
+                        return hospitalAndCommons;
+                    }
+                })
+                .subscribe(new DisposableObserver<HospitalAndCommon>() {
+                    @Override
+                    public void onNext(HospitalAndCommon hospitalAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name=hospitalAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                        return false;
+                                    }
 
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+                        mOverlay.setFocusItemsOnTap(true);
+
+                        mapView.getOverlays().add(mOverlay);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+//                .flatMap(new Function<HospitalAndCommon, ObservableSource<ArrayList<OverlayItem>>>() {
+//                    @Override
+//                    public ObservableSource<ArrayList<OverlayItem>> apply(HospitalAndCommon hospitalAndCommon) throws Exception {
+//                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+//                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+//                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+//                        items.add(new OverlayItem("Title", "Description", new GeoPoint(latitude, longitude)));
+//                        return (ObservableSource<ArrayList<OverlayItem>>) items;
+//                    }
+//                })
+//                .subscribe(new DisposableObserver<ArrayList<OverlayItem>>() {
+//                    @Override
+//                    public void onNext(ArrayList<OverlayItem> overlayItems) {
+//                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, overlayItems,
+//                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+//                                    @Override
+//                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+//                                        return false;
+//                                    }
+//
+//                                    @Override
+//                                    public boolean onItemLongPress(int index, OverlayItem item) {
+//                                        return false;
+//                                    }
+//                                });
+//                        mOverlay.setFocusItemsOnTap(true);
+//
+//                        mapView.getOverlays().add(mOverlay);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//
+//                    }
+//                });
+    }
 }
+
+
+

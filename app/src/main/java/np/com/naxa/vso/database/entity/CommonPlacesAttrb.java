@@ -4,6 +4,8 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Keep;
 
 /**
@@ -14,7 +16,7 @@ import android.support.annotation.Keep;
 @Entity(tableName = "CommonPlacesAttrb",
         indices = {@Index(value = "latitude", unique = true),
                 @Index(value = "longitude", unique = true)})
-public class CommonPlacesAttrb {
+public class CommonPlacesAttrb implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int uid;
@@ -101,4 +103,43 @@ public class CommonPlacesAttrb {
     public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.uid);
+        dest.writeString(this.name);
+        dest.writeString(this.address);
+        dest.writeString(this.type);
+        dest.writeValue(this.latitude);
+        dest.writeValue(this.longitude);
+        dest.writeString(this.remarks);
+    }
+
+    protected CommonPlacesAttrb(Parcel in) {
+        this.uid = in.readInt();
+        this.name = in.readString();
+        this.address = in.readString();
+        this.type = in.readString();
+        this.latitude = (Double) in.readValue(Double.class.getClassLoader());
+        this.longitude = (Double) in.readValue(Double.class.getClassLoader());
+        this.remarks = in.readString();
+    }
+
+    public static final Parcelable.Creator<CommonPlacesAttrb> CREATOR = new Parcelable.Creator<CommonPlacesAttrb>() {
+        @Override
+        public CommonPlacesAttrb createFromParcel(Parcel source) {
+            return new CommonPlacesAttrb(source);
+        }
+
+        @Override
+        public CommonPlacesAttrb[] newArray(int size) {
+            return new CommonPlacesAttrb[size];
+        }
+    };
 }

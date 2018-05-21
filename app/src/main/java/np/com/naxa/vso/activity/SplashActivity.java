@@ -11,15 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.reactivex.ObservableSource;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.DatabaseDataSPClass;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -27,7 +23,6 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
-import np.com.naxa.vso.utils.ProgressDialogUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -41,13 +36,14 @@ public class SplashActivity extends AppCompatActivity {
     private HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     private EducationalInstitutesViewModel educationalInstitutesViewModel;
     private OpenSpaceViewModel openSpaceViewModel;
-
+    private DatabaseDataSPClass sharedpref=new DatabaseDataSPClass(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spash);
         repository = new MapDataRepository();
+
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -60,9 +56,15 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-        new Handler().postDelayed(() -> {
-            loadDataAndCallHomeActivity();
-        }, 2000);
+        if(sharedpref.checkIfDataPresent()){
+            HomeActivity.start(SplashActivity.this);
+        }else{
+            new Handler().postDelayed(() -> {
+                loadDataAndCallHomeActivity();
+            }, 2000);
+        }
+
+
     }
 
     private void loadDataAndCallHomeActivity() {
@@ -86,6 +88,7 @@ public class SplashActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        sharedpref.saveDataPresent();
                         HomeActivity.start(SplashActivity.this);
                     }
                 });
