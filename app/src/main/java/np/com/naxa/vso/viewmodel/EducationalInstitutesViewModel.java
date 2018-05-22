@@ -7,6 +7,8 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.databaserepository.EducationalInstitutesRepository;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 
@@ -35,6 +37,8 @@ public class EducationalInstitutesViewModel  extends AndroidViewModel {
         Log.d("VIewholder", "insert: "+educationalInstitutes.getContact_no());
         mRepository.insert(educationalInstitutes); }
 
-
+    public Flowable<List<EducationAndCommon>> getAllEducationDetailList(){
+        return mRepository.getAll();
+    }
 
 }

@@ -2,11 +2,11 @@ package np.com.naxa.vso.database.databaserepository;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.VsoRoomDatabase;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
@@ -93,5 +93,11 @@ public class HospitalFacilitiesRepository {
         Log.d("HospitalRepository", "insert: " + hospitalFacilities.getContact_Number());
         mHospitalFacilitiesDao.insert(hospitalFacilities);
     }
+
+    public Flowable<List<HospitalAndCommon>> getAllDetail(){
+        return mHospitalFacilitiesDao.getAllHospitalDetailList();
+    }
+
+
 
 }

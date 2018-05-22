@@ -2,6 +2,7 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -73,6 +75,7 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,12 +85,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.operators.flowable.FlowableFromArray;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -96,6 +101,8 @@ import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.activity.SplashActivity;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -204,6 +211,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+    public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("data", hospitalAndCommonList);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -237,7 +252,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
-        loadAllMarker();
+//        loadAllMarker();
+        try {
+            List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
+            loadFilteredHospitalMarker(hospitalAndCommonList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -253,7 +274,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onError(Throwable e) {e.printStackTrace();
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
 
                     }
 
@@ -304,7 +326,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         floatingSearchView.setDimBackground(true);
 
-        
+
     }
 
     private void setupMap() {
@@ -430,6 +452,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, null);
         recyclerViewDataDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewDataDetails.setAdapter(categoriesDetailAdapter);
+
     }
 
     private void setupGridRecycler() {
@@ -504,6 +527,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
+        if (position == 0) {
+            loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
+            return;
+        }
+        if (position == 2) {
+            loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
+            return;
+        }
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
                     @Override
@@ -627,11 +658,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
+            mapView.invalidate();
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
         }
     }
 
@@ -673,7 +703,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-                handleLocationPermission();
+
+//                handleLocationPermission();
                 break;
         }
     }
@@ -706,7 +737,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (pos == 1) {
             loadlayerToMap(geoJson);
         }
-
         if (pos == 2) {
             loadlayerToMap(geoJson);
         }
@@ -780,5 +810,151 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+        flowableList.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommonList) throws Exception {
+                        return hospitalAndCommonList;
+                    }
+                })
+                .subscribe(new DisposableSubscriber<HospitalAndCommon>() {
+                    @Override
+                    public void onNext(HospitalAndCommon hospitalAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name = hospitalAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(null, null, new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
 
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+                        mapView.getOverlays().add(mOverlay);
+                        mapView.invalidate();
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+    private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+        flowableList.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<EducationAndCommon>, Iterable<EducationAndCommon>>() {
+                    @Override
+                    public Iterable<EducationAndCommon> apply(List<EducationAndCommon> educationAndCommons) throws Exception {
+                        return educationAndCommons;
+                    }
+                }).subscribe(new DisposableSubscriber<EducationAndCommon>() {
+            @Override
+            public void onNext(EducationAndCommon educationAndCommon) {
+                ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                String name = educationAndCommon.getCommonPlacesAttrb().getName();
+                double latitude = educationAndCommon.getCommonPlacesAttrb().getLatitude();
+                double longitude = educationAndCommon.getCommonPlacesAttrb().getLongitude();
+                items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                            @Override
+                            public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onItemLongPress(int index, OverlayItem item) {
+                                return false;
+                            }
+                        });
+                mapView.getOverlays().add(mOverlay);
+                mapView.invalidate();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+
+    private void loadFilteredHospitalMarker(List<HospitalAndCommon> filteredHospitalList) {
+
+        mapView.getOverlays().clear();
+        Observable.just(filteredHospitalList)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommons) throws Exception {
+                        return hospitalAndCommons;
+                    }
+                })
+                .subscribe(new DisposableObserver<HospitalAndCommon>() {
+                    @Override
+                    public void onNext(HospitalAndCommon hospitalAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name = hospitalAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+
+                        mapView.getOverlays().add(mOverlay);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 }
+
+
+
