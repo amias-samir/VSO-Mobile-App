@@ -2,6 +2,7 @@ package np.com.naxa.vso.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
@@ -38,14 +41,13 @@ public class SplashActivity extends AppCompatActivity {
     private HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     private EducationalInstitutesViewModel educationalInstitutesViewModel;
     private OpenSpaceViewModel openSpaceViewModel;
-    private DatabaseDataSPClass sharedpref=new DatabaseDataSPClass(this);
+    private DatabaseDataSPClass sharedpref = new DatabaseDataSPClass(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spash);
         repository = new MapDataRepository();
-
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -58,25 +60,23 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-        if(sharedpref.checkIfDataPresent()){
+        if (sharedpref.checkIfDataPresent()) {
             HomeActivity.start(SplashActivity.this);
-        }else{
+        } else {
             new Handler().postDelayed(() -> {
                 loadDataAndCallHomeActivity();
             }, 2000);
         }
-
-
     }
 
     private void loadDataAndCallHomeActivity() {
-        int position = 0;
-        repository.getGeoJsonString(position)
+        int pos = 0;
+        repository.getGeoJsonString(pos)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(readGeoJason(position++))
-                .flatMap(readGeoJason(position++))
-                .flatMap(readGeoJason(position))
+                .flatMap(readGeoJason(0))
+                .flatMap(readGeoJason(1))
+                .flatMap(readGeoJason(2))
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
                     public void onNext(Pair pair) {
@@ -100,6 +100,7 @@ public class SplashActivity extends AppCompatActivity {
         return pair -> {
             String assetName = (String) pair.first;
             String fileContent = (String) pair.second;
+            Log.i(TAG,position+"");
             saveGeoJsonDataToDatabase(position, fileContent);
             return repository.getGeoJsonString(position + 1);
         };
