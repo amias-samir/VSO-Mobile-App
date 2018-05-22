@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -54,7 +55,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.events.MapEventsReceiver;
@@ -68,6 +71,7 @@ import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -102,6 +106,7 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
+import np.com.naxa.vso.home.model.MarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
@@ -892,6 +897,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
+        MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
+
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
@@ -909,50 +916,46 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void loadMunicipalityBoarder() {
         mapView.getOverlays().clear();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        RadiusMarkerClusterer radiusMarkerClusterer = new RadiusMarkerClusterer(this);
+        // marker icons
+         List<Marker> markerIconBmps_ = new ArrayList<Marker>();
 
-
-                Log.d(TAG, "loadMunicipalityBoarder: ");
+        new Thread(() -> {
+            Log.d(TAG, "loadMunicipalityBoarder: ");
 //            vMapView.getOverlays().clear();
 
-                String jsonString = null;
-                try {
+            String jsonString = null;
+            try {
 //                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
-                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-                    int size = jsonStream.available();
-                    byte[] buffer = new byte[size];
-                    jsonStream.read(buffer);
-                    jsonStream.close();
-                    jsonString = new String(buffer, "UTF-8");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                final KmlDocument kmlDocument = new KmlDocument();
-                kmlDocument.parseGeoJSON(jsonString);
-
-                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-
-                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-
-                final Style defaultStyle = new Style(null, 0x901010AA, 3f, 0x20AA1010);
-                myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "run: load boarder");
-                        mapView.getOverlays().add(myOverLayBoarder);
-                        mapView.invalidate();
-                        mapController.animateTo(centerPoint);
-                    }
-                });
-
-
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                int size = jsonStream.available();
+                byte[] buffer = new byte[size];
+                jsonStream.read(buffer);
+                jsonStream.close();
+                jsonString = new String(buffer, "UTF-8");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return;
             }
+
+            final KmlDocument kmlDocument = new KmlDocument();
+            kmlDocument.parseGeoJSON(jsonString);
+
+            Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+            Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+            final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
+            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+
+            runOnUiThread(() -> {
+                Log.d(TAG, "run: load boarder");
+                mapView.getOverlays().add(myOverLayBoarder);
+                mapView.invalidate();
+                mapController.animateTo(centerPoint);
+            });
+
+
         }).start();
     }
 
