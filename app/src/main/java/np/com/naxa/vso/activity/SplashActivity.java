@@ -2,6 +2,7 @@ package np.com.naxa.vso.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,15 +12,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.DatabaseDataSPClass;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -27,7 +28,6 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
-import np.com.naxa.vso.utils.ProgressDialogUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -41,12 +41,13 @@ public class SplashActivity extends AppCompatActivity {
     private HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
     private EducationalInstitutesViewModel educationalInstitutesViewModel;
     private OpenSpaceViewModel openSpaceViewModel;
-
+    private DatabaseDataSPClass sharedpref = new DatabaseDataSPClass(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spash);
+        repository = new MapDataRepository();
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -59,22 +60,23 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-        new Handler().postDelayed(() -> {
-            loadDataAndCallHomeActivity();
-        }, 2000);
+        if (sharedpref.checkIfDataPresent()) {
+            HomeActivity.start(SplashActivity.this);
+        } else {
+            new Handler().postDelayed(() -> {
+                loadDataAndCallHomeActivity();
+            }, 2000);
+        }
     }
 
     private void loadDataAndCallHomeActivity() {
-
-        repository = new MapDataRepository();
-
-        int position = 0;
-        repository.getGeoJsonString(position)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(readGeoJason(position++))
-                .flatMap(readGeoJason(position++))
-                .flatMap(readGeoJason(position))
+        int pos = 0;
+        repository.getGeoJsonString(pos)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(readGeoJason(0))
+                .flatMap(readGeoJason(1))
+                .flatMap(readGeoJason(2))
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
                     public void onNext(Pair pair) {
@@ -88,18 +90,18 @@ public class SplashActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        sharedpref.saveDataPresent();
                         HomeActivity.start(SplashActivity.this);
                     }
                 });
-
     }
 
     private Function<Pair, ObservableSource<Pair>> readGeoJason(int position) {
         return pair -> {
             String assetName = (String) pair.first;
             String fileContent = (String) pair.second;
+            Log.i(TAG,position+"");
             saveGeoJsonDataToDatabase(position, fileContent);
-            Log.i("Shree", "Position is: " + position);
             return repository.getGeoJsonString(position + 1);
         };
     }
@@ -140,12 +142,12 @@ public class SplashActivity extends AppCompatActivity {
 
         CommonPlacesAttrbRepository.pID.clear();
         JSONObject jsonObject = null;
-        String name = null, address = null,  remarks = null;
+        String name = null, address = null, remarks = null;
 
-        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null,emergency_service = null, icu_service = null,
-                ambulance = null ,number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
+        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null, emergency_service = null, icu_service = null,
+                ambulance = null, number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
                 fire_extingiusher = null, evacuation_plan = null, alternative_route = null, no_of_doctors = null, no_of_nurse = null,
-                no_of_health_assistent = null, total_no_of_employees= null, water_storage = null, emergency_stock_capcity = null, ict_grading = null ;
+                no_of_health_assistent = null, total_no_of_employees = null, water_storage = null, emergency_stock_capcity = null, ict_grading = null;
 
         Long fk_common_places = null;
         Double latitude = 0.0, longitude = 0.0;
@@ -189,11 +191,10 @@ public class SplashActivity extends AppCompatActivity {
                 emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
                 ict_grading = properties.getString("ICT_Grading_A_B_C_D");
 
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,category,type, open_space, contact_no,
-                        contact_pe,emergency_service,icu_service,ambulance,number_of_beds, structure_type,earthquake_damage,toilet_facility,
-                        fire_extingiusher,evacuation_plan,alternative_route, no_of_doctors,no_of_nurse,no_of_health_assistent,total_no_of_employees,
-                        water_storage, emergency_stock_capcity,ict_grading);
-
+                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, category, type, open_space, contact_no,
+                        contact_pe, emergency_service, icu_service, ambulance, number_of_beds, structure_type, earthquake_damage, toilet_facility,
+                        fire_extingiusher, evacuation_plan, alternative_route, no_of_doctors, no_of_nurse, no_of_health_assistent, total_no_of_employees,
+                        water_storage, emergency_stock_capcity, ict_grading);
 
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }

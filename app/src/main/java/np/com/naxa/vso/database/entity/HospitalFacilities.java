@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Keep;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -19,7 +21,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 parentColumns = "uid",
                 childColumns = "fk_common_places",
                 onDelete = CASCADE))
-public class HospitalFacilities {
+public class HospitalFacilities implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int hid;
@@ -315,4 +317,77 @@ public class HospitalFacilities {
     public void setType(String type) {
         Type = type;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.hid);
+        dest.writeValue(this.fk_common_places);
+        dest.writeString(this.Category);
+        dest.writeString(this.Type);
+        dest.writeString(this.Open_Space);
+        dest.writeString(this.Contact_Number);
+        dest.writeString(this.Contact_Person);
+        dest.writeString(this.Emergency_Service);
+        dest.writeString(this.ICU_Service);
+        dest.writeString(this.Ambulance_Service);
+        dest.writeString(this.Number_of_Beds);
+        dest.writeString(this.Structure_Type);
+        dest.writeString(this.Earthquake_Damage);
+        dest.writeString(this.Toilet_Facility);
+        dest.writeString(this.Fire_Extinguisher);
+        dest.writeString(this.Evacuation_Plan);
+        dest.writeString(this.Alternatice_Route);
+        dest.writeString(this.No_of_Doctors);
+        dest.writeString(this.No_of_Nurses);
+        dest.writeString(this.No_of_Health_Assistant);
+        dest.writeString(this.Total_No_of_Employees);
+        dest.writeString(this.Water_Storage_Capacity_Litre_);
+        dest.writeString(this.Emergency_Stock_Capacity);
+        dest.writeString(this.ICT_Grading_A_B_C_D);
+    }
+
+    protected HospitalFacilities(Parcel in) {
+        this.hid = in.readInt();
+        this.fk_common_places = (Long) in.readValue(Long.class.getClassLoader());
+        this.Category = in.readString();
+        this.Type = in.readString();
+        this.Open_Space = in.readString();
+        this.Contact_Number = in.readString();
+        this.Contact_Person = in.readString();
+        this.Emergency_Service = in.readString();
+        this.ICU_Service = in.readString();
+        this.Ambulance_Service = in.readString();
+        this.Number_of_Beds = in.readString();
+        this.Structure_Type = in.readString();
+        this.Earthquake_Damage = in.readString();
+        this.Toilet_Facility = in.readString();
+        this.Fire_Extinguisher = in.readString();
+        this.Evacuation_Plan = in.readString();
+        this.Alternatice_Route = in.readString();
+        this.No_of_Doctors = in.readString();
+        this.No_of_Nurses = in.readString();
+        this.No_of_Health_Assistant = in.readString();
+        this.Total_No_of_Employees = in.readString();
+        this.Water_Storage_Capacity_Litre_ = in.readString();
+        this.Emergency_Stock_Capacity = in.readString();
+        this.ICT_Grading_A_B_C_D = in.readString();
+    }
+
+    public static final Parcelable.Creator<HospitalFacilities> CREATOR = new Parcelable.Creator<HospitalFacilities>() {
+        @Override
+        public HospitalFacilities createFromParcel(Parcel source) {
+            return new HospitalFacilities(source);
+        }
+
+        @Override
+        public HospitalFacilities[] newArray(int size) {
+            return new HospitalFacilities[size];
+        }
+    };
 }

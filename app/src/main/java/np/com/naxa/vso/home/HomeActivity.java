@@ -2,6 +2,7 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -72,10 +74,13 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,12 +90,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.operators.flowable.FlowableFromArray;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -98,6 +105,9 @@ import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
+import np.com.naxa.vso.activity.SplashActivity;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
@@ -110,6 +120,7 @@ import np.com.naxa.vso.home.model.MarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.OsmMarkerCluster;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -167,6 +178,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
     RadiusMarkerClusterer poiMarkers;
+    List<Overlay> overlaysList ;
 
     private String latitude;
     private String longitude;
@@ -207,6 +219,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+    public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
+        Intent intent = new Intent(context, HomeActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("data", hospitalAndCommonList);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -240,11 +260,39 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
-//        commonPlacesAttribViewModel
-//                .getmAllCommonPlacesAttrb()
+//        loadAllMarker();
+        try {
+            List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
+            loadFilteredHospitalMarker(hospitalAndCommonList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
+    private void loadAllMarker() {
+        Observable.just(0, 1, 2)
+                .flatMap((Function<Integer, ObservableSource<Pair>>) integer -> repo.getGeoJsonString(integer))
+                .subscribe(new DisposableObserver<Pair>() {
+                    @Override
+                    public void onNext(Pair pair) {
+                        String assetName = (String) pair.first;
+                        String fileContent = (String) pair.second;
+                        loadlayerToMap(fileContent);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
@@ -286,7 +334,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         floatingSearchView.setDimBackground(true);
 
-        
+
     }
 
     private void setupMap() {
@@ -331,6 +379,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
+
+
+//        for clustering
+        overlaysList = this.mapView.getOverlays();
 
         showOverlayOnMap(-1);
     }
@@ -412,6 +464,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, null);
         recyclerViewDataDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewDataDetails.setAdapter(categoriesDetailAdapter);
+
     }
 
     private void setupGridRecycler() {
@@ -486,7 +539,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
-
+        if (position == 0) {
+            loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
+            return;
+        }
+        if (position == 2) {
+            loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
+            return;
+        }
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
                     @Override
@@ -500,7 +560,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         String fileContent = (String) pair.second;
 //                        loadLineLayers(assetName, fileContent);
 //                        loadMarkersFromGeoJson(assetName, fileContent);
-
+                        mapView.getOverlays().clear();
                         saveGeoJsonDataToDatabase(position, fileContent);
                     }
 
@@ -508,7 +568,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onError(Throwable e) {
                         Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
-
                     }
 
                     @Override
@@ -611,11 +670,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
+            mapView.invalidate();
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
         }
     }
 
@@ -651,14 +709,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             switchViews();
         }
-
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-                handleLocationPermission();
+
+//                handleLocationPermission();
                 break;
         }
     }
@@ -686,215 +744,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
         if (pos == 0) {
-//            save hospital data
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    saveHospitalData(geoJson);
-                }
-            }).start();
             loadlayerToMap(geoJson);
         }
-
         if (pos == 1) {
-//            save openspace data
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    saveOpenSpaces(geoJson);
-                }
-            }).start();
             loadlayerToMap(geoJson);
-
         }
-
         if (pos == 2) {
-//            save school data
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    saveEducationalInstitutes(geoJson);
-                }
-            }).start();
             loadlayerToMap(geoJson);
-
-        }
-
-    }
-
-    private void saveHospitalData(String geoJsonString) {
-
-        CommonPlacesAttrbRepository.pID.clear();
-        JSONObject jsonObject = null;
-        String name = null, address = null,  remarks = null;
-
-        String category = null, type = null, open_space = null, contact_no = null, contact_pe = null,emergency_service = null, icu_service = null,
-                ambulance = null ,number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
-                fire_extingiusher = null, evacuation_plan = null, alternative_route = null, no_of_doctors = null, no_of_nurse = null,
-                no_of_health_assistent = null, total_no_of_employees= null, water_storage = null, emergency_stock_capcity = null, ict_grading = null ;
-
-        Long fk_common_places = null;
-        Double latitude = 0.0, longitude = 0.0;
-        try {
-            jsonObject = new JSONObject(geoJsonString);
-            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
-
-            for (int i = 0; i < jsonarray.length(); i++) {
-                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                name = properties.getString("name");
-                address = properties.getString("Address");
-                latitude = Double.parseDouble(properties.getString("Y"));
-                longitude = Double.parseDouble(properties.getString("X"));
-                remarks = properties.getString("Remarks");
-
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, "hospital", latitude, longitude, remarks);
-
-                fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
-                Log.d(TAG, "saveHospitalData: " + fk_common_places);
-
-                category = properties.getString("Category");
-                type = properties.getString("Type");
-                open_space = properties.getString("Open_Space");
-                contact_no = properties.getString("Contact_Number");
-                contact_pe = properties.getString("Contact_Person");
-                emergency_service = properties.getString("Emergency_Service");
-                icu_service = properties.getString("ICU_Service");
-                ambulance = properties.getString("Ambulance_Service");
-                number_of_beds = properties.getString("Number_of_Beds");
-                structure_type = properties.getString("Structure_Type");
-                earthquake_damage = properties.getString("Earthquake_Damage");
-                toilet_facility = properties.getString("Toilet_Facility");
-                fire_extingiusher = properties.getString("Fire_Extinguisher");
-                evacuation_plan = properties.getString("Evacuation_Plan");
-                alternative_route = properties.getString("Alternatice_Route");
-                no_of_doctors = properties.getString("No_of_Doctors");
-                no_of_nurse = properties.getString("No_of_Nurses");
-                no_of_health_assistent = properties.getString("No_of_Health_Assistant");
-                total_no_of_employees = properties.getString("Total_No_of_Employees");
-                water_storage = properties.getString("Water_Storage_Capacity_Litre_");
-                emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
-                ict_grading = properties.getString("ICT_Grading_A_B_C_D");
-
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,category,type, open_space, contact_no,
-                        contact_pe,emergency_service,icu_service,ambulance,number_of_beds, structure_type,earthquake_damage,toilet_facility,
-                        fire_extingiusher,evacuation_plan,alternative_route, no_of_doctors,no_of_nurse,no_of_health_assistent,total_no_of_employees,
-                        water_storage, emergency_stock_capcity,ict_grading);
-
-
-                hospitalFacilitiesVewModel.insert(hospitalFacilities);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    private void saveEducationalInstitutes(String geoJsonString) {
-
-        CommonPlacesAttrbRepository.pID.clear();
-
-        JSONObject jsonObject = null;
-        Double latitude = 0.0, longitude = 0.0;
-        String name = null, address = null, type = null, remarks = null;
-
-        Long fk_common_places = null;
-        String college_he = null, contact_no = null, contact_pe = null, earthquake = null, evacuation = null, fire_extin = null,
-                female_student = null, male_student = null, total_student = null, level = null, structure = null, open_space = null;
-        try {
-            jsonObject = new JSONObject(geoJsonString);
-            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
-
-            for (int i = 0; i < jsonarray.length(); i++) {
-                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                name = properties.getString("name");
-                address = properties.getString("Address");
-                type = properties.getString("Type");
-                latitude = Double.parseDouble(properties.getString("Y"));
-                longitude = Double.parseDouble(properties.getString("X"));
-                remarks = properties.getString("Remarks");
-
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
-
-                fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
-                Log.d(TAG, "saveEducationalInstitutes: " + fk_common_places);
-
-                college_he = properties.getString("College_He");
-                contact_no = properties.getString("Contact_Nu");
-                contact_pe = properties.getString("Contact_Pe");
-                earthquake = properties.getString("Earthquake");
-                evacuation = properties.getString("Evacuation");
-                fire_extin = properties.getString("Fire_Extin");
-                male_student = properties.getString("Male_Stude");
-                female_student = properties.getString("Female_Stu");
-                total_student = properties.getString("Total_Stud");
-                open_space = properties.getString("Open_Space");
-                structure = properties.getString("Structure_");
-
-                EducationalInstitutes educationalInstitutes = new EducationalInstitutes(fk_common_places, college_he, contact_no, contact_pe, earthquake,
-                        evacuation, female_student, male_student, total_student, fire_extin, level, open_space, structure);
-                educationalInstitutesViewModel.insert(educationalInstitutes);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveOpenSpaces(String geoJsonString) {
-        CommonPlacesAttrbRepository.pID.clear();
-
-        JSONObject jsonObject = null;
-        Double latitude = 0.0, longitude = 0.0;
-        String name = null, address = null, type = null, remarks = null;
-
-        Long fk_common_places = null;
-        String access_roa = null, accommodat = null, area_sqm = null, hign_tensi = null, road_access = null, shape_area = null,
-                shape_leng = null, terrain_ty = null, toilet_fac = null, water_faci = null, wifi_facil = null;
-        try {
-            jsonObject = new JSONObject(geoJsonString);
-            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
-
-            for (int i = 0; i < jsonarray.length(); i++) {
-                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                name = properties.getString("name");
-                address = properties.getString("Address");
-                type = properties.getString("Type");
-                latitude = Double.parseDouble(properties.getString("Y"));
-                longitude = Double.parseDouble(properties.getString("X"));
-                remarks = properties.getString("Remarks");
-
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
-
-                fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
-                Log.d(TAG, "saveOpenSpaces: " + fk_common_places);
-
-                access_roa = properties.getString("Access_Roa");
-                accommodat = properties.getString("Accommodat");
-                area_sqm = properties.getString("Area_SqM");
-                hign_tensi = properties.getString("High_Tensi");
-                road_access = properties.getString("Road_Acces");
-                shape_area = properties.getString("Shape_Area");
-                shape_leng = properties.getString("Shape_Leng");
-                terrain_ty = properties.getString("Terrain_Ty");
-                toilet_fac = properties.getString("Toilet_Fac");
-                water_faci = properties.getString("Water_Faci");
-                wifi_facil = properties.getString("Wifi_Facil");
-
-                OpenSpace openSpace = new OpenSpace(fk_common_places, access_roa, accommodat, area_sqm, hign_tensi, road_access, shape_area,
-                        shape_leng, terrain_ty, toilet_fac, water_faci, wifi_facil);
-                openSpaceViewModel.insert(openSpace);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
     private void loadlayerToMap(String geoJson) {
-        Log.i("Shree", geoJson);
-        mapView.getOverlays().clear();
+//        mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
         MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
@@ -959,5 +820,154 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+        flowableList.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommonList) throws Exception {
+                        return hospitalAndCommonList;
+                    }
+                })
+                .subscribe(new DisposableSubscriber<HospitalAndCommon>() {
+                    @Override
+                    public void onNext(HospitalAndCommon hospitalAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name = hospitalAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(null, null, new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
 
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+
+                        overlaysList.add(mOverlay);
+//                        mapView.getOverlays().add(OsmMarkerCluster.createPointOfInterestOverlay(overlaysList, getApplicationContext()));
+//                        mapView.getOverlays().addAll(overlaysList);
+                        mapView.invalidate();
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+    private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+        flowableList.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<EducationAndCommon>, Iterable<EducationAndCommon>>() {
+                    @Override
+                    public Iterable<EducationAndCommon> apply(List<EducationAndCommon> educationAndCommons) throws Exception {
+                        return educationAndCommons;
+                    }
+                }).subscribe(new DisposableSubscriber<EducationAndCommon>() {
+            @Override
+            public void onNext(EducationAndCommon educationAndCommon) {
+                ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                String name = educationAndCommon.getCommonPlacesAttrb().getName();
+                double latitude = educationAndCommon.getCommonPlacesAttrb().getLatitude();
+                double longitude = educationAndCommon.getCommonPlacesAttrb().getLongitude();
+                items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                            @Override
+                            public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onItemLongPress(int index, OverlayItem item) {
+                                return false;
+                            }
+                        });
+                mapView.getOverlays().add(mOverlay);
+                mapView.invalidate();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+
+    private void loadFilteredHospitalMarker(List<HospitalAndCommon> filteredHospitalList) {
+
+        mapView.getOverlays().clear();
+        Observable.just(filteredHospitalList)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommons) throws Exception {
+                        return hospitalAndCommons;
+                    }
+                })
+                .subscribe(new DisposableObserver<HospitalAndCommon>() {
+                    @Override
+                    public void onNext(HospitalAndCommon hospitalAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name = hospitalAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+
+                        mapView.getOverlays().add(mOverlay);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 }
+
+
+

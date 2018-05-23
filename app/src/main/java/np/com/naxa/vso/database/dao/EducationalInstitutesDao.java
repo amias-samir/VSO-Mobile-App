@@ -7,6 +7,9 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 
 /**
@@ -14,7 +17,7 @@ import np.com.naxa.vso.database.entity.EducationalInstitutes;
  */
 
 @Dao
-public interface EducationalInstitutesDao{
+public interface EducationalInstitutesDao {
 
     // LiveData is a data holder class that can be observed within a given lifecycle.
     // Always holds/caches latest version of data. Notifies its active observers when the
@@ -31,4 +34,8 @@ public interface EducationalInstitutesDao{
 
     @Query("DELETE FROM educational_institutes")
     void deleteAll();
+
+    @Query("SELECT * FROM educational_institutes "
+            + "INNER JOIN commonplacesattrb ON commonplacesattrb.uid = educational_institutes.fk_common_places")
+    Flowable<List<EducationAndCommon>> getAllDetail();
 }

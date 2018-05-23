@@ -35,6 +35,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
+import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 
@@ -92,7 +93,6 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         initUIOptionData();
 
 
-
     }
 
     private void initRoomDatabase() {
@@ -101,12 +101,11 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     }
 
-    private void initUIOptionData (){
+    private void initUIOptionData() {
 
         InitUIOptionDataPostTask initUIOptionDataPostTask = new InitUIOptionDataPostTask();
         initUIOptionDataPostTask.execute();
     }
-
 
 
     @Override
@@ -247,11 +246,13 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
                     // Update the cached copy of the words in the adapter.
 //                adapter.setWords(words);
 
-                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
-//                    Log.d(TAG, "onChanged: data retrieved "+hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
-//                    Log.d(TAG, "onChanged: data retrieved "+hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
-//                    Log.d("HospitalFiltered", "onChanged: data retrieved "+hospitalFacilities.size());
-//                    Toast.makeText(HospitalFilterActivity.this, hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName()+"\n "+hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType(), Toast.LENGTH_SHORT).show();
+//                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
+                    HomeActivity.start(HospitalFilterActivity.this, (ArrayList) hospitalFacilities);
+
+//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
+//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
+//                    Log.d("HospitalFiltered", "onChanged: data retrieved " + hospitalFacilities.size());
+
                 }
             });
 
@@ -261,7 +262,6 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         }
 
     }
-
 
 
     // Filter option initialize
@@ -278,7 +278,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
             hospitalFacilitiesVewModel.getAllTypeList().observe(owner, new Observer<List<String>>() {
                 @Override
                 public void onChanged(@NonNull final List<String> distinctValuesList) {
-                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+                    Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
 
                     hospitalTypeList.addAll(distinctValuesList);
                 }
@@ -288,7 +288,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
             hospitalFacilitiesVewModel.getAllStructureTypeList().observe(owner, new Observer<List<String>>() {
                 @Override
                 public void onChanged(@NonNull final List<String> distinctValuesList) {
-                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+                    Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
 
                     buildingStructureList.addAll(distinctValuesList);
                 }
@@ -297,7 +297,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
             hospitalFacilitiesVewModel.getAllBedCapacityList().observe(owner, new Observer<List<String>>() {
                 @Override
                 public void onChanged(@NonNull final List<String> distinctValuesList) {
-                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+                    Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
                     bedCapacityList.addAll(distinctValuesList);
                 }
             });
@@ -306,13 +306,13 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
             hospitalFacilitiesVewModel.getAllEvacuationPlanList().observe(owner, new Observer<List<String>>() {
                 @Override
                 public void onChanged(@NonNull final List<String> distinctValuesList) {
-                    Log.d(TAG, "onChanged: "+distinctValuesList.get(0));
+                    Log.d(TAG, "onChanged: " + distinctValuesList.get(0));
 
                     evacuationPlansList.addAll(distinctValuesList);
                 }
             });
 
-           return hospitalTypeList;
+            return hospitalTypeList;
         }
 
         @Override

@@ -8,10 +8,10 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.databaserepository.HospitalFacilitiesRepository;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
-import np.com.naxa.vso.database.entity.OpenSpace;
 
 
 /**
@@ -86,7 +86,12 @@ public class HospitalFacilitiesVewModel extends AndroidViewModel {
                                                               String excavation_plans) {
         mAllFilteredHospitalFacilities = mRepository.getAllFilteredHospitalFacilities(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans);
 
+
         return mAllFilteredHospitalFacilities;
+    }
+
+    public Flowable<List<HospitalAndCommon>> getAllHospitalDetailList(){
+        return mRepository.getAllDetail();
     }
 
 
