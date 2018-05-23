@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -54,6 +55,8 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
+import org.osmdroid.bonuspack.routing.GoogleRoadManager;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -69,9 +72,12 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
@@ -84,6 +90,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -247,11 +255,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupFloatingToolbar();
 
 //        loadAllMarker();
-        try {
+
+        if (getIntent().getParcelableArrayListExtra("data") != null) {
             List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
             loadFilteredHospitalMarker(hospitalAndCommonList);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }
@@ -669,31 +676,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+//                provider.startLocationProvider(new IMyLocationConsumer() {
+//                    @Override
+//                    public void onLocationChanged(Location location, IMyLocationProvider source) {
+//                        Log.i("Shree", "Current Location: " + location.getLatitude() + location.getLongitude());
+//                    }
+//                });
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-                String location = "Current location is: "
-                        +provider.getLastKnownLocation().getLatitude()
-                        +", "
-                        +provider.getLastKnownLocation().getLongitude();
-                Log.i(TAG, location);
                 myLocationNewOverlay.enableMyLocation();
-                Observable.just(mapView.getOverlays().add(myLocationNewOverlay))
-                        .subscribe(new DisposableObserver<Boolean>() {
-                            @Override
-                            public void onNext(Boolean aBoolean) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-//                mapView.getOverlays().add(myLocationNewOverlay);
+                mapView.getOverlays().add(myLocationNewOverlay);
+                mapView.invalidate();
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
@@ -726,38 +718,43 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void routeLocation() {
-        //Experimenting with routing
+        Observable.create(new ObservableOnSubscribe<Polyline>() {
+            @Override
+            public void subscribe(ObservableEmitter<Polyline> e) throws Exception {
+                try {
+                    RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
 
-        RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+                    GeoPoint startPoint = new GeoPoint(27.714849, 85.324253);
+                    GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
 
-        double lat = -27.714849;
-        double lng = 85.324253;
-        GeoPoint gp = new GeoPoint(lat, lng);
-        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-        waypoints.add(gp);
+                    ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                    waypoints.add(startPoint);
+                    waypoints.add(endPoint);
+                    Road road = roadManager.getRoad(waypoints);
+                    Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                    roadOverlay.setGeodesic(true);
+                    e.onNext(roadOverlay);
+                } catch (Exception ex) {
+                    e.onError(ex);
+                } finally {
+                    e.onComplete();
+                }
 
-//                GeoPoint endPoint = new GeoPoint(item.getPoint().getLatitude(), item.getPoint().getLongitude());
-        GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
-        waypoints.add(endPoint);
-        Log.i(TAG, waypoints.toString());
-        Observable.just(waypoints)
+            }
+        })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<ArrayList<GeoPoint>>() {
+                .subscribe(new DisposableObserver<Polyline>() {
                     @Override
-                    public void onNext(ArrayList<GeoPoint> geoPoints) {
-                        Road road = roadManager.getRoad(geoPoints);
-
-                        if (road.mStatus != Road.STATUS_OK)
-                            Toast.makeText(HomeActivity.this, "Error when loading the road - status=" + road.mStatus, Toast.LENGTH_SHORT).show();
-
-                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                    public void onNext(Polyline roadOverlay) {
                         mapView.getOverlays().add(roadOverlay);
+                        clearClusterAndMarkers();
+                        mapView.invalidate();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -765,29 +762,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 });
-
-
-    }
-
-    private void addMarkerToMap(Location location) {
-        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        items.add(new OverlayItem("", "", new GeoPoint(location.getLatitude(), location.getLongitude())));
-
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
-                this, items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(final int index, final OverlayItem item) {
-                        return false;
-                    }
-                });
-        mOverlay.setFocusItemsOnTap(true);
-        mapView.getOverlays().add(mOverlay);
     }
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
@@ -969,7 +943,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     private void loadFilteredHospitalMarker(List<HospitalAndCommon> filteredHospitalList) {
 
         mapView.getOverlays().clear();
@@ -1013,7 +986,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
-
+                        mapView.invalidate();
                     }
                 });
     }
