@@ -546,7 +546,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
 
-                            HospitalWithDIstance(hospitalAndCommonListForSorting);
+                            HospitalWithDIstance(hospitalAndCommonList);
                         }
 
                         @Override
@@ -647,7 +647,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onSuccess(List<MapMarkerItem> myItems) {
                         clusterManagerPlugin.addItems(myItems);
                         clusterManagerPlugin.cluster();
-                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
+//                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
                     }
 
                     @Override
@@ -963,9 +963,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
     private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList){
 
-        List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
         List<Float> sortedDistanceList = new ArrayList<Float>();
 
         GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
@@ -980,12 +980,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         SortingDistance sortingDistance = new SortingDistance();
         LinkedHashMap linkedHospitalAndDistance =  sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude );
 
+
                 //Getting Set of keys from HashMap
         Set<HospitalAndCommon> keySet = linkedHospitalAndDistance.keySet();
         //Creating an ArrayList of keys by passing the keySet
         sortedHospitalList = new ArrayList<HospitalAndCommon>(keySet);
-        String name = sortedHospitalList.get(0).getCommonPlacesAttrb().getName();
-        Log.d(TAG, "HospitalWithDIstance: "+name);
+        
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // Stuff that updates the UI
+                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalList);
+
+
+            }
+        });
 
 
         //Getting Collection of values from HashMap
