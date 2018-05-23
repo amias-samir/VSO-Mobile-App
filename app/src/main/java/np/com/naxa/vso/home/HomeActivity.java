@@ -114,6 +114,7 @@ import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.home.model.MarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
+import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.OsmMarkerCluster;
@@ -963,11 +964,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
     private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList){
 
         List<Float> sortedDistanceList = new ArrayList<Float>();
-
         GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
         provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
 
@@ -981,28 +982,38 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         LinkedHashMap linkedHospitalAndDistance =  sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude );
 
 
-                //Getting Set of keys from HashMap
         Set<HospitalAndCommon> keySet = linkedHospitalAndDistance.keySet();
-        //Creating an ArrayList of keys by passing the keySet
         sortedHospitalList = new ArrayList<HospitalAndCommon>(keySet);
-        
+
+        Collection<Float> values = linkedHospitalAndDistance.values();
+        sortedDistanceList = new ArrayList<Float>(values);
+
+        List<SortedHospitalItem> sortedHospitalItemList = new ArrayList<SortedHospitalItem>() ;
+        for(int i = 0; i< linkedHospitalAndDistance.size(); i++){
+            Float distance = sortedDistanceList.get(i);
+            String distanceInMeterKm;
+            if(sortedDistanceList.get(i)>1000){
+                distanceInMeterKm = (distance/1000)+" Kms. away" ;
+            }else {
+                distanceInMeterKm = distance+ " Meters away";
+            }
+            SortedHospitalItem sortedHospitalItem = new SortedHospitalItem(sortedHospitalList.get(i), distanceInMeterKm);
+            sortedHospitalItemList.add(sortedHospitalItem);
+        }
+
+
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
                 // Stuff that updates the UI
-                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalList);
+                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
 
 
             }
         });
 
 
-        //Getting Collection of values from HashMap
-        Collection<Float> values = linkedHospitalAndDistance.values();
-        //Creating an ArrayList of values
-        sortedDistanceList = new ArrayList<Float>(values);
-        Log.d(TAG, "HospitalWithDIstance: "+sortedDistanceList.get(0));
 
 
 
