@@ -1,9 +1,11 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -17,6 +19,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +38,8 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -676,12 +681,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-//                provider.startLocationProvider(new IMyLocationConsumer() {
-//                    @Override
-//                    public void onLocationChanged(Location location, IMyLocationProvider source) {
-//                        Log.i("Shree", "Current Location: " + location.getLatitude() + location.getLongitude());
-//                    }
-//                });
+                provider.startLocationProvider(new IMyLocationConsumer() {
+                    @Override
+                    public void onLocationChanged(Location location, IMyLocationProvider source) {
+                        Log.i("Shree", "Current Location: " + location.getLatitude() + location.getLongitude());
+                        routeLocation(new GeoPoint(location.getLatitude(), location.getLongitude()));
+                    }
+                });
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
                 myLocationNewOverlay.enableMyLocation();
                 mapView.getOverlays().add(myLocationNewOverlay);
@@ -717,30 +723,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void routeLocation() {
-        Observable.create(new ObservableOnSubscribe<Polyline>() {
-            @Override
-            public void subscribe(ObservableEmitter<Polyline> e) throws Exception {
-                try {
-                    RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+    @SuppressLint("MissingPermission")
+    private void routeLocation(GeoPoint startPoint) {
 
-                    GeoPoint startPoint = new GeoPoint(27.714849, 85.324253);
-                    GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
-
-                    ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-                    waypoints.add(startPoint);
-                    waypoints.add(endPoint);
-                    Road road = roadManager.getRoad(waypoints);
-                    Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                    roadOverlay.setGeodesic(true);
-                    e.onNext(roadOverlay);
-                } catch (Exception ex) {
-                    e.onError(ex);
-                } finally {
-                    e.onComplete();
-                }
-
+        Observable.create((ObservableOnSubscribe<Polyline>) e -> {
+            try {
+                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+                GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
+                ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                waypoints.add(startPoint);
+                waypoints.add(endPoint);
+                Road road = roadManager.getRoad(waypoints);
+                Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                roadOverlay.setGeodesic(true);
+                e.onNext(roadOverlay);
+            } catch (Exception ex) {
+                e.onError(ex);
+            } finally {
+                e.onComplete();
             }
+
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -762,6 +764,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 });
+    }
+
+    @SuppressLint("MissingPermission")
+    public GeoPoint getGeoPointUsingFused() {
+        final GeoPoint[] geoPoint = new GeoPoint[1];
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                geoPoint[0] = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
+        });
+
+        return geoPoint[0];
     }
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
