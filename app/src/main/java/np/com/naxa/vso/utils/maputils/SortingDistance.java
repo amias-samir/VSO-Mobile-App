@@ -44,7 +44,7 @@ public class SortingDistance {
 
                         hashMapOpenWithDistance.put(openSpaceList.get(i), distance1);
                     }
-                    sortMapByValuesWithDuplicates(hashMapOpenWithDistance);
+                    sortMapByValuesWithDuplicatesOpen(hashMapOpenWithDistance);
                 }
 
         return sortedMap;
@@ -116,6 +116,36 @@ public class SortingDistance {
 //        Collection<Float> values = sortedMap.values();
 //        //Creating an ArrayList of values
 //        sortedOpenSpacesDistanceList = new ArrayList<Float>(values);
+
+
+    }
+
+    private void sortMapByValuesWithDuplicatesOpen(Map passedMap) {
+        List mapKeys = new ArrayList(passedMap.keySet());
+        List mapValues = new ArrayList(passedMap.values());
+        Collections.sort(mapValues);
+//        Collections.sort(mapKeys);
+
+
+
+        Iterator valueIt = mapValues.iterator();
+        while (valueIt.hasNext()) {
+            Object val = valueIt.next();
+            Iterator keyIt = mapKeys.iterator();
+
+            while (keyIt.hasNext()) {
+                Object key = keyIt.next();
+                Object comp1 = passedMap.get(key);
+                Float comp2 = Float.parseFloat(val.toString());
+
+                if (comp1.equals(comp2)) {
+                    passedMap.remove(key);
+                    mapKeys.remove(key);
+                    sortedMap.put((OpenAndCommon) key, (Float) val);
+                    break;
+                }
+            }
+        }
 
 
     }

@@ -1,12 +1,13 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -17,6 +18,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +37,8 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -57,6 +61,8 @@ import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
+import org.osmdroid.bonuspack.routing.GoogleRoadManager;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -74,9 +80,12 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
@@ -91,6 +100,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -105,6 +116,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
@@ -176,9 +188,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
     RadiusMarkerClusterer poiMarkers;
-    List<Overlay> overlaysList ;
+    List<Overlay> overlaysList;
 
-    List<HospitalAndCommon> hospitalAndCommonListForSorting = new ArrayList<>() ;
+    List<HospitalAndCommon> hospitalAndCommonListForSorting = new ArrayList<>();
 
     private String latitude;
     private String longitude;
@@ -261,11 +273,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupFloatingToolbar();
 
 //        loadAllMarker();
-        try {
+
+        if (getIntent().getParcelableArrayListExtra("data") != null) {
             List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
             loadFilteredHospitalMarker(hospitalAndCommonList);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }
@@ -709,30 +720,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-                String location = "Current location is: "
-                        +provider.getLastKnownLocation().getLatitude()
-                        +", "
-                        +provider.getLastKnownLocation().getLongitude();
-                Log.i(TAG, location);
                 myLocationNewOverlay.enableMyLocation();
-                Observable.just(mapView.getOverlays().add(myLocationNewOverlay))
-                        .subscribe(new DisposableObserver<Boolean>() {
-                            @Override
-                            public void onNext(Boolean aBoolean) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-//                mapView.getOverlays().add(myLocationNewOverlay);
+                mapView.getOverlays().add(myLocationNewOverlay);
+                mapView.invalidate();
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
@@ -758,45 +748,78 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-//                routeLocation();
-                handleLocationPermission();
+                routeLocation();
+//                handleLocationPermission();
                 break;
         }
     }
 
+
     private void routeLocation() {
-        //Experimenting with routing
 
-        RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+        final GeoPoint[] end = new GeoPoint[1];
 
-        double lat = -27.714849;
-        double lng = 85.324253;
-        GeoPoint gp = new GeoPoint(lat, lng);
-        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-        waypoints.add(gp);
+        double latitude = 27.71635;
+        double longitude = 85.32507;
 
-//                GeoPoint endPoint = new GeoPoint(item.getPoint().getLatitude(), item.getPoint().getLongitude());
-        GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
-        waypoints.add(endPoint);
-        Log.i(TAG, waypoints.toString());
-        Observable.just(waypoints)
+        final GeoPoint startpoint = new GeoPoint(latitude, longitude);
+
+        SortingDistance sortingDistance = new SortingDistance();
+
+        openSpaceViewModel.getAllOpenSpaceList()
+                .subscribe(new DisposableSubscriber<List<OpenAndCommon>>() {
+                    @Override
+                    public void onNext(List<OpenAndCommon> openAndCommons) {
+                        LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons, latitude, longitude);
+
+                        Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
+                        List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
+
+                        end[0] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
+                                sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
+
+        Observable.create((ObservableOnSubscribe<Polyline>) e -> {
+            try {
+                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+                GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
+                ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                waypoints.add(startpoint);
+                waypoints.add(end[0]);
+                Road road = roadManager.getRoad(waypoints);
+                Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                roadOverlay.setGeodesic(true);
+                e.onNext(roadOverlay);
+            } catch (Exception ex) {
+                e.onError(ex);
+            } finally {
+                e.onComplete();
+            }
+
+        })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<ArrayList<GeoPoint>>() {
+                .subscribe(new DisposableObserver<Polyline>() {
                     @Override
-                    public void onNext(ArrayList<GeoPoint> geoPoints) {
-                        Road road = roadManager.getRoad(geoPoints);
-
-                        if (road.mStatus != Road.STATUS_OK)
-                            Toast.makeText(HomeActivity.this, "Error when loading the road - status=" + road.mStatus, Toast.LENGTH_SHORT).show();
-
-                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                    public void onNext(Polyline roadOverlay) {
                         mapView.getOverlays().add(roadOverlay);
+                        clearClusterAndMarkers();
+                        mapView.invalidate();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -804,29 +827,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 });
-
-
     }
 
-    private void addMarkerToMap(Location location) {
-        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        items.add(new OverlayItem("", "", new GeoPoint(location.getLatitude(), location.getLongitude())));
+    @SuppressLint("MissingPermission")
+    public GeoPoint getGeoPointUsingFused() {
+        final GeoPoint[] geoPoint = new GeoPoint[1];
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                geoPoint[0] = new GeoPoint(location.getLatitude(), location.getLongitude());
+            }
+        });
 
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(
-                this, items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(final int index, final OverlayItem item) {
-                        return false;
-                    }
-                });
-        mOverlay.setFocusItemsOnTap(true);
-        mapView.getOverlays().add(mOverlay);
+        return geoPoint[0];
     }
 
     private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
@@ -866,7 +880,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         RadiusMarkerClusterer radiusMarkerClusterer = new RadiusMarkerClusterer(this);
         // marker icons
-         List<Marker> markerIconBmps_ = new ArrayList<Marker>();
+        List<Marker> markerIconBmps_ = new ArrayList<Marker>();
 
         new Thread(() -> {
             Log.d(TAG, "loadMunicipalityBoarder: ");
@@ -966,7 +980,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
-    private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList){
+
+    private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList) {
 
         List<Float> sortedDistanceList = new ArrayList<Float>();
         GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
@@ -979,8 +994,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         double longitude = 85.32507;
 
         SortingDistance sortingDistance = new SortingDistance();
-        LinkedHashMap linkedHospitalAndDistance =  sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude );
-
+        LinkedHashMap linkedHospitalAndDistance = sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude);
 
         Set<HospitalAndCommon> keySet = linkedHospitalAndDistance.keySet();
         sortedHospitalList = new ArrayList<HospitalAndCommon>(keySet);
@@ -988,14 +1002,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Collection<Float> values = linkedHospitalAndDistance.values();
         sortedDistanceList = new ArrayList<Float>(values);
 
-        List<SortedHospitalItem> sortedHospitalItemList = new ArrayList<SortedHospitalItem>() ;
-        for(int i = 0; i< linkedHospitalAndDistance.size(); i++){
+        List<SortedHospitalItem> sortedHospitalItemList = new ArrayList<SortedHospitalItem>();
+        for (int i = 0; i < linkedHospitalAndDistance.size(); i++) {
             Float distance = sortedDistanceList.get(i);
             String distanceInMeterKm;
-            if(sortedDistanceList.get(i)>1000){
-                distanceInMeterKm = (distance/1000)+" Kms. away" ;
-            }else {
-                distanceInMeterKm = distance+ " Meters away";
+            if (sortedDistanceList.get(i) > 1000) {
+                distanceInMeterKm = (distance / 1000) + " Kms. away";
+            } else {
+                distanceInMeterKm = distance + " Meters away";
             }
             SortedHospitalItem sortedHospitalItem = new SortedHospitalItem(sortedHospitalList.get(i), distanceInMeterKm);
             sortedHospitalItemList.add(sortedHospitalItem);
@@ -1012,9 +1026,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-
-
-
 
 
         return linkedHospitalAndDistance;
@@ -1068,7 +1079,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     private void loadFilteredHospitalMarker(List<HospitalAndCommon> filteredHospitalList) {
 
         mapView.getOverlays().clear();
@@ -1112,7 +1122,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
-
+                        mapView.invalidate();
                     }
                 });
     }
