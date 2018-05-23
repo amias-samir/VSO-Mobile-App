@@ -1,8 +1,6 @@
 package np.com.naxa.vso.home;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -11,12 +9,12 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -52,13 +50,13 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -71,11 +69,10 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +89,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.internal.operators.flowable.FlowableFromArray;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -100,10 +96,8 @@ import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
-import np.com.naxa.vso.activity.SplashActivity;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
-import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
@@ -480,8 +474,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             int visbleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
             changeDataOverviewText(visbleItemIndex);
-        }, 1000);
-        // toggleSliderHeight();
+        }, 500);
+        toggleSliderHeight();
 
     }
 
@@ -676,8 +670,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+                String location = "Current location is: "
+                        +provider.getLastKnownLocation().getLatitude()
+                        +", "
+                        +provider.getLastKnownLocation().getLongitude();
+                Log.i(TAG, location);
                 myLocationNewOverlay.enableMyLocation();
-                mapView.getOverlays().add(myLocationNewOverlay);
+                Observable.just(mapView.getOverlays().add(myLocationNewOverlay))
+                        .subscribe(new DisposableObserver<Boolean>() {
+                            @Override
+                            public void onNext(Boolean aBoolean) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+//                mapView.getOverlays().add(myLocationNewOverlay);
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
@@ -703,10 +719,54 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-
-//                handleLocationPermission();
+//                routeLocation();
+                handleLocationPermission();
                 break;
         }
+    }
+
+    private void routeLocation() {
+        //Experimenting with routing
+
+        RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+
+        double lat = -27.714849;
+        double lng = 85.324253;
+        GeoPoint gp = new GeoPoint(lat, lng);
+        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+        waypoints.add(gp);
+
+//                GeoPoint endPoint = new GeoPoint(item.getPoint().getLatitude(), item.getPoint().getLongitude());
+        GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
+        waypoints.add(endPoint);
+        Log.i(TAG, waypoints.toString());
+        Observable.just(waypoints)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<ArrayList<GeoPoint>>() {
+                    @Override
+                    public void onNext(ArrayList<GeoPoint> geoPoints) {
+                        Road road = roadManager.getRoad(geoPoints);
+
+                        if (road.mStatus != Road.STATUS_OK)
+                            Toast.makeText(HomeActivity.this, "Error when loading the road - status=" + road.mStatus, Toast.LENGTH_SHORT).show();
+
+                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                        mapView.getOverlays().add(roadOverlay);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
     }
 
     private void addMarkerToMap(Location location) {
@@ -813,7 +873,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
-        flowableList.subscribeOn(Schedulers.io())
+        flowableList
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
                     @Override
@@ -833,6 +894,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                                     @Override
                                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
+
 
                                         return true;
                                     }
@@ -869,40 +931,41 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public Iterable<EducationAndCommon> apply(List<EducationAndCommon> educationAndCommons) throws Exception {
                         return educationAndCommons;
                     }
-                }).subscribe(new DisposableSubscriber<EducationAndCommon>() {
-            @Override
-            public void onNext(EducationAndCommon educationAndCommon) {
-                ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-                String name = educationAndCommon.getCommonPlacesAttrb().getName();
-                double latitude = educationAndCommon.getCommonPlacesAttrb().getLatitude();
-                double longitude = educationAndCommon.getCommonPlacesAttrb().getLongitude();
-                items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
-                ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
-                        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                            @Override
-                            public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                                return false;
-                            }
+                })
+                .subscribe(new DisposableSubscriber<EducationAndCommon>() {
+                    @Override
+                    public void onNext(EducationAndCommon educationAndCommon) {
+                        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+                        String name = educationAndCommon.getCommonPlacesAttrb().getName();
+                        double latitude = educationAndCommon.getCommonPlacesAttrb().getLatitude();
+                        double longitude = educationAndCommon.getCommonPlacesAttrb().getLongitude();
+                        items.add(new OverlayItem(name, "Description", new GeoPoint(latitude, longitude)));
+                        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                                    @Override
+                                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                                        return false;
+                                    }
 
-                            @Override
-                            public boolean onItemLongPress(int index, OverlayItem item) {
-                                return false;
-                            }
-                        });
-                mapView.getOverlays().add(mOverlay);
-                mapView.invalidate();
-            }
+                                    @Override
+                                    public boolean onItemLongPress(int index, OverlayItem item) {
+                                        return false;
+                                    }
+                                });
+                        mapView.getOverlays().add(mOverlay);
+                        mapView.invalidate();
+                    }
 
-            @Override
-            public void onError(Throwable t) {
+                    @Override
+                    public void onError(Throwable t) {
 
-            }
+                    }
 
-            @Override
-            public void onComplete() {
+                    @Override
+                    public void onComplete() {
 
-            }
-        });
+                    }
+                });
 
     }
 

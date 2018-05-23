@@ -7,6 +7,9 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.databaserepository.ContactRepository;
 import np.com.naxa.vso.database.databaserepository.OpenSpaceRepository;
 import np.com.naxa.vso.database.entity.OpenSpace;
@@ -39,6 +42,10 @@ public class OpenSpaceViewModel extends AndroidViewModel {
     public void insert(OpenSpace openSpace) {
         Log.d("VIewholder", "insert: " + openSpace.getAccess_roa());
         openSpaceRepository.insert(openSpace);
+    }
+
+    public Flowable<List<OpenAndCommon>> getAllOpenSpaceList() {
+        return openSpaceRepository.getAll();
     }
 }
 

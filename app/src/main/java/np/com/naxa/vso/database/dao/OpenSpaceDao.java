@@ -7,6 +7,9 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
 /**
@@ -33,5 +36,9 @@ public interface OpenSpaceDao {
 
     @Query("DELETE FROM OpenSpace_table")
     void deleteAll();
+
+    @Query("SELECT * FROM openspace_table "
+            + "INNER JOIN commonplacesattrb ON commonplacesattrb.uid = openspace_table.fk_common_places")
+    Flowable<List<OpenAndCommon>> getAllOpenSpacelist();
 
 }
