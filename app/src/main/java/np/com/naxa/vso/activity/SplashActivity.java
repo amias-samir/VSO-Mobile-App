@@ -100,7 +100,7 @@ public class SplashActivity extends AppCompatActivity {
         return pair -> {
             String assetName = (String) pair.first;
             String fileContent = (String) pair.second;
-            Log.i(TAG,position+"");
+            Log.i(TAG,fileContent+"");
             saveGeoJsonDataToDatabase(position, fileContent);
             return repository.getGeoJsonString(position + 1);
         };

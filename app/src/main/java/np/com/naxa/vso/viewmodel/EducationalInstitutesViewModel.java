@@ -37,8 +37,4 @@ public class EducationalInstitutesViewModel  extends AndroidViewModel {
         Log.d("VIewholder", "insert: "+educationalInstitutes.getContact_no());
         mRepository.insert(educationalInstitutes); }
 
-    public Flowable<List<EducationAndCommon>> getAllEducationDetailList(){
-        return mRepository.getAll();
-    }
-
 }

@@ -7,7 +7,9 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.VsoRoomDatabase;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.dao.OpenSpaceDao;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
@@ -43,6 +45,10 @@ public class OpenSpaceRepository {
         Log.d("ContactRepository", "insert: "+ openSpace.getAccess_roa());
         mOpenSpaceDao.insert(openSpace);
 //        new OpenSpaceRepository.insertAsyncTask(mOpenSpaceDao).execute(openSpace);
+    }
+
+    public Flowable<List<OpenAndCommon>> getAll(){
+        return mOpenSpaceDao.getAllOpenSpacelist();
     }
 
     private static class insertAsyncTask extends AsyncTask<OpenSpace, Void, Void> {
