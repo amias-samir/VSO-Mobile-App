@@ -1,52 +1,81 @@
 package np.com.naxa.vso.utils.maputils;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
 public class SortingDistance {
+    private static final String TAG = "SortingDistance";
 
-    Map<OpenSpace, Float> hashMapWithDistance;
+    Map<OpenAndCommon, Float> hashMapOpenWithDistance;
+    Map<HospitalAndCommon, Float> hashMapHospitalWithDistance;
     List<OpenSpace> sortedOpenSpacesList;
     List<Float> sortedOpenSpacesDistanceList;
 
+    LinkedHashMap sortedMap = new LinkedHashMap();
 
-    public void sortingOpenSpaceDistanceData(List<OpenSpace> openSpaceList, ) {
 
-        hashMapWithDistance = new HashMap<OpenSpace, Float>();
+    public LinkedHashMap sortingOpenSpaceDistanceData(List<OpenAndCommon> openSpaceList, Double myLat, Double myLong ) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        hashMapOpenWithDistance = new HashMap<OpenAndCommon, Float>();
+
                 if (openSpaceList.size() > 1) {
-//                    sortServiceData(servicesData, myLat, myLon);
                     for (int i = 0; i < openSpaceList.size(); i++) {
 
-//                        double latfirst = openSpaceList.get(i).getLatitude();
-//                        double longfirst = openSpaceList.get(i).getLongitude();
-                        double latfirst = 27.1254545;
-                        double longfirst = 85.3265655;
+                        double latfirst = openSpaceList.get(i).getCommonPlacesAttrb().getLatitude();
+                        double longfirst = openSpaceList.get(i).getCommonPlacesAttrb().getLongitude();
+//                        double latfirst = 27.1254545;
+//                        double longfirst = 85.3265655;
 
                         float[] result1 = new float[3];
                         Location.distanceBetween(myLat, myLong, latfirst, longfirst, result1);
                         Float distance1 = result1[0];
 
-                        hashMapWithDistance.put(openSpaceList.get(i), distance1);
+                        hashMapOpenWithDistance.put(openSpaceList.get(i), distance1);
                     }
-                    sortMapByValuesWithDuplicates(hashMapWithDistance);
+                    sortMapByValuesWithDuplicates(hashMapOpenWithDistance);
                 }
+
+        return sortedMap;
+    }
+
+
+    public LinkedHashMap sortingHospitalDistanceData(List<HospitalAndCommon> hospitalAndCommonList, Double myLat, Double myLong ) {
+
+        hashMapHospitalWithDistance = new HashMap<HospitalAndCommon, Float>();
+
+        Log.d(TAG, "sortingHospitalDistanceData: "+ myLat + myLong);
+        if (hospitalAndCommonList.size() > 1) {
+            for (int i = 0; i < hospitalAndCommonList.size(); i++) {
+
+                Log.d(TAG, "sortingHospitalDistanceData: "+ i);
+
+                double latfirst = hospitalAndCommonList.get(i).getCommonPlacesAttrb().getLatitude();
+                double longfirst = hospitalAndCommonList.get(i).getCommonPlacesAttrb().getLongitude();
+//                        double latfirst = 27.1254545;
+//                        double longfirst = 85.3265655;
+
+                float[] result1 = new float[3];
+                Location.distanceBetween(myLat, myLong, latfirst, longfirst, result1);
+                Float distance1 = result1[0];
+
+                hashMapHospitalWithDistance.put(hospitalAndCommonList.get(i), distance1);
             }
-        }).start();
+            sortMapByValuesWithDuplicates(hashMapHospitalWithDistance);
+        }
+
+        return sortedMap;
     }
 
     private void sortMapByValuesWithDuplicates(Map passedMap) {
@@ -55,7 +84,7 @@ public class SortingDistance {
         Collections.sort(mapValues);
 //        Collections.sort(mapKeys);
 
-        LinkedHashMap sortedMap = new LinkedHashMap();
+
 
         Iterator valueIt = mapValues.iterator();
         while (valueIt.hasNext()) {
@@ -70,33 +99,24 @@ public class SortingDistance {
                 if (comp1.equals(comp2)) {
                     passedMap.remove(key);
                     mapKeys.remove(key);
-                    sortedMap.put((OpenSpace) key, (Float) val);
+                    sortedMap.put((HospitalAndCommon) key, (Float) val);
                     break;
                 }
             }
         }
-        //Getting Set of keys from HashMap
-        Set<OpenSpace> keySet = sortedMap.keySet();
-        //Creating an ArrayList of keys by passing the keySet
-        sortedOpenSpacesList = new ArrayList<OpenSpace>(keySet);
 
 
-        //Getting Collection of values from HashMap
-        Collection<Float> values = sortedMap.values();
-        //Creating an ArrayList of values
-        sortedOpenSpacesDistanceList = new ArrayList<Float>(values);
+//        //Getting Set of keys from HashMap
+//        Set<OpenSpace> keySet = sortedMap.keySet();
+//        //Creating an ArrayList of keys by passing the keySet
+//        sortedOpenSpacesList = new ArrayList<OpenSpace>(keySet);
+//
+//
+//        //Getting Collection of values from HashMap
+//        Collection<Float> values = sortedMap.values();
+//        //Creating an ArrayList of values
+//        sortedOpenSpacesDistanceList = new ArrayList<Float>(values);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-//                initServicesList(sortedOpenSpacesList, sortedOpenSpacesDistanceList);
-
-                openspaceName.setText(sortedOpenSpacesList.get(0).getAccess_roa());
-                openspaceDistance.setText(sortedOpenSpacesDistanceList.get(0).toString());
-
-
-            }
-        });
 
     }
 }

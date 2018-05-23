@@ -83,7 +83,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -115,6 +117,7 @@ import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.OsmMarkerCluster;
+import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -173,6 +176,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FolderOverlay myOverLayBoarder;
     RadiusMarkerClusterer poiMarkers;
     List<Overlay> overlaysList ;
+
+    List<HospitalAndCommon> hospitalAndCommonListForSorting = new ArrayList<>() ;
 
     private String latitude;
     private String longitude;
@@ -535,6 +540,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void showOverlayOnMap(int position) {
         if (position == 0) {
             loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
+
+            hospitalFacilitiesVewModel.getAllHospitalDetailList()
+                    .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
+                        @Override
+                        public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
+
+                            HospitalWithDIstance(hospitalAndCommonListForSorting);
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+
             return;
         }
         if (position == 2) {
@@ -889,6 +915,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
                     @Override
                     public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommonList) throws Exception {
+
                         return hospitalAndCommonList;
                     }
                 })
@@ -915,9 +942,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                     }
                                 });
 
-                        overlaysList.add(mOverlay);
+                        Log.d(TAG, "onNext: ");
+//                        overlaysList.add(mOverlay);
+
 //                        mapView.getOverlays().add(OsmMarkerCluster.createPointOfInterestOverlay(overlaysList, getApplicationContext()));
-//                        mapView.getOverlays().addAll(overlaysList);
+                        mapView.getOverlays().add(mOverlay);
                         mapView.invalidate();
                     }
 
@@ -932,6 +961,42 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
+    }
+
+    private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList){
+
+        List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
+        List<Float> sortedDistanceList = new ArrayList<Float>();
+
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+
+//        double latitude = provider.getLastKnownLocation().getLatitude();
+//        double longitude = provider.getLastKnownLocation().getLongitude();
+
+        double latitude = 27.71635;
+        double longitude = 85.32507;
+
+        SortingDistance sortingDistance = new SortingDistance();
+        LinkedHashMap linkedHospitalAndDistance =  sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude );
+
+                //Getting Set of keys from HashMap
+        Set<HospitalAndCommon> keySet = linkedHospitalAndDistance.keySet();
+        //Creating an ArrayList of keys by passing the keySet
+        sortedHospitalList = new ArrayList<HospitalAndCommon>(keySet);
+        String name = sortedHospitalList.get(0).getCommonPlacesAttrb().getName();
+        Log.d(TAG, "HospitalWithDIstance: "+name);
+
+
+        //Getting Collection of values from HashMap
+        Collection<Float> values = linkedHospitalAndDistance.values();
+        //Creating an ArrayList of values
+        sortedDistanceList = new ArrayList<Float>(values);
+        Log.d(TAG, "HospitalWithDIstance: "+sortedDistanceList.get(0));
+
+
+
+        return linkedHospitalAndDistance;
     }
 
     private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
