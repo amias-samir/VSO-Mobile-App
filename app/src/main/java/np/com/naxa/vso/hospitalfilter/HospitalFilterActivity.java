@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +105,6 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
         InitUIOptionDataPostTask initUIOptionDataPostTask = new InitUIOptionDataPostTask();
         initUIOptionDataPostTask.execute();
-
-
     }
 
 
@@ -247,12 +246,13 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
                     // Update the cached copy of the words in the adapter.
 //                adapter.setWords(words);
 
-                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
+//                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
                     HomeActivity.start(HospitalFilterActivity.this, (ArrayList) hospitalFacilities);
 
-                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
-                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
-                    Log.d("HospitalFiltered", "onChanged: data retrieved " + hospitalFacilities.size());
+//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
+//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
+//                    Log.d("HospitalFiltered", "onChanged: data retrieved " + hospitalFacilities.size());
+
                 }
             });
 

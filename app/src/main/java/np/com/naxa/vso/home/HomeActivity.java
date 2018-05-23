@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -57,7 +56,9 @@ import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.bonuspack.routing.GoogleRoadManager;
@@ -76,6 +77,8 @@ import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.Polyline;
@@ -89,7 +92,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -118,9 +123,13 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
+import np.com.naxa.vso.home.model.MarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
+import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.OsmMarkerCluster;
+import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -178,6 +187,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
     RadiusMarkerClusterer poiMarkers;
+    List<Overlay> overlaysList ;
+
+    List<HospitalAndCommon> hospitalAndCommonListForSorting = new ArrayList<>() ;
 
     private String latitude;
     private String longitude;
@@ -378,6 +390,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
 
+
+//        for clustering
+        overlaysList = this.mapView.getOverlays();
+
         showOverlayOnMap(-1);
     }
 
@@ -535,6 +551,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void showOverlayOnMap(int position) {
         if (position == 0) {
             loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
+
+            hospitalFacilitiesVewModel.getAllHospitalDetailList()
+                    .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
+                        @Override
+                        public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
+
+                            HospitalWithDIstance(hospitalAndCommonList);
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+
             return;
         }
         if (position == 2) {
@@ -621,7 +658,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onSuccess(List<MapMarkerItem> myItems) {
                         clusterManagerPlugin.addItems(myItems);
                         clusterManagerPlugin.cluster();
-                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
+//                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
                     }
 
                     @Override
@@ -796,6 +833,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
+        MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
+
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
@@ -813,50 +852,46 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void loadMunicipalityBoarder() {
         mapView.getOverlays().clear();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        RadiusMarkerClusterer radiusMarkerClusterer = new RadiusMarkerClusterer(this);
+        // marker icons
+         List<Marker> markerIconBmps_ = new ArrayList<Marker>();
 
-
-                Log.d(TAG, "loadMunicipalityBoarder: ");
+        new Thread(() -> {
+            Log.d(TAG, "loadMunicipalityBoarder: ");
 //            vMapView.getOverlays().clear();
 
-                String jsonString = null;
-                try {
+            String jsonString = null;
+            try {
 //                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
-                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-                    int size = jsonStream.available();
-                    byte[] buffer = new byte[size];
-                    jsonStream.read(buffer);
-                    jsonStream.close();
-                    jsonString = new String(buffer, "UTF-8");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                final KmlDocument kmlDocument = new KmlDocument();
-                kmlDocument.parseGeoJSON(jsonString);
-
-                Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-
-                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-
-                final Style defaultStyle = new Style(null, 0x901010AA, 3f, 0x20AA1010);
-                myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "run: load boarder");
-                        mapView.getOverlays().add(myOverLayBoarder);
-                        mapView.invalidate();
-                        mapController.animateTo(centerPoint);
-                    }
-                });
-
-
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                int size = jsonStream.available();
+                byte[] buffer = new byte[size];
+                jsonStream.read(buffer);
+                jsonStream.close();
+                jsonString = new String(buffer, "UTF-8");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return;
             }
+
+            final KmlDocument kmlDocument = new KmlDocument();
+            kmlDocument.parseGeoJSON(jsonString);
+
+            Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+
+            Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+
+            final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
+            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+
+            runOnUiThread(() -> {
+                Log.d(TAG, "run: load boarder");
+                mapView.getOverlays().add(myOverLayBoarder);
+                mapView.invalidate();
+                mapController.animateTo(centerPoint);
+            });
+
+
         }).start();
     }
 
@@ -869,6 +904,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
                     @Override
                     public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommonList) throws Exception {
+
                         return hospitalAndCommonList;
                     }
                 })
@@ -894,6 +930,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                         return false;
                                     }
                                 });
+
+                        Log.d(TAG, "onNext: ");
+//                        overlaysList.add(mOverlay);
+
+//                        mapView.getOverlays().add(OsmMarkerCluster.createPointOfInterestOverlay(overlaysList, getApplicationContext()));
                         mapView.getOverlays().add(mOverlay);
                         mapView.invalidate();
                     }
@@ -909,6 +950,62 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
+    }
+
+
+    List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
+    private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList){
+
+        List<Float> sortedDistanceList = new ArrayList<Float>();
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+
+//        double latitude = provider.getLastKnownLocation().getLatitude();
+//        double longitude = provider.getLastKnownLocation().getLongitude();
+
+        double latitude = 27.71635;
+        double longitude = 85.32507;
+
+        SortingDistance sortingDistance = new SortingDistance();
+        LinkedHashMap linkedHospitalAndDistance =  sortingDistance.sortingHospitalDistanceData(hospitalAndCommonList, latitude, longitude );
+
+
+        Set<HospitalAndCommon> keySet = linkedHospitalAndDistance.keySet();
+        sortedHospitalList = new ArrayList<HospitalAndCommon>(keySet);
+
+        Collection<Float> values = linkedHospitalAndDistance.values();
+        sortedDistanceList = new ArrayList<Float>(values);
+
+        List<SortedHospitalItem> sortedHospitalItemList = new ArrayList<SortedHospitalItem>() ;
+        for(int i = 0; i< linkedHospitalAndDistance.size(); i++){
+            Float distance = sortedDistanceList.get(i);
+            String distanceInMeterKm;
+            if(sortedDistanceList.get(i)>1000){
+                distanceInMeterKm = (distance/1000)+" Kms. away" ;
+            }else {
+                distanceInMeterKm = distance+ " Meters away";
+            }
+            SortedHospitalItem sortedHospitalItem = new SortedHospitalItem(sortedHospitalList.get(i), distanceInMeterKm);
+            sortedHospitalItemList.add(sortedHospitalItem);
+        }
+
+
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // Stuff that updates the UI
+                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
+
+
+            }
+        });
+
+
+
+
+
+        return linkedHospitalAndDistance;
     }
 
     private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
