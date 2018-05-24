@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -22,7 +23,11 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
+import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
@@ -61,17 +66,27 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     String imageFilePath = null;
     File imageFileToBeUploaded;
     Boolean hasNewImage = false;
-    String full_name, contact_no, detailed_message, latitude, longitude;
+    String full_name, contact_no, detailed_message, latitude, longitude, incident_type, incident_time, ward;
     String jsonToSend = "";
+
+    @BindView(R.id.tv_incident_time)
+    TextInputLayout tvIncidentTime;
+    @BindView(R.id.spinner_ward)
+    Spinner spinnerWard;
+    @BindView(R.id.spinner_incident_type)
+    Spinner spinnerIncidentType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_v2);
+        ButterKnife.bind(this);
 
         initUI();
 
         initToolbar();
+
+        setCurrentDate();
 
 //        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -100,6 +115,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     Toast.makeText(ReportActivity.this, "you need to take GPS Location first", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                incident_time = tvIncidentTime.getEditText().getText().toString();
+                incident_type = spinnerIncidentType.getSelectedItem().toString();
+                ward = spinnerWard.getSelectedItem().toString();
                 full_name = tvName.getEditText().getText().toString();
                 contact_no = tvContactNumber.getEditText().getText().toString();
                 detailed_message = tvMessage.getEditText().getText().toString();
@@ -109,16 +127,19 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 try {
                     JSONObject header = new JSONObject();
 
-                    header.put("full_name", full_name);
+                    header.put("incident_time", incident_time);
+                    header.put("incident_type", incident_type);
+                    header.put("ward", ward);
+                    header.put("name", full_name);
                     header.put("contact_no", contact_no);
                     header.put("latitude", latitude);
                     header.put("longitude", longitude);
-                    header.put("detailed_message", detailed_message);
+                    header.put("message", detailed_message);
 
                     jsonToSend = header.toString();
-                    Log.d(TAG, "onClick: "+jsonToSend);
+                    Log.d(TAG, "onClick: " + jsonToSend);
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -236,20 +257,20 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     File imageFile;
     MultipartBody.Part body = null;
     Bitmap bitmap;
+
     private void sendDataToServer(String jsonData) {
 
         if (hasNewImage) {
 
 //            imageFile = new File(imageFilePath);
 //            if (imageFile.exists()) {
-                Log.d(TAG, "sendDataToServer: image file exist");
-                RequestBody surveyBody = RequestBody.create(MediaType.parse("image/*"), imageFileToBeUploaded);
-                body = MultipartBody.Part.createFormData("photo", imageFileToBeUploaded.getName(), surveyBody);
+            Log.d(TAG, "sendDataToServer: image file exist");
+            RequestBody surveyBody = RequestBody.create(MediaType.parse("image/*"), imageFileToBeUploaded);
+            body = MultipartBody.Part.createFormData("photo", imageFileToBeUploaded.getName(), surveyBody);
 
-            }
-            else {
-                body = null;
-            }
+        } else {
+            body = null;
+        }
 
 
         RequestBody data = RequestBody.create(MediaType.parse("text/plain"), jsonData);
@@ -302,5 +323,23 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 Toast.makeText(ReportActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+    @OnClick(R.id.tv_incident_time)
+    public void onViewClicked() {
+    }
+
+    private void setCurrentDate (){
+        final Calendar c = Calendar.getInstance();
+        int yy = c.get(Calendar.YEAR);
+        int mm = c.get(Calendar.MONTH);
+        int dd = c.get(Calendar.DAY_OF_MONTH);
+
+        // set current date into textview
+        tvIncidentTime.getEditText().setText((new StringBuilder()
+                // Month is 0 based, just add 1
+                .append(yy).append("").append("-").append(mm + 1).append("-")
+                .append(dd)));
     }
 }
