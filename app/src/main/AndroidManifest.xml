@@ -43,8 +43,9 @@
             android:exported="true" />
         <activity
             android:name=".activity.ReportActivity"
+            android:windowSoftInputMode="stateVisible"
             android:exported="true" />
-        <activity android:name=".activity.LoadingActivity" />
+        <!--<activity android:name=".activity.LoadingActivity" />-->
         <activity
             android:name=".home.HomeActivity"
             android:exported="true"
