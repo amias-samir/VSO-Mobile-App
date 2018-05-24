@@ -10,7 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -57,14 +59,18 @@ import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
+import org.osmdroid.bonuspack.routing.GoogleRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.bonuspack.routing.RoadNode;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.util.CloudmadeUtil;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
@@ -77,7 +83,10 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.osmdroid.views.util.constants.OverlayConstants;
 import org.reactivestreams.Publisher;
 
 import java.io.IOException;
@@ -707,14 +716,33 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             if (!statusOfGPS) {
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             } else {
+
+                FusedLocationProviderClient fusedLocationProviderClient = new FusedLocationProviderClient(this);
+
+
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+                myLocationNewOverlay.setDrawAccuracyEnabled(true);
+
+                provider.startLocationProvider(new IMyLocationConsumer() {
+                    @Override
+                    public void onLocationChanged(Location location, IMyLocationProvider source) {
+                        Log.i("Shree", "Got it");
+                    }
+                });
+                mapView.getOverlays().clear();
+                mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
                 myLocationNewOverlay.enableFollowLocation();
-
-                mapView.getOverlays().add(myLocationNewOverlay);
                 mapView.invalidate();
+
+                try {
+                    Log.i("Shree", "Somethings: " + provider.getLastKnownLocation().getLongitude());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
@@ -778,6 +806,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableSubscriber<Polyline>() {
                     @Override
                     public void onNext(Polyline roadOverlay) {
+
                         mapView.getOverlays().add(getMarkerOverlay(points));
                         mapView.getOverlays().add(roadOverlay);
                         mapView.invalidate();
@@ -795,11 +824,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-
     public Flowable<Polyline> routeGenerateObservable(GeoPoint[] points) {
         return Observable.create((ObservableOnSubscribe<Polyline>) e -> {
             try {
-                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+                RoadManager roadManager = new GoogleRoadManager();
 
                 ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
                 waypoints.add(points[0]);
@@ -807,8 +835,44 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 Road road = roadManager.getRoad(waypoints);
 
+                final int[] step = {1};
+                Drawable nodeIcon = getResources().getDrawable(R.drawable.mapbox_marker_icon_default);
+                Drawable icon = getResources().getDrawable(R.drawable.ic_call_black_24dp);
+                Observable.just(road.mNodes)
+                        .flatMapIterable(new Function<ArrayList<RoadNode>, Iterable<RoadNode>>() {
+                            @Override
+                            public Iterable<RoadNode> apply(ArrayList<RoadNode> roadNodes) throws Exception {
+                                return roadNodes;
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<RoadNode>() {
+                            @Override
+                            public void onNext(RoadNode roadNode) {
+                                Marker nodeMarker = new Marker(mapView);
+                                nodeMarker.setPosition(roadNode.mLocation);
+                                nodeMarker.setIcon(nodeIcon);
+                                nodeMarker.setTitle("Step " + step[0]++);
+                                nodeMarker.setSnippet(roadNode.mInstructions);
+                                nodeMarker.setSubDescription(Road.getLengthDurationText(HomeActivity.this, roadNode.mLength, roadNode.mDuration));
+                                nodeMarker.setImage(icon);
+                                mapView.getOverlays().add(nodeMarker);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
                 Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                roadOverlay.setGeodesic(true);
+
                 e.onNext(roadOverlay);
             } catch (Exception ex) {
                 e.onError(ex);
