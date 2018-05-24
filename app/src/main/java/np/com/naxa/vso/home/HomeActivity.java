@@ -78,6 +78,7 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.reactivestreams.Publisher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,6 +90,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -114,7 +116,6 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
-import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
@@ -710,6 +711,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
                 myLocationNewOverlay.enableMyLocation();
+                myLocationNewOverlay.enableFollowLocation();
+
                 mapView.getOverlays().add(myLocationNewOverlay);
                 mapView.invalidate();
             }
@@ -760,79 +763,59 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         points[0] = new GeoPoint(latitude, longitude);
 
         openSpaceViewModel.getAllOpenSpaceList()
+                .flatMap((Function<List<OpenAndCommon>, Publisher<Polyline>>) openAndCommons -> {
+                    LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons, latitude, longitude);
+                    Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
+                    List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
+
+                    points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
+                            sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
+
+                    return routeGenerateObservable(points);
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSubscriber<List<OpenAndCommon>>() {
+                .subscribe(new DisposableSubscriber<Polyline>() {
                     @Override
-                    public void onNext(List<OpenAndCommon> openAndCommons) {
-                        LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons, latitude, longitude);
-
-                        Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
-                        List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
-
-                        points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
-                                sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
+                    public void onNext(Polyline roadOverlay) {
+                        mapView.getOverlays().add(getMarkerOverlay(points));
+                        mapView.getOverlays().add(roadOverlay);
+                        mapView.invalidate();
                     }
 
                     @Override
                     public void onError(Throwable t) {
+                        t.printStackTrace();
                     }
 
                     @Override
                     public void onComplete() {
+
                     }
                 });
+    }
 
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Observable.create((ObservableOnSubscribe<Polyline>) e -> {
-                    try {
-                        RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+    public Flowable<Polyline> routeGenerateObservable(GeoPoint[] points) {
+        return Observable.create((ObservableOnSubscribe<Polyline>) e -> {
+            try {
+                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
 
-                        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                waypoints.add(points[0]);
+                waypoints.add(points[1]);
 
-                        waypoints.add(points[0]);
-                        waypoints.add(points[1]);
+                Road road = roadManager.getRoad(waypoints);
 
-                        Road road = roadManager.getRoad(waypoints);
-
-                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                        roadOverlay.setGeodesic(true);
-                        e.onNext(roadOverlay);
-                    } catch (Exception ex) {
-                        e.onError(ex);
-                    } finally {
-                        e.onComplete();
-                    }
-
-                })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new DisposableObserver<Polyline>() {
-                            @Override
-                            public void onNext(Polyline roadOverlay) {
-                                clearClusterAndMarkers();
-                                mapView.getOverlays().add(getMarkerOverlay(points));
-                                mapView.getOverlays().add(roadOverlay);
-                                mapView.invalidate();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
+                Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                roadOverlay.setGeodesic(true);
+                e.onNext(roadOverlay);
+            } catch (Exception ex) {
+                e.onError(ex);
+            } finally {
+                e.onComplete();
             }
-        }, 2500);
-
+        }).toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @SuppressLint("MissingPermission")
