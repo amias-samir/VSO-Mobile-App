@@ -5,20 +5,17 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -58,11 +55,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
-import org.osmdroid.bonuspack.clustering.StaticCluster;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.Style;
-import org.osmdroid.bonuspack.routing.GoogleRoadManager;
-import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -80,12 +74,9 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
@@ -100,7 +91,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
@@ -124,12 +114,10 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
-import np.com.naxa.vso.home.model.MarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
-import np.com.naxa.vso.utils.maputils.OsmMarkerCluster;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -442,8 +430,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ExpandableUseActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_open_spaces:
-                    HospitalFilterActivity.start(HomeActivity.this);
-
+                    routeLocation();
+//                    HospitalFilterActivity.start(HomeActivity.this);
                     break;
             }
             return true;
@@ -748,8 +736,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-                routeLocation();
-//                handleLocationPermission();
+                handleLocationPermission();
                 break;
         }
     }
@@ -757,16 +744,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void routeLocation() {
 
-        final GeoPoint[] end = new GeoPoint[1];
+        final GeoPoint[] points = new GeoPoint[2];
 
         double latitude = 27.71635;
         double longitude = 85.32507;
 
-        final GeoPoint startpoint = new GeoPoint(latitude, longitude);
-
         SortingDistance sortingDistance = new SortingDistance();
 
+        points[0] = new GeoPoint(latitude, longitude);
+
         openSpaceViewModel.getAllOpenSpaceList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSubscriber<List<OpenAndCommon>>() {
                     @Override
                     public void onNext(List<OpenAndCommon> openAndCommons) {
@@ -775,7 +764,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
                         List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
 
-                        end[0] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
+                        points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
                                 sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
                     }
 
@@ -789,44 +778,55 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
 
-        Observable.create((ObservableOnSubscribe<Polyline>) e -> {
-            try {
-                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
-                GeoPoint endPoint = new GeoPoint(27.617458, 85.526783);
-                ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-                waypoints.add(startpoint);
-                waypoints.add(end[0]);
-                Road road = roadManager.getRoad(waypoints);
-                Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                roadOverlay.setGeodesic(true);
-                e.onNext(roadOverlay);
-            } catch (Exception ex) {
-                e.onError(ex);
-            } finally {
-                e.onComplete();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Observable.create((ObservableOnSubscribe<Polyline>) e -> {
+                    try {
+                        RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
+
+                        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+
+                        waypoints.add(points[0]);
+                        waypoints.add(points[1]);
+
+                        Road road = roadManager.getRoad(waypoints);
+
+                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                        roadOverlay.setGeodesic(true);
+                        e.onNext(roadOverlay);
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    } finally {
+                        e.onComplete();
+                    }
+
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<Polyline>() {
+                            @Override
+                            public void onNext(Polyline roadOverlay) {
+                                clearClusterAndMarkers();
+                                mapView.getOverlays().add(getMarkerOverlay(points));
+                                mapView.getOverlays().add(roadOverlay);
+                                mapView.invalidate();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
             }
+        }, 2500);
 
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<Polyline>() {
-                    @Override
-                    public void onNext(Polyline roadOverlay) {
-                        mapView.getOverlays().add(roadOverlay);
-                        clearClusterAndMarkers();
-                        mapView.invalidate();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
     }
 
     @SuppressLint("MissingPermission")
@@ -1125,6 +1125,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         mapView.invalidate();
                     }
                 });
+    }
+
+    public Overlay getMarkerOverlay(GeoPoint[] points) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        for (GeoPoint point : points) {
+            items.add(new OverlayItem("", "", point));
+        }
+
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                        //do something
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(final int index, final OverlayItem item) {
+                        return false;
+                    }
+                });
+
+        return mOverlay;
     }
 }
 
