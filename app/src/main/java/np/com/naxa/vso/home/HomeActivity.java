@@ -38,6 +38,8 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -54,10 +56,18 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.KmlFeature;
+import org.osmdroid.bonuspack.kml.KmlLineString;
+import org.osmdroid.bonuspack.kml.KmlPlacemark;
+import org.osmdroid.bonuspack.kml.KmlPoint;
+import org.osmdroid.bonuspack.kml.KmlPolygon;
+import org.osmdroid.bonuspack.kml.KmlTrack;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.bonuspack.routing.GoogleRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -70,7 +80,9 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.util.CloudmadeUtil;
+
+import org.osmdroid.util.BoundingBox;
+
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
@@ -80,6 +92,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -128,6 +141,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -367,8 +381,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+
+
         mapController = mapView.getController();
         mapController.setZoom(12);
+//        mapView.zoomToBoundingBox(boundingBox, true);
+//        mapController.zoomToSpan(boundingBox.getLatitudeSpan(), boundingBox.getLongitudeSpan());
         poiMarkers = new RadiusMarkerClusterer(this);
 
         loadMunicipalityBoarder();
@@ -556,7 +574,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
                         @Override
                         public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
-
                             HospitalWithDIstance(hospitalAndCommonList);
                         }
 
@@ -936,13 +953,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         List<Marker> markerIconBmps_ = new ArrayList<Marker>();
 
         new Thread(() -> {
-            Log.d(TAG, "loadMunicipalityBoarder: ");
 //            vMapView.getOverlays().clear();
 
             String jsonString = null;
             try {
-//                    InputStream jsonStream = getResources().openRawResource(R.raw.changunarayan_boundary);
                 InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+//                InputStream jsonStream = VSO.getInstance().getAssets().open("ward_changu.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -955,24 +971,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             final KmlDocument kmlDocument = new KmlDocument();
             kmlDocument.parseGeoJSON(jsonString);
+//            Log.d(TAG, "loadMunicipalityBoarder: JSON "+ jsonString);
 
             Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-
             Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-
+//
             final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
+//            KmlFeature.Styler styler = new MyKmlStyler();
             myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
 
             runOnUiThread(() -> {
-                Log.d(TAG, "run: load boarder");
                 mapView.getOverlays().add(myOverLayBoarder);
+                BoundingBox boundingBox =new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
+                mapView.zoomToBoundingBox(boundingBox, true);
                 mapView.invalidate();
+
                 mapController.animateTo(centerPoint);
+
+
             });
 
 
         }).start();
     }
+
 
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
         mapView.getOverlays().clear();
@@ -1033,15 +1055,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
-
     private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList) {
 
         List<Float> sortedDistanceList = new ArrayList<Float>();
-        GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
-        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-
-//        double latitude = provider.getLastKnownLocation().getLatitude();
-//        double longitude = provider.getLastKnownLocation().getLongitude();
 
         double latitude = 27.71635;
         double longitude = 85.32507;
@@ -1083,6 +1099,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         return linkedHospitalAndDistance;
     }
+
+    private void initMyLocationNewOverlay() {
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+        provider.addLocationSource(LocationManager.GPS_PROVIDER);
+
+        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+        myLocationNewOverlay.enableMyLocation();
+        mapView.getOverlays().add(myLocationNewOverlay);
+
+        double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
+        double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
+
+    }
+
 
     private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
         mapView.getOverlays().clear();
