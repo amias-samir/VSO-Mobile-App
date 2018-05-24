@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity">
+        <activity android:name=".activity.SplashActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,14 +39,12 @@
         <activity
             android:name=".TestFlowChart"
             android:exported="true" />
-        <activity
-            android:name=".emergencyContacts.EmergencyContactsActivity"
-            android:exported="true" />
+
         <activity
             android:name=".activity.ReportActivity"
             android:windowSoftInputMode="stateVisible"
             android:exported="true" />
-        <!--<activity android:name=".activity.LoadingActivity" />-->
+
         <activity
             android:name=".home.HomeActivity"
             android:exported="true"

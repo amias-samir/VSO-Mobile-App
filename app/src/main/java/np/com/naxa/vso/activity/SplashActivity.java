@@ -60,13 +60,15 @@ public class SplashActivity extends AppCompatActivity {
             Log.d(TAG, "Exception: " + e.toString());
         }
 
-        if (sharedpref.checkIfDataPresent()) {
-            HomeActivity.start(SplashActivity.this);
-        } else {
-            new Handler().postDelayed(() -> {
+        new Handler().postDelayed(() -> {
+            if (sharedpref.checkIfDataPresent()) {
+                HomeActivity.start(SplashActivity.this);
+            } else {
                 loadDataAndCallHomeActivity();
-            }, 2000);
-        }
+            }
+        }, 2000);
+
+
     }
 
     private void loadDataAndCallHomeActivity() {
