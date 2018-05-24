@@ -190,6 +190,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private final int RESULT_LOCATION_PERMISSION = 100;
     private final int RESULT_LAT_LONG = 150;
 
+    private boolean BACKBUTTONCOUNTER = false;
 
     private MapDataRepository repo;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -723,7 +724,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         int visibleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
         if (visibleItemIndex == 0) {
             if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
-                super.onBackPressed();
+                if (BACKBUTTONCOUNTER) {
+                    super.onBackPressed();
+                } else {
+                    ToastUtils.showToast("Press Again To Exit.");
+                    BACKBUTTONCOUNTER = true;
+                }
             } else {
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
