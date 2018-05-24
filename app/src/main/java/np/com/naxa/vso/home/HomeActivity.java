@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -144,6 +145,9 @@ import timber.log.Timber;
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 
+
+
+
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "HomeActivity";
@@ -196,6 +200,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private String latitude;
     private String longitude;
+    private String dataSetInfoText;
 
     private ArrayList<String> assetList;
     private ArrayList<String> contentList;
@@ -234,6 +239,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+
+
     public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
         Intent intent = new Intent(context, HomeActivity.class);
         Bundle bundle = new Bundle();
@@ -241,6 +248,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtras(bundle);
         context.startActivity(intent);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -523,7 +531,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 clearClusterAndMarkers();
                 break;
             case 1:
-                tvDataSet.setText(generateDataCardText());
+//                tvDataSet.setText(generateDataCardText());
+                tvDataSet.setText(dataSetInfoText);
                 break;
         }
     }
@@ -1026,8 +1035,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 // Stuff that updates the UI
                 ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
-
-
+                dataSetInfoText = (sortedHospitalItemList.size()+" Hospitals found ");
             }
         });
 
@@ -1035,19 +1043,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return linkedHospitalAndDistance;
     }
 
-    private void initMyLocationNewOverlay() {
+    private void initMyCurrentLocation() {
         GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
         provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
         provider.addLocationSource(LocationManager.GPS_PROVIDER);
+
 
         MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
         myLocationNewOverlay.enableMyLocation();
         mapView.getOverlays().add(myLocationNewOverlay);
 
-        double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
-        double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
+
+//                double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
+//                double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
+
+
 
     }
+
 
 
     private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
