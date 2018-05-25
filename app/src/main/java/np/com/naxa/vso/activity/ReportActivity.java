@@ -332,7 +332,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     message = "slow internet connection, please try again later";
                 }
 
-                DialogFactory.createSimpleOkErrorDialog(this, "Sending Failed!!", message).show();
+                DialogFactory.createSimpleOkErrorDialog(ReportActivity.this, "Sending Failed!!", message).show();
                 Toast.makeText(ReportActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });

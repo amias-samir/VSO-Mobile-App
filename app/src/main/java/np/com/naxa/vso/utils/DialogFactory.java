@@ -23,7 +23,7 @@ public final class DialogFactory {
 
     private ProgressDialog progressDialog;
 
-    public static Dialog createSimpleOkErrorDialog(Callback<AskForHelpResponse> context, String title, String message) {
+    public static Dialog createSimpleOkErrorDialog(Context context, String title, String message) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
@@ -31,14 +31,6 @@ public final class DialogFactory {
         return alertDialog.create();
     }
 
-    public static Dialog createSimpleOkErrorDialog(Context context,
-                                                   @StringRes int titleResource,
-                                                   @StringRes int messageResource) {
-
-        return createSimpleOkErrorDialog(context,
-                context.getString(titleResource),
-                context.getString(messageResource));
-    }
 
     public static Dialog createGenericErrorDialog(Context context, String message) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context, R.style.RiseUpDialog)
