@@ -193,6 +193,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private String latitude;
     private String longitude;
+    private String dataSetInfoText;
 
     private ArrayList<String> assetList;
     private ArrayList<String> contentList;
@@ -231,6 +232,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         context.startActivity(intent);
     }
 
+
     public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
         Intent intent = new Intent(context, HomeActivity.class);
         Bundle bundle = new Bundle();
@@ -238,6 +240,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtras(bundle);
         context.startActivity(intent);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -520,7 +523,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 clearClusterAndMarkers();
                 break;
             case 1:
-                tvDataSet.setText(generateDataCardText());
+//                tvDataSet.setText(generateDataCardText());
+                tvDataSet.setText(dataSetInfoText);
                 break;
         }
     }
@@ -581,32 +585,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
                 return;
         }
-//        if (position == 0) {
-//            loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
-//
-//            hospitalFacilitiesVewModel.getAllHospitalDetailList()
-//                    .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
-//                        @Override
-//                        public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
-//                            HospitalWithDIstance(hospitalAndCommonList);
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable t) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onComplete() {
-//
-//                        }
-//                    });
-//
-//
-//            return;
-//        } else if (position == 2) {
-//
-//        }
 
         repo.getGeoJsonString(position)
                 .subscribe(new Observer<Pair>() {
@@ -747,22 +725,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             } else {
 
-                FusedLocationProviderClient fusedLocationProviderClient = new FusedLocationProviderClient(this);
-
-
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
 
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
                 myLocationNewOverlay.setDrawAccuracyEnabled(true);
 
-                provider.startLocationProvider(new IMyLocationConsumer() {
-                    @Override
-                    public void onLocationChanged(Location location, IMyLocationProvider source) {
-                        Log.i("Shree", "Got it");
-                    }
-                });
                 mapView.getOverlays().clear();
+                mapView.getOverlays().add(myOverLayBoarder);
                 mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
                 myLocationNewOverlay.enableFollowLocation();
@@ -972,8 +942,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             String jsonString = null;
             try {
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("ward_changu.geojson");
+//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changu_ward.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -986,9 +956,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             final KmlDocument kmlDocument = new KmlDocument();
             kmlDocument.parseGeoJSON(jsonString);
-//            Log.d(TAG, "loadMunicipalityBoarder: JSON "+ jsonString);
 
-            Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+            Drawable defaultMarker = getResources().getDrawable(R.drawable.mapbox_marker_icon_default);
             Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 //
             final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
@@ -1054,10 +1023,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 // Stuff that updates the UI
                 ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
+                dataSetInfoText = (sortedHospitalItemList.size() + " Hospitals found ");
             }
         });
 
         return linkedHospitalAndDistance;
+    }
+
+    private void initMyCurrentLocation() {
+        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
+        provider.addLocationSource(LocationManager.GPS_PROVIDER);
+
+
+        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
+        myLocationNewOverlay.enableMyLocation();
+        mapView.getOverlays().add(myLocationNewOverlay);
+
+//                double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
+//                double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
     }
 
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
@@ -1087,7 +1071,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Observable.just(filteredHospitalList)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMapIterable((Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>) hospitalAndCommons -> hospitalAndCommons)
+                .flatMapIterable(new Function<List<HospitalAndCommon>, Iterable<HospitalAndCommon>>() {
+                    @Override
+                    public Iterable<HospitalAndCommon> apply(List<HospitalAndCommon> hospitalAndCommonList) throws Exception {
+                        return hospitalAndCommonList;
+                    }
+                })
                 .subscribe(new DisposableObserver<HospitalAndCommon>() {
                     @Override
                     public void onNext(HospitalAndCommon hospitalAndCommon) {
@@ -1102,7 +1091,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
-                        mapView.invalidate();
+
                     }
                 });
     }
@@ -1151,26 +1140,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb) {
-        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        String name = commonPlacesAttrb.getName();
-        double latitude = commonPlacesAttrb.getLatitude();
-        double longitude = commonPlacesAttrb.getLongitude();
-        items.add(new OverlayItem(name, "", new GeoPoint(latitude, longitude)));
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(int index, OverlayItem item) {
-                        return false;
-                    }
-                });
-        return mOverlay;
-    }
 
     public Overlay getMarkerOverlay(GeoPoint[] points) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
@@ -1194,7 +1163,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         return mOverlay;
     }
-}
 
+    private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        String name = commonPlacesAttrb.getName();
+        double latitude = commonPlacesAttrb.getLatitude();
+        double longitude = commonPlacesAttrb.getLongitude();
+        items.add(new OverlayItem(name, "", new GeoPoint(latitude, longitude)));
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(int index, OverlayItem item) {
+                        return false;
+                    }
+                });
+        return mOverlay;
+    }
+
+}
 
 
