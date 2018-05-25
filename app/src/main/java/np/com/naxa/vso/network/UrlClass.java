@@ -10,8 +10,7 @@ public class UrlClass {
     public static final String REQUEST_401 = "401";
     public static final String REQUEST_400 = "400";
 
-    public static final String BASE_URL = "http://naxa.com.np/vso/";
-
+    public static final String BASE_URL = "http://app.naxa.com.np/";
 
     public static  String VSO_BASE_URL ;
 

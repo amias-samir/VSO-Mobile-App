@@ -60,6 +60,18 @@
                     android:gravity="center"
                     android:text="@string/browse_data_by_categories" />
 
+                <TextView
+                    android:id="@+id/tv_data_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/toggle_slide_panel_main_grid"
+                    android:gravity="center"
+                    android:layout_centerVertical="true"
+                    android:text="@string/filter"
+                    android:visibility="gone"
+                    android:drawableTop="@drawable/ic_filter_list_black"/>
+
+
                 <ImageView
                     android:id="@+id/toggle_slide_panel_main_grid"
                     android:layout_width="wrap_content"

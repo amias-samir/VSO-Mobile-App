@@ -1,5 +1,6 @@
 package np.com.naxa.vso.activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +33,8 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
+import np.com.naxa.vso.utils.DialogFactory;
+import np.com.naxa.vso.utils.ProgressDialogUtils;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -260,6 +263,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
     private void sendDataToServer(String jsonData) {
 
+        ProgressDialog progressDialog = DialogFactory.createProgressDialog(this, "Please wait!!!\nSending... ");
+        progressDialog.show();
+
         if (hasNewImage) {
 
 //            imageFile = new File(imageFilePath);
@@ -294,6 +300,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             private void handleProfileUpdateResponse(AskForHelpResponse askForHelpResponse) {
                 switch (askForHelpResponse.getStatus()) {
                     case REQUEST_OK:
+                        if(progressDialog.isShowing() && progressDialog!=null){
+                            progressDialog.dismiss();
+                        }
                         handleSuccess(askForHelpResponse);
                         Log.d("", "handleProfileUpdateResponse: 200");
                         break;
@@ -312,6 +321,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
             @Override
             public void onFailure(Call<AskForHelpResponse> call, Throwable t) {
+                if(progressDialog.isShowing() && progressDialog!=null){
+                    progressDialog.dismiss();
+                }
 
                 String message = "Internet Connection Error!, please try again later";
                 Log.d("", "onFailure: ");
@@ -320,6 +332,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     message = "slow internet connection, please try again later";
                 }
 
+                DialogFactory.createSimpleOkErrorDialog(this, "Sending Failed!!", message).show();
                 Toast.makeText(ReportActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });

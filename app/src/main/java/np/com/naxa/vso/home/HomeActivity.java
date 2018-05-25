@@ -10,9 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -38,8 +36,6 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -56,33 +52,21 @@ import com.mapbox.services.commons.geojson.Point;
 import com.mapbox.services.commons.models.Position;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
-import org.osmdroid.bonuspack.kml.KmlFeature;
-import org.osmdroid.bonuspack.kml.KmlLineString;
-import org.osmdroid.bonuspack.kml.KmlPlacemark;
-import org.osmdroid.bonuspack.kml.KmlPoint;
-import org.osmdroid.bonuspack.kml.KmlPolygon;
-import org.osmdroid.bonuspack.kml.KmlTrack;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.bonuspack.routing.GoogleRoadManager;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.bonuspack.routing.RoadNode;
-import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-
 import org.osmdroid.util.BoundingBox;
-
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
@@ -92,14 +76,12 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
-
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-import org.osmdroid.views.util.constants.OverlayConstants;
 import org.reactivestreams.Publisher;
 
 import java.io.IOException;
@@ -112,6 +94,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -138,10 +121,10 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
+import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
-
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -152,9 +135,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
-
-
-
 
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
@@ -196,6 +176,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.floating_search_view)
     FloatingSearchView floatingSearchView;
+    @BindView(R.id.tv_data_filter)
+    TextView tvDataFilter;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -225,6 +207,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
+    private int gridPosition;
 
     private PermissionsManager permissionsManager;
     //    private LocationLayerPlugin locationPlugin;
@@ -247,7 +230,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
     }
-
 
 
     public static void start(Context context, ArrayList<HospitalAndCommon> hospitalAndCommonList) {
@@ -511,6 +493,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             showOverlayOnMap(position);
             switchViews();
+            gridPosition = position;
         });
     }
 
@@ -537,11 +520,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (visbleItemIndex) {
             case 0:
                 tvDataSet.setText(R.string.browse_data_by_categories);
+                tvDataFilter.setVisibility(View.GONE);
                 clearClusterAndMarkers();
                 break;
             case 1:
 //                tvDataSet.setText(generateDataCardText());
                 tvDataSet.setText(dataSetInfoText);
+                tvDataFilter.setVisibility(View.VISIBLE);
+
+
                 break;
         }
     }
@@ -989,7 +976,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
-                BoundingBox boundingBox =new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
+                BoundingBox boundingBox = new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
                 mapView.zoomToBoundingBox(boundingBox, true);
                 mapView.invalidate();
 
@@ -1062,6 +1049,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     List<HospitalAndCommon> sortedHospitalList = new ArrayList<HospitalAndCommon>();
+
     private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList) {
 
         List<Float> sortedDistanceList = new ArrayList<Float>();
@@ -1098,7 +1086,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 // Stuff that updates the UI
                 ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
-                dataSetInfoText = (sortedHospitalItemList.size()+" Hospitals found ");
+                dataSetInfoText = (sortedHospitalItemList.size() + " Hospitals found ");
             }
         });
 
@@ -1121,9 +1109,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
 
 
-
     }
-
 
 
     private void loadFilteredEducationMarkerFlowable(Flowable<List<EducationAndCommon>> flowableList) {
@@ -1243,6 +1229,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
         return mOverlay;
+    }
+
+    @OnClick(R.id.tv_data_filter)
+    public void onViewCategorizedDataFilter() {
+
+        if(gridPosition == 0){
+            HospitalFilterActivity.start(HomeActivity.this);
+        }
     }
 }
 

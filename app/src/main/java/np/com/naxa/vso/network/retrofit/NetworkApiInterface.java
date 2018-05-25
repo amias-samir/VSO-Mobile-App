@@ -17,7 +17,7 @@ import retrofit2.http.Part;
 public interface NetworkApiInterface {
 
     @Multipart
-    @POST("ask_for_help")
+    @POST("ReportController/report_insert_api")
     Call<AskForHelpResponse> getAskForHelpResponse(@Part MultipartBody.Part file,
                                                      @Part("data") RequestBody jsonToSend);
 }
