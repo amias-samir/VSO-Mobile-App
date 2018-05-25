@@ -737,18 +737,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
                 myLocationNewOverlay.setDrawAccuracyEnabled(true);
 
-                mapView.getOverlays().clear();
-                mapView.getOverlays().add(myOverLayBoarder);
                 mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
                 myLocationNewOverlay.enableFollowLocation();
                 mapView.invalidate();
 
-                try {
-                    Log.i("Shree", "Somethings: " + provider.getLastKnownLocation().getLongitude());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
@@ -917,7 +910,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadlayerToMap(String geoJson) {
-//        mapView.getOverlays().clear();
+        mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
         MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
@@ -1046,15 +1039,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         myLocationNewOverlay.enableMyLocation();
         mapView.getOverlays().add(myLocationNewOverlay);
 
-//                double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
-//                double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
-
-
+//      double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
+//      double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
     }
 
 
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
-
         flowableList.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
@@ -1177,11 +1167,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @OnClick(R.id.tv_data_filter)
     public void onViewCategorizedDataFilter() {
 
-        if(gridPosition == 0){
+        if (gridPosition == 0) {
             HospitalFilterActivity.start(HomeActivity.this);
         }
     }
-
 
 
     private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb) {
@@ -1202,6 +1191,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         return false;
                     }
                 });
+
         return mOverlay;
     }
 
