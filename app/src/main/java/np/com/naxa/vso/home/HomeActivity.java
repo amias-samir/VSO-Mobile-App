@@ -193,7 +193,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     RadiusMarkerClusterer poiMarkers;
     List<Overlay> overlaysList;
 
-    List<EducationAndCommon> sortedEducationList = new ArrayList<>();
     List<HospitalAndCommon> sortedHospitalList = new ArrayList<>();
 
     private String latitude;
@@ -220,10 +219,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected DirectedLocationOverlay myLocationOverlay;
     //MyLocationNewOverlay myLocationNewOverlay;
     protected LocationManager mLocationManager;
-    private GeoPoint currentLocation ;
-
-
-
+    private GeoPoint currentLocation;
 
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
     List<CommonPlacesAttrb> commonPlacesAttrbsList = new ArrayList<>();
@@ -296,13 +292,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void initLocationListner(Bundle savedInstanceState){
+    public void initLocationListner(Bundle savedInstanceState) {
 
-        mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         myLocationOverlay = new DirectedLocationOverlay(this);
         mapView.getOverlays().add(myLocationOverlay);
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             Location location = null;
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -318,7 +314,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 myLocationOverlay.setEnabled(false);
             }
         } else {
-            myLocationOverlay.setLocation((GeoPoint)savedInstanceState.getParcelable("location"));
+            myLocationOverlay.setLocation((GeoPoint) savedInstanceState.getParcelable("location"));
             //TODO: restore other aspects of myLocationOverlay...
         }
 
@@ -568,8 +564,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                tvDataSet.setText(generateDataCardText());
                 tvDataSet.setText(dataSetInfoText);
                 tvDataFilter.setVisibility(View.VISIBLE);
-
-
                 break;
         }
     }
@@ -821,21 +815,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         final GeoPoint[] points = new GeoPoint[2];
 
-        double latitude = 27.71635;
-        double longitude = 85.32507;
-
         SortingDistance sortingDistance = new SortingDistance();
 
-        points[0] = new GeoPoint(latitude, longitude);
+        points[0] = currentLocation;
 
         openSpaceViewModel.getAllOpenSpaceList()
                 .flatMap((Function<List<OpenAndCommon>, Publisher<Polyline>>) openAndCommons -> {
-                    LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons, latitude, longitude);
+                    LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons,
+                            currentLocation.getLatitude(),
+                            currentLocation.getLongitude());
                     Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
                     List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
 
                     points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
                             sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
+
                     return routeGenerateObservable(points);
                 })
                 .subscribeOn(Schedulers.io())
@@ -1235,17 +1229,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     //------------ LocationListener implementation
     private final NetworkLocationIgnorer mIgnorer = new NetworkLocationIgnorer();
     long mLastTime = 0; // milliseconds
     double mSpeed = 0.0; // km/h
-    @Override public void onLocationChanged(final Location pLoc) {
+
+    @Override
+    public void onLocationChanged(final Location pLoc) {
         long currentTime = System.currentTimeMillis();
         if (mIgnorer.shouldIgnore(pLoc.getProvider(), currentTime))
             return;
         double dT = currentTime - mLastTime;
-        if (dT < 100.0){
+        if (dT < 100.0) {
             //Toast.makeText(this, pLoc.getProvider()+" dT="+dT, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -1253,7 +1248,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         GeoPoint newLocation = new GeoPoint(pLoc);
         currentLocation = newLocation;
-        if (!myLocationOverlay.isEnabled()){
+        if (!myLocationOverlay.isEnabled()) {
             //we get the location for the first time:
             myLocationOverlay.setEnabled(true);
             mapView.getController().animateTo(newLocation);
@@ -1261,9 +1256,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         GeoPoint prevLocation = myLocationOverlay.getLocation();
         myLocationOverlay.setLocation(newLocation);
-        myLocationOverlay.setAccuracy((int)pLoc.getAccuracy());
+        myLocationOverlay.setAccuracy((int) pLoc.getAccuracy());
 
-        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)){
+        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
             mSpeed = pLoc.getSpeed() * 3.6;
             long speedInt = Math.round(mSpeed);
 
@@ -1272,13 +1267,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) { }
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
 
     @Override
-    public void onProviderEnabled(String s) { }
+    public void onProviderEnabled(String s) {
+    }
 
     @Override
-    public void onProviderDisabled(String s) { }
+    public void onProviderDisabled(String s) {
+    }
 
 
 }
