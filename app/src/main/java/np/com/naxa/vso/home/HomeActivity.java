@@ -818,7 +818,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-                handleLocationPermission();
+//                handleLocationPermission();
+                mapView.getController().animateTo(currentLocation);
                 break;
         }
     }
