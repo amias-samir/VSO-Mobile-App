@@ -965,8 +965,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             String jsonString = null;
             try {
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("ward_changu.geojson");
+//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changu_ward.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -979,9 +979,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             final KmlDocument kmlDocument = new KmlDocument();
             kmlDocument.parseGeoJSON(jsonString);
-//            Log.d(TAG, "loadMunicipalityBoarder: JSON "+ jsonString);
 
-            Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+            Drawable defaultMarker = getResources().getDrawable(R.drawable.mapbox_marker_icon_default);
             Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 //
             final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
