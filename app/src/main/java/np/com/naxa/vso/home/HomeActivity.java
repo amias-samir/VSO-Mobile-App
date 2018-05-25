@@ -5,17 +5,20 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,6 +71,7 @@ import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -78,6 +82,7 @@ import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
@@ -138,7 +143,7 @@ import timber.log.Timber;
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     private static final String TAG = "HomeActivity";
 
@@ -211,10 +216,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isGridShown = true;
     private int gridPosition;
 
-    private PermissionsManager permissionsManager;
-    //    private LocationLayerPlugin locationPlugin;
-    private LocationEngine locationEngine;
-    private Location originLocation;
+    //location listner
+    protected DirectedLocationOverlay myLocationOverlay;
+    //MyLocationNewOverlay myLocationNewOverlay;
+    protected LocationManager mLocationManager;
+    private GeoPoint currentLocation ;
+
+
+
 
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
     List<CommonPlacesAttrb> commonPlacesAttrbsList = new ArrayList<>();
@@ -263,6 +272,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         slidingPanel.setAnchorPoint(0.4f);
 
+        initLocationListner(savedInstanceState);
+
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
@@ -281,6 +292,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (getIntent().getParcelableArrayListExtra("data") != null) {
             List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
             loadFilteredHospitalMarker(hospitalAndCommonList);
+        }
+
+    }
+
+    public void initLocationListner(Bundle savedInstanceState){
+
+        mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        myLocationOverlay = new DirectedLocationOverlay(this);
+        mapView.getOverlays().add(myLocationOverlay);
+
+        if (savedInstanceState == null){
+            Location location = null;
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location == null)
+                    location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+            if (location != null) {
+                //location known:
+                onLocationChanged(location);
+                currentLocation = new GeoPoint(location);
+            } else {
+                //no location known: hide myLocationOverlay
+                myLocationOverlay.setEnabled(false);
+            }
+        } else {
+            myLocationOverlay.setLocation((GeoPoint)savedInstanceState.getParcelable("location"));
+            //TODO: restore other aspects of myLocationOverlay...
         }
 
     }
@@ -1204,6 +1243,53 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
         return mOverlay;
     }
+
+
+
+    //------------ LocationListener implementation
+    private final NetworkLocationIgnorer mIgnorer = new NetworkLocationIgnorer();
+    long mLastTime = 0; // milliseconds
+    double mSpeed = 0.0; // km/h
+    @Override public void onLocationChanged(final Location pLoc) {
+        long currentTime = System.currentTimeMillis();
+        if (mIgnorer.shouldIgnore(pLoc.getProvider(), currentTime))
+            return;
+        double dT = currentTime - mLastTime;
+        if (dT < 100.0){
+            //Toast.makeText(this, pLoc.getProvider()+" dT="+dT, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mLastTime = currentTime;
+
+        GeoPoint newLocation = new GeoPoint(pLoc);
+        currentLocation = newLocation;
+        if (!myLocationOverlay.isEnabled()){
+            //we get the location for the first time:
+            myLocationOverlay.setEnabled(true);
+            mapView.getController().animateTo(newLocation);
+        }
+
+        GeoPoint prevLocation = myLocationOverlay.getLocation();
+        myLocationOverlay.setLocation(newLocation);
+        myLocationOverlay.setAccuracy((int)pLoc.getAccuracy());
+
+        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)){
+            mSpeed = pLoc.getSpeed() * 3.6;
+            long speedInt = Math.round(mSpeed);
+
+        }
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) { }
+
+    @Override
+    public void onProviderEnabled(String s) { }
+
+    @Override
+    public void onProviderDisabled(String s) { }
+
 
 }
 
