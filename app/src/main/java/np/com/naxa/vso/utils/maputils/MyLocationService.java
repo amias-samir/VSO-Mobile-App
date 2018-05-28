@@ -18,18 +18,15 @@ public class MyLocationService extends Service {
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+    Location mLastLocation;
 
 
     private class LocationListener implements android.location.LocationListener {
-
-        Location mLastLocation;
-//        HomeActivity homeActivity = new HomeActivity();
 
         public LocationListener(String provider)
         {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
-//            homeActivity.onLocationChanged(mLastLocation);
         }
 
         @Override
@@ -37,7 +34,6 @@ public class MyLocationService extends Service {
         {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
-//            homeActivity.onLocationChanged(mLastLocation);
 
         }
 
