@@ -145,7 +145,7 @@ import timber.log.Timber;
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "HomeActivity";
 
@@ -303,30 +303,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         myLocationOverlay = new DirectedLocationOverlay(this);
         mapView.getOverlays().add(myLocationOverlay);
 
-//        if (savedInstanceState == null) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 Intent serviceIntent = new Intent(this, MyLocationService.class);
                 startService(serviceIntent);
-
                 location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location == null)
                     location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
             if (location != null) {
                 //location known:
-                onLocationChanged(location);
                 currentLocation = new GeoPoint(location);
-
+                onLocationChanged(location);
             } else {
                 //no location known: hide myLocationOverlay
                 myLocationOverlay.setEnabled(false);
             }
-//        } else {
-//            myLocationOverlay.setLocation((GeoPoint) savedInstanceState.getParcelable("location"));
-//            //TODO: restore other aspects of myLocationOverlay...
-//        }
-
     }
 
     private void loadAllMarker() {
@@ -419,9 +411,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         mapController = mapView.getController();
-        mapController.setZoom(12);
-//        mapView.zoomToBoundingBox(boundingBox, true);
-//        mapController.zoomToSpan(boundingBox.getLatitudeSpan(), boundingBox.getLongitudeSpan());
+        mapController.setZoom(12.0f);
         poiMarkers = new RadiusMarkerClusterer(this);
 
         loadMunicipalityBoarder();
@@ -1226,22 +1216,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     //------------ LocationListener implementation
-    private final NetworkLocationIgnorer mIgnorer = new NetworkLocationIgnorer();
-    long mLastTime = 0; // milliseconds
-    double mSpeed = 0.0; // km/h
-
-    @Override
     public void onLocationChanged(final Location pLoc) {
-        long currentTime = System.currentTimeMillis();
-        if (mIgnorer.shouldIgnore(pLoc.getProvider(), currentTime))
-            return;
-        double dT = currentTime - mLastTime;
-        if (dT < 100.0) {
-            //Toast.makeText(this, pLoc.getProvider()+" dT="+dT, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mLastTime = currentTime;
-
         GeoPoint newLocation = new GeoPoint(pLoc);
         currentLocation = newLocation;
         if (!myLocationOverlay.isEnabled()) {
@@ -1249,29 +1224,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             myLocationOverlay.setEnabled(true);
             mapView.getController().animateTo(newLocation);
         }
-
-        GeoPoint prevLocation = myLocationOverlay.getLocation();
         myLocationOverlay.setLocation(newLocation);
+        myLocationOverlay.setEnabled(true);
         myLocationOverlay.setAccuracy((int) pLoc.getAccuracy());
-
-        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-            mSpeed = pLoc.getSpeed() * 3.6;
-            long speedInt = Math.round(mSpeed);
-
-        }
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
     }
 
 
