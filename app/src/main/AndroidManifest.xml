@@ -38,6 +38,8 @@
         <!-- android:resource="@xml/file_paths" /> -->
         <!-- </provider> -->
 
+        <service android:name=".utils.maputils.MyLocationService" android:process=":my_service" />
+
         <activity
             android:name=".TestFlowChart"
             android:exported="true" />

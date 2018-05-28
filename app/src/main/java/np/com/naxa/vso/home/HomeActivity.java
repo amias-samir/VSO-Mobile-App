@@ -132,6 +132,7 @@ import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.NetworkUtils;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -272,9 +273,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         slidingPanel.setAnchorPoint(0.4f);
 
-
-        initLocationListner();
-
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
@@ -295,6 +293,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             loadFilteredHospitalMarker(hospitalAndCommonList);
         }
 
+        initLocationListner();
+
     }
 
     public void initLocationListner() {
@@ -305,6 +305,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        if (savedInstanceState == null) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                Intent serviceIntent = new Intent(this, MyLocationService.class);
+                startService(serviceIntent);
 
                 location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location == null)
@@ -819,6 +822,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 else {
                     myLocationOverlay.setEnabled(true);
                     mapView.getController().animateTo(currentLocation);
+                    Intent serviceIntent = new Intent(this, MyLocationService.class);
+                    stopService(serviceIntent);
                 }
 
                 break;
@@ -1022,18 +1027,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
-    private void initMyLocationNewOverlay() {
-        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
-        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-        provider.addLocationSource(LocationManager.GPS_PROVIDER);
-
-        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-        myLocationNewOverlay.enableMyLocation();
-        mapView.getOverlays().add(myLocationNewOverlay);
-
-        double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
-        double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
-    }
 
     private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList) {
 
@@ -1077,19 +1070,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return linkedHospitalAndDistance;
     }
 
-    private void initMyCurrentLocation() {
-        GpsMyLocationProvider provider = new GpsMyLocationProvider(this);
-        provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
-        provider.addLocationSource(LocationManager.GPS_PROVIDER);
-
-
-        MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
-        myLocationNewOverlay.enableMyLocation();
-        mapView.getOverlays().add(myLocationNewOverlay);
-
-//      double latitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLatitude();
-//      double longitude = myLocationNewOverlay.getMyLocationProvider().getLastKnownLocation().getLongitude();
-    }
 
 
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
