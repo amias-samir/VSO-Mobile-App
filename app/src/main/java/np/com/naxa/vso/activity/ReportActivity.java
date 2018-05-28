@@ -31,6 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
+import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
@@ -294,7 +295,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 }
 
                 handleProfileUpdateResponse(response.body());
-                Log.d("", "onResponse: got response");
+                Log.d("", "onResponse: got response data "+response.body().getData().toString());
+                Log.d("", "onResponse: got response status"+response.body().getStatus().toString());
             }
 
             private void handleProfileUpdateResponse(AskForHelpResponse askForHelpResponse) {
@@ -304,7 +306,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                             progressDialog.dismiss();
                         }
                         handleSuccess(askForHelpResponse);
-                        Log.d("", "handleProfileUpdateResponse: 200");
+                        Log.d("", "handleReportResponse: 200");
                         break;
 
                     default:
@@ -315,8 +317,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
 
             private void handleSuccess(AskForHelpResponse askForHelpResponse) {
-
-
+                DialogFactory.createMessageDialog(ReportActivity.this,"Success", "Data sent successfully").show();
+//                HomeActivity.start(ReportActivity.this);
+                tvName.getEditText().setText("");
+                tvContactNumber.getEditText().setText("");
+                tvMessage.getEditText().setText("");
             }
 
             @Override

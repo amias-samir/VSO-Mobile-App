@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.location.gps" />
+
 
     <application
         android:name=".home.VSO"
@@ -42,8 +44,13 @@
 
         <activity
             android:name=".activity.ReportActivity"
-            android:windowSoftInputMode="stateVisible"
-            android:exported="true" />
+            android:windowSoftInputMode="stateHidden"
+            android:exported="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".home.HomeActivity" />
+
+        </activity>
 
         <activity
             android:name=".home.HomeActivity"

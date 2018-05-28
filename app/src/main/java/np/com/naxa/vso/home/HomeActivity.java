@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -220,6 +221,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     //MyLocationNewOverlay myLocationNewOverlay;
     protected LocationManager mLocationManager;
     private GeoPoint currentLocation;
+    Location location = null;
+
+
 
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
     List<CommonPlacesAttrb> commonPlacesAttrbsList = new ArrayList<>();
@@ -268,7 +272,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         slidingPanel.setAnchorPoint(0.4f);
 
-        initLocationListner(savedInstanceState);
+
+        initLocationListner();
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -292,15 +297,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void initLocationListner(Bundle savedInstanceState) {
+    public void initLocationListner() {
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         myLocationOverlay = new DirectedLocationOverlay(this);
         mapView.getOverlays().add(myLocationOverlay);
 
-        if (savedInstanceState == null) {
-            Location location = null;
+//        if (savedInstanceState == null) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
                 location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if (location == null)
                     location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -309,14 +314,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 //location known:
                 onLocationChanged(location);
                 currentLocation = new GeoPoint(location);
+
             } else {
                 //no location known: hide myLocationOverlay
                 myLocationOverlay.setEnabled(false);
             }
-        } else {
-            myLocationOverlay.setLocation((GeoPoint) savedInstanceState.getParcelable("location"));
-            //TODO: restore other aspects of myLocationOverlay...
-        }
+//        } else {
+//            myLocationOverlay.setLocation((GeoPoint) savedInstanceState.getParcelable("location"));
+//            //TODO: restore other aspects of myLocationOverlay...
+//        }
 
     }
 
@@ -806,7 +812,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.fab_location_toggle:
 //                handleLocationPermission();
-                mapView.getController().animateTo(currentLocation);
+                if(currentLocation == null) {
+                    Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
+                    initLocationListner();
+                }
+                else {
+                    myLocationOverlay.setEnabled(true);
+                    mapView.getController().animateTo(currentLocation);
+                }
+
                 break;
         }
     }
@@ -1228,6 +1242,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         return mOverlay;
     }
+
 
 
     //------------ LocationListener implementation
