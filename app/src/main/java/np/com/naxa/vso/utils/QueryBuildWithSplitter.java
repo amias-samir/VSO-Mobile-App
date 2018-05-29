@@ -55,25 +55,25 @@ public class QueryBuildWithSplitter {
 //                String temp = trunk.replaceAll("\\s+", "");
                     String[] splitted_string = trunk.split(",");
 
-                    splittedStringWithOR = " yes ";
+                    splittedStringWithOR = " Yes ";
                     for (int i = 0; i < splitted_string.length; i++) {
 
                         if (splitted_string[i].trim().contentEquals("ICU_Service")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
 
                         }
                         if (splitted_string[i].trim().contentEquals("Ambulance_Service")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
                         if (splitted_string[i].trim().contentEquals("Toilet_Facility")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
                         if (splitted_string[i].trim().contentEquals("Fire_Extinguisher")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
 
 
@@ -84,25 +84,25 @@ public class QueryBuildWithSplitter {
 //                    String temp = trunk.replaceAll("\\s+", "");
                     String[] splitted_string = trunk.split(",");
 
-                    splittedStringWithOR = " no ";
+                    splittedStringWithOR = " No ";
                     for (int i = 0; i < splitted_string.length; i++) {
 
                         if (splitted_string[i].trim().contentEquals("ICU_Service")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
 
                         }
                         if (splitted_string[i].trim().contentEquals("Ambulance_Service")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
                         if (splitted_string[i].trim().contentEquals("Toilet_Facility")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
                         if (splitted_string[i].trim().contentEquals("Fire_Extinguisher")) {
                             String columnName = splitted_string[i].trim().toLowerCase();
-                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " yes ";
+                            splittedStringWithOR = splittedStringWithOR + columnName + " LIKE :" + " Yes ";
                         }
 
 

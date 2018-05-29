@@ -52,10 +52,13 @@ public interface HospitalFacilitiesDao  {
 
     @Query("SELECT * FROM hospital_facilities "
             + "INNER JOIN commonplacesattrb ON commonplacesattrb.uid = hospital_facilities.fk_common_places "
-            + "WHERE type LIKE :hospital_type OR number_of_beds LIKE :bedCapacity" +
-            " AND structure_type LIKE :building_structure OR emergency_service LIKE :available_facilities OR evacuation_plan LIKE :excavation_plans")
-    LiveData<List<HospitalAndCommon>> getAllFilteredList(String hospital_type, String bedCapacity, String building_structure,
-                                                         String available_facilities, String excavation_plans);
+            + "WHERE  ward LIKE :ward AND type LIKE :hospital_type OR number_of_beds LIKE :bedCapacity" +
+            " AND structure_type LIKE :building_structure AND emergency_service LIKE :available_facilities AND evacuation_plan LIKE :excavation_plans" +
+            " AND ( medicine_in_stock LIKE :medicine_stock OR blood_in_stock LIKE :blood_stock OR disaster_preparedness_response_plan LIKE :disaster_plan" +
+            " OR first_aid_and_emergency_rescue LIKE :first_aid OR earthquake_damage LIKE :earthquake_resilient)")
+    LiveData<List<HospitalAndCommon>> getAllFilteredList(String ward, String hospital_type, String bedCapacity, String building_structure,
+                                                         String available_facilities, String excavation_plans, String medicine_stock,
+                                                         String blood_stock, String disaster_plan, String first_aid, String earthquake_resilient);
 
     @Query("SELECT * FROM hospital_facilities "
             + "INNER JOIN commonplacesattrb ON commonplacesattrb.uid = hospital_facilities.fk_common_places")

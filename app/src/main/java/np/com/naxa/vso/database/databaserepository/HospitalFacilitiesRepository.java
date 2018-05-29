@@ -71,18 +71,21 @@ public class HospitalFacilitiesRepository {
     }
 
 
-        public LiveData<List<String >> getDistinctValuesFromColumn(String columnName){
-        Log.d("repo", "getDistinctValuesFromColumn: "+columnName);
+    public LiveData<List<String>> getDistinctValuesFromColumn(String columnName) {
+        Log.d("repo", "getDistinctValuesFromColumn: " + columnName);
         mAllDistinctValuesList = mHospitalFacilitiesDao.getDistinctValuesFromColumn(columnName);
 //        Log.d("", "getDistinctValuesFromColumn: value "+mAllDistinctValuesList.getValue().get(1));
         return mAllDistinctValuesList;
     }
 
 
-    public LiveData<List<HospitalAndCommon>> getAllFilteredHospitalFacilities(String ward, String hospital_type,  String bedCapacity,
-                                                                               String building_structure, String available_facilities, String excavation_plans) {
+    public LiveData<List<HospitalAndCommon>> getAllFilteredHospitalFacilities(String ward, String hospital_type, String bedCapacity,
+                                                                              String building_structure, String available_facilities, String excavation_plans,
+                                                                              String medicine_stock, String blood_stock, String disaster_plan, String first_aid,
+                                                                              String earthquake_resilient) {
 
-        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList( hospital_type, bedCapacity,  building_structure, available_facilities, excavation_plans);
+        mAllFilteredHospitalFacilities = mHospitalFacilitiesDao.getAllFilteredList(ward, hospital_type, bedCapacity, building_structure,
+                available_facilities, excavation_plans, medicine_stock, blood_stock, disaster_plan, first_aid, earthquake_resilient);
         return mAllFilteredHospitalFacilities;
     }
 
@@ -94,10 +97,9 @@ public class HospitalFacilitiesRepository {
         mHospitalFacilitiesDao.insert(hospitalFacilities);
     }
 
-    public Flowable<List<HospitalAndCommon>> getAllDetail(){
+    public Flowable<List<HospitalAndCommon>> getAllDetail() {
         return mHospitalFacilitiesDao.getAllHospitalDetailList();
     }
-
 
 
 }

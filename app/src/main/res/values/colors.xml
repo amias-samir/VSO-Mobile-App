@@ -22,4 +22,13 @@
     <color name="button_button_sheet">#bfcbd9</color>
     <color name="dimBg">#bf000000</color>
 
+
+    <!-- form builder-->
+    <color name="colorFormMasterHeaderBackground">#DDDDDD</color>
+    <color name="colorFormMasterHeaderText">#000000</color>
+    <color name="colorFormMasterElementBackground">#FFFFFF</color>
+    <color name="colorFormMasterElementTextTitle">#222222</color>
+    <color name="colorFormMasterElementTextValue">#000000</color>
+    <color name="colorFormMasterDivider">#DDDDDD</color>
+
 </resources>

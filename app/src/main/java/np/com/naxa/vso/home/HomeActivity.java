@@ -289,10 +289,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        loadAllMarker();
 
-        if (getIntent().getParcelableArrayListExtra("data") != null) {
-            List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
-            loadFilteredHospitalMarker(hospitalAndCommonList);
+        try {
+            if (getIntent().getParcelableArrayListExtra("data") != null) {
+                List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
+                loadFilteredHospitalMarker(hospitalAndCommonList);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
 
         initLocationListner();
 
@@ -1202,7 +1207,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb) {
+    private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb){
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = commonPlacesAttrb.getName();
         double latitude = commonPlacesAttrb.getLatitude();

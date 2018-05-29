@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -29,6 +30,7 @@ import me.riddhimanadib.formmaster.listener.OnFormElementValueChangedListener;
 import me.riddhimanadib.formmaster.model.BaseFormElement;
 import me.riddhimanadib.formmaster.model.FormElementPickerMulti;
 import me.riddhimanadib.formmaster.model.FormElementPickerSingle;
+import me.riddhimanadib.formmaster.model.FormElementSwitch;
 import me.riddhimanadib.formmaster.model.FormHeader;
 import np.com.naxa.vso.R;
 
@@ -51,14 +53,18 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     private static final int TAG_WARD = 01;
     private static final int TAG_HOSPITAL_TYPE = 02;
-    private static final int TAG_BED = 03;
-    private static final int TAG_BED_CAPACITY = 04;
-    private static final int TAG_BUILDING_STRUCTURE = 05;
-    private static final int TAG_BUILDING_STRUCTURE_LIST = 15;
-    private static final int TAG_AVAILABLE_FACILITIES = 06;
-    private static final int TAG_AVAILABLE_FACILITIES_LIST = 16;
-    private static final int TAG_EXCAVATION_PLANS = 07;
-    private static final int TAG_EXCAVATION_PLANS_LIST = 17;
+    private static final int TAG_BED_CAPACITY = 03;
+    private static final int TAG_BUILDING_STRUCTURE_LIST = 04;
+    private static final int TAG_AVAILABLE_FACILITIES_LIST = 05;
+    private static final int TAG_EXCAVATION_PLANS_LIST = 06;
+
+    private static final int TAG_MEDICINE_STOCK = 11;
+    private static final int TAG_BLOOD_STOCK = 12;
+    private static final int TAG_DISASTERS_PLAN = 13;
+    private static final int TAG_FIRST_AID = 14;
+    private static final int TAG_EARTHQUAKE_RESILIENT = 15;
+    private static final int TAG_ALTERNATIVE_ROUTE = 16;
+    private static final int TAG_OCCUPANCY = 17;
 
 
     HospitalFacilitiesVewModel hospitalFacilitiesVewModel;
@@ -140,7 +146,6 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mFormBuilder = new FormBuilder(this, mRecyclerView, this);
 
-        FormHeader headerWard = FormHeader.createInstance("Ward");
         List<String> wardList = new ArrayList<>();
         wardList.add("1");
         wardList.add("2");
@@ -148,48 +153,58 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         wardList.add("4");
         wardList.add("5");
         wardList.add("6");
+        wardList.add("7");
+        wardList.add("8");
+        wardList.add("9");
+        wardList.add("10");
+        wardList.add("11");
+        wardList.add("12");
         FormElementPickerSingle wardListElement = FormElementPickerSingle.createInstance().setTag(TAG_WARD).setTitle("Select Ward").setOptions(wardList).setPickerTitle("Pick any ward");
 
-        FormHeader headerHospitalType = FormHeader.createInstance("Hospital Facilities");
         FormElementPickerSingle hospitalTypeElement = FormElementPickerSingle.createInstance().setTag(TAG_HOSPITAL_TYPE).setTitle("Hospital Type").setOptions(hospitalTypeList).setPickerTitle("Pick any type");
 
-
-        FormHeader headerBedCapacity = FormHeader.createInstance("Bed Capacity");
         FormElementPickerMulti bedCapacityElement = FormElementPickerMulti.createInstance().setTag(TAG_BED_CAPACITY).setTitle("Bed Capacity").setOptions(bedCapacityList).setPickerTitle("Choose one or more bed capacity").setNegativeText("reset");
 
-        FormHeader headerBuildingStructure = FormHeader.createInstance("Structure");
         FormElementPickerMulti buildingStructureElement = FormElementPickerMulti.createInstance().setTag(TAG_BUILDING_STRUCTURE_LIST).setTitle("Building Structure Module").setOptions(buildingStructureList).setPickerTitle("Choose one or more building structure").setNegativeText("reset");
 
-        FormHeader headerAvailiableFacilities = FormHeader.createInstance("Facilities");
         List<String> availiableFaclities = new ArrayList<>();
         availiableFaclities.add("Emergency_Service");
         availiableFaclities.add("ICU_Service");
         availiableFaclities.add("Ambulance_Service");
-        availiableFaclities.add("Toilet_Facility");
+//        availiableFaclities.add("Toilet_Facility");
         availiableFaclities.add("Fire_Extinguisher");
         FormElementPickerMulti availiableFaclitieseElement = FormElementPickerMulti.createInstance().setTag(TAG_AVAILABLE_FACILITIES_LIST).setTitle("Available Facilities List").setOptions(availiableFaclities).setPickerTitle("Choose one or more available facilities").setNegativeText("reset");
 
+        FormElementPickerSingle excavationPlansElement = FormElementPickerSingle.createInstance().setTag(TAG_EXCAVATION_PLANS_LIST).setTitle("Evacuation Plans List").setOptions(evacuationPlansList).setPickerTitle("Choose evacuation plan");
+
         FormHeader headerBuildingExcavation = FormHeader.createInstance("Building Evacuation");
-        FormElementPickerMulti excavationPlansElement = FormElementPickerMulti.createInstance().setTag(TAG_EXCAVATION_PLANS_LIST).setTitle("Evacuation Plans List").setOptions(evacuationPlansList).setPickerTitle("Choose one or more evacuation plan").setNegativeText("reset");
+
+// switch input
+        FormElementSwitch medicineStocklElement = FormElementSwitch.createInstance().setTag(TAG_MEDICINE_STOCK).setTitle("Medicine Stock").setSwitchTexts("Yes", "No");
+
+        FormElementSwitch bloodStocklElement = FormElementSwitch.createInstance().setTag(TAG_BLOOD_STOCK).setTitle("Blood Stock").setSwitchTexts("Yes", "No");
+
+        FormElementSwitch disasterElement = FormElementSwitch.createInstance().setTag(TAG_DISASTERS_PLAN).setTitle("Disaster Preparedness Response Plan").setSwitchTexts("Yes", "No");
+
+        FormElementSwitch firstAidElement = FormElementSwitch.createInstance().setTag(TAG_FIRST_AID).setTitle("First Aid and Emergency Rescue").setSwitchTexts("Yes", "No");
+
+        FormElementSwitch earthquakeElement = FormElementSwitch.createInstance().setTag(TAG_EARTHQUAKE_RESILIENT).setTitle("Earthquake Resilient").setSwitchTexts("Yes", "No");
+
+        FormElementSwitch alterntiveRouteElement = FormElementSwitch.createInstance().setTag(TAG_ALTERNATIVE_ROUTE).setTitle("Alternative Routes").setSwitchTexts("Yes", "No");
 
         List<BaseFormElement> formItems = new ArrayList<>();
-//        formItems.add(headerWard);
         formItems.add(wardListElement);
-
-//        formItems.add(headerHospitalType);
         formItems.add(hospitalTypeElement);
-
-//        formItems.add(headerBedCapacity);
         formItems.add(bedCapacityElement);
-
-//        formItems.add(headerBuildingStructure);
         formItems.add(buildingStructureElement);
-
-//        formItems.add(headerAvailiableFacilities);
         formItems.add(availiableFaclitieseElement);
-
-//        formItems.add(headerBuildingExcavation);
         formItems.add(excavationPlansElement);
+        formItems.add(medicineStocklElement);
+        formItems.add(bloodStocklElement);
+        formItems.add(disasterElement);
+        formItems.add(firstAidElement);
+        formItems.add(earthquakeElement);
+//        formItems.add(alterntiveRouteElement);
 
         mFormBuilder.addFormElements(formItems);
     }
@@ -211,8 +226,8 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
 
     private void getFormData() {
 
-        String ward, hospital_type, bed, bed_capacity, building_structure, building_structure_list, available_facilities, available_facilities_list,
-                excavation_plans, excavation_plans_list;
+        String ward, hospital_type, bed_capacity, building_structure_list, available_facilities_list, excavation_plans_list,
+                medicine_stock = "no", blood_stock = "no", disaster_plan = "no", first_aid = "no", earthquake_resilient = "no";
 
         BaseFormElement wardElement = mFormBuilder.getFormElement(TAG_WARD);
         BaseFormElement hospitalTypeElement = mFormBuilder.getFormElement(TAG_HOSPITAL_TYPE);
@@ -221,30 +236,47 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
         BaseFormElement availableFacilitiesElementList = mFormBuilder.getFormElement(TAG_AVAILABLE_FACILITIES_LIST);
         BaseFormElement excavationPlansElementList = mFormBuilder.getFormElement(TAG_EXCAVATION_PLANS_LIST);
 
-        ward = wardElement.getValue();
+        BaseFormElement medicineElement = mFormBuilder.getFormElement(TAG_MEDICINE_STOCK);
+        BaseFormElement bloodElement = mFormBuilder.getFormElement(TAG_BLOOD_STOCK);
+        BaseFormElement disasterElement = mFormBuilder.getFormElement(TAG_DISASTERS_PLAN);
+        BaseFormElement firstAidElement = mFormBuilder.getFormElement(TAG_FIRST_AID);
+        BaseFormElement earthquakeElement = mFormBuilder.getFormElement(TAG_EARTHQUAKE_RESILIENT);
+
+        ward = wardElement.getValue().trim();
         hospital_type = hospitalTypeElement.getValue();
         bed_capacity = bedCapacityElement.getValue();
         building_structure_list = buildingStructureElementList.getValue();
         available_facilities_list = availableFacilitiesElementList.getValue();
-        excavation_plans_list = excavationPlansElementList.getValue();
 
-        Log.d("HospitalFilter", "getFormData: " + ward + " , " + bed_capacity + " , " + excavation_plans_list);
+        excavation_plans_list = ((TextUtils.isEmpty(excavationPlansElementList.getValue().trim())) ? "No" : excavationPlansElementList.getValue().trim());
+        medicine_stock = ((TextUtils.isEmpty(medicineElement.getValue().trim())) ? "No" : medicineElement.getValue().trim());
+        blood_stock = ((TextUtils.isEmpty(bloodElement.getValue().trim())) ? "No" : bloodElement.getValue().trim());
+        disaster_plan = ((TextUtils.isEmpty(disasterElement.getValue().trim())) ? "No" : disasterElement.getValue().trim());
+        first_aid = ((TextUtils.isEmpty(firstAidElement.getValue().trim())) ? "No" : firstAidElement.getValue().trim());
+        earthquake_resilient = ((TextUtils.isEmpty(earthquakeElement.getValue().trim())) ? "No" : earthquakeElement.getValue().trim());
+
+
+        Log.d("HospitalFilter", "getFormData: " + ward + " , " + medicine_stock + " , " + blood_stock + " , " + disaster_plan + " , " + first_aid + " , " + earthquake_resilient);
 
         searchDataFromDatabase(ward, hospital_type,
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("number_of_beds", bed_capacity),
                 QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("structure_type", building_structure_list),
-                QueryBuildWithSplitter.availableFacilitiesQueryBuilder(available_facilities_list),
-                QueryBuildWithSplitter.dynamicStringSplitterWithColumnCheckQuery("evacuation_plan", excavation_plans_list));
+                QueryBuildWithSplitter.availableFacilitiesQueryBuilder(available_facilities_list), excavation_plans_list,
+                medicine_stock, blood_stock, disaster_plan, first_aid, earthquake_resilient);
     }
 
 
-    private void searchDataFromDatabase(String ward, String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans) {
+    private void searchDataFromDatabase(String ward, String hospital_type, String bedCapacity, String building_structure, String available_facilities, String excavation_plans,
+                                        String medicineStock, String bloodStock, String disasterPlan, String firstAid, String earthquakeResilient) {
         try {
-            hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans).observe(this, new android.arch.lifecycle.Observer<List<HospitalAndCommon>>() {
+            hospitalFacilitiesVewModel.getFilteredList(ward, hospital_type, bedCapacity, building_structure, available_facilities, excavation_plans,
+                    medicineStock, bloodStock, disasterPlan, firstAid, earthquakeResilient).observe(this, new android.arch.lifecycle.Observer<List<HospitalAndCommon>>() {
                 @Override
                 public void onChanged(@Nullable final List<HospitalAndCommon> hospitalFacilities) {
                     // Update the cached copy of the words in the adapter.
 //                adapter.setWords(words);
+
+                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilities.size());
 
 //                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
                     HomeActivity.start(HospitalFilterActivity.this, (ArrayList) hospitalFacilities);
