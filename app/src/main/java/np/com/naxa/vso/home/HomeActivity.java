@@ -132,6 +132,7 @@ import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.NetworkUtils;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.LocationBus;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
@@ -1246,7 +1247,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         currentLocation = newLocation;
         if (!myLocationOverlay.isEnabled()) {
             //we get the location for the first time:
-            myLocationOverlay.setEnabled(true);
             mapView.getController().animateTo(newLocation);
         }
 
@@ -1274,7 +1274,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onProviderDisabled(String s) {
     }
-
 
 }
 

@@ -193,10 +193,13 @@ public class SplashActivity extends AppCompatActivity {
                 emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
                 ict_grading = properties.getString("ICT_Grading_A_B_C_D");
 
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, category, type, open_space, contact_no,
+                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,"", category, type, open_space, contact_no,
                         contact_pe, emergency_service, icu_service, ambulance, number_of_beds, structure_type, earthquake_damage, toilet_facility,
                         fire_extingiusher, evacuation_plan, alternative_route, no_of_doctors, no_of_nurse, no_of_health_assistent, total_no_of_employees,
-                        water_storage, emergency_stock_capcity, ict_grading);
+                        water_storage, emergency_stock_capcity, ict_grading,"","","","",
+                        "","","","",""
+                ,"","","","","","","",
+                        "","","","","");
 
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }

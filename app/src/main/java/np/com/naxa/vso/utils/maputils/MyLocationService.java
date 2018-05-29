@@ -20,6 +20,12 @@ public class MyLocationService extends Service {
     private static final float LOCATION_DISTANCE = 10f;
     Location mLastLocation;
 
+//    LocationBus locationBus;
+
+//    MyLocationService(LocationBus locationBus){
+//        this.locationBus = locationBus;
+//    }
+
 
     private class LocationListener implements android.location.LocationListener {
 
@@ -35,6 +41,7 @@ public class MyLocationService extends Service {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
 
+//            locationBus.locationTransporter(location);
         }
 
         @Override
@@ -126,4 +133,6 @@ public class MyLocationService extends Service {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
+
+
 }

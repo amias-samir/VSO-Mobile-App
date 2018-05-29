@@ -29,6 +29,9 @@ public class HospitalFacilities implements Parcelable {
     @ColumnInfo(name = "fk_common_places")
     private Long fk_common_places;
 
+    @ColumnInfo(name = "ward")
+    private String Ward;
+
     @ColumnInfo(name = "category")
     private String Category;
 
@@ -95,13 +98,83 @@ public class HospitalFacilities implements Parcelable {
     @ColumnInfo(name = "ict_grading_a_b_c_d")
     private String ICT_Grading_A_B_C_D;
 
-    public HospitalFacilities(Long fk_common_places, String Category, String Type, String Open_Space, String Contact_Number,
+    @ColumnInfo(name = "no_of_rooms")
+    private String No_of_Rooms;
+
+    @ColumnInfo(name = "no_of_stories")
+    private String No_of_Stories;
+
+    @ColumnInfo(name = "emergency_phone_number")
+    private String Emergency_Phone_Number;
+
+    @ColumnInfo(name = "male_toilet")
+    private String Male_Toilet;
+
+    @ColumnInfo(name = "female_toilet")
+    private String Female_Toilet;
+
+    @ColumnInfo(name = "differently_abled_toilet_facility")
+    private String Differently_abled_Toilet_Facility;
+
+    @ColumnInfo(name = "disaster_preparedness_response_plan")
+    private String Disaster_Preparedness_Response_Plan;
+
+    @ColumnInfo(name = "first_aid_and_emergency_rescue")
+    private String First_Aid_and_Emergency_Rescue;
+
+    @ColumnInfo(name = "national_building_code")
+    private String National_Building_Code;
+
+    @ColumnInfo(name = "building_age_and_state")
+    private String Building_Age_and_State;
+
+    @ColumnInfo(name = "occupancy")
+    private String Occupancy;
+
+    @ColumnInfo(name = "area_in_sq_m")
+    private String Area_in_Sq_m;
+
+    @ColumnInfo(name = "built_up_area_in_sq_m")
+    private String Built_up_Area_in_Sq_m;
+
+    @ColumnInfo(name = "built_up_area_in_hectare")
+    private String Built_up_Area_in_Hectare;
+
+    @ColumnInfo(name = "area_in_hectare")
+    private String Area_in_Hectare;
+
+    @ColumnInfo(name = "open_area_in_sq_m")
+    private String Open_Area_in_Sq_m;
+
+    @ColumnInfo(name = "open_area_in_hectare")
+    private String Open_Area_in_Hectare;
+
+    @ColumnInfo(name = "email")
+    private String Email;
+
+    @ColumnInfo(name = "web")
+    private String Web;
+
+    @ColumnInfo(name = "medicine_in_stock")
+    private String Medicine_in_Stock;
+
+    @ColumnInfo(name = "blood_in_stock")
+    private String Blood_in_Stock;
+
+    public HospitalFacilities(Long fk_common_places, String Ward, String Category, String Type, String Open_Space, String Contact_Number,
                               String Contact_Person, String Emergency_Service, String ICU_Service, String Ambulance_Service,
                               String Number_of_Beds, String Structure_Type, String Earthquake_Damage, String Toilet_Facility,
                               String Fire_Extinguisher, String Evacuation_Plan, String Alternatice_Route, String No_of_Doctors,
                               String No_of_Nurses, String No_of_Health_Assistant, String Total_No_of_Employees,
-                              String Water_Storage_Capacity_Litre_, String Emergency_Stock_Capacity, String ICT_Grading_A_B_C_D) {
+                              String Water_Storage_Capacity_Litre_, String Emergency_Stock_Capacity, String ICT_Grading_A_B_C_D,
+                              String No_of_Rooms, String No_of_Stories, String Emergency_Phone_Number, String Male_Toilet,
+                              String Female_Toilet, String Differently_abled_Toilet_Facility, String Disaster_Preparedness_Response_Plan,
+                              String First_Aid_and_Emergency_Rescue, String National_Building_Code, String Building_Age_and_State,
+                              String Occupancy, String Area_in_Sq_m, String Built_up_Area_in_Sq_m, String Built_up_Area_in_Hectare,
+                              String Area_in_Hectare, String Open_Area_in_Sq_m, String Open_Area_in_Hectare, String Email,
+                              String Web, String Medicine_in_Stock, String Blood_in_Stock) {
         this.fk_common_places = fk_common_places;
+        this.Ward = Ward;
         this.Category = Category;
         this.Type = Type;
         this.Open_Space = Open_Space;
@@ -124,7 +197,30 @@ public class HospitalFacilities implements Parcelable {
         this.Water_Storage_Capacity_Litre_ = Water_Storage_Capacity_Litre_;
         this.Emergency_Stock_Capacity = Emergency_Stock_Capacity;
         this.ICT_Grading_A_B_C_D = ICT_Grading_A_B_C_D;
+        this.ICT_Grading_A_B_C_D = ICT_Grading_A_B_C_D;
+        this.No_of_Rooms = No_of_Rooms;
+        this.No_of_Stories = No_of_Stories;
+        this.Emergency_Phone_Number = Emergency_Phone_Number;
+        this.Male_Toilet = Male_Toilet;
+        this.Female_Toilet = Female_Toilet;
+        this.Differently_abled_Toilet_Facility = Differently_abled_Toilet_Facility;
+        this.Disaster_Preparedness_Response_Plan = Disaster_Preparedness_Response_Plan;
+        this.First_Aid_and_Emergency_Rescue = First_Aid_and_Emergency_Rescue;
+        this.National_Building_Code = National_Building_Code;
+        this.Building_Age_and_State = Building_Age_and_State;
+        this.Occupancy = Occupancy;
+        this.Area_in_Sq_m = Area_in_Sq_m;
+        this.Built_up_Area_in_Sq_m = Built_up_Area_in_Sq_m;
+        this.Built_up_Area_in_Hectare = Built_up_Area_in_Hectare;
+        this.Area_in_Hectare = Area_in_Hectare;
+        this.Open_Area_in_Sq_m = Open_Area_in_Sq_m;
+        this.Open_Area_in_Hectare = Open_Area_in_Hectare;
+        this.Email = Email;
+        this.Web = Web;
+        this.Medicine_in_Stock = Medicine_in_Stock;
+        this.Blood_in_Stock = Blood_in_Stock;
     }
+
 
     public int getHid() {
         return hid;
@@ -318,6 +414,183 @@ public class HospitalFacilities implements Parcelable {
         Type = type;
     }
 
+    public String getNo_of_Rooms() {
+        return No_of_Rooms;
+    }
+
+    public void setNo_of_Rooms(String no_of_Rooms) {
+        No_of_Rooms = no_of_Rooms;
+    }
+
+    public String getNo_of_Stories() {
+        return No_of_Stories;
+    }
+
+    public void setNo_of_Stories(String no_of_Stories) {
+        No_of_Stories = no_of_Stories;
+    }
+
+    public String getEmergency_Phone_Number() {
+        return Emergency_Phone_Number;
+    }
+
+    public void setEmergency_Phone_Number(String emergency_Phone_Number) {
+        Emergency_Phone_Number = emergency_Phone_Number;
+    }
+
+    public String getMale_Toilet() {
+        return Male_Toilet;
+    }
+
+    public void setMale_Toilet(String male_Toilet) {
+        Male_Toilet = male_Toilet;
+    }
+
+    public String getFemale_Toilet() {
+        return Female_Toilet;
+    }
+
+    public void setFemale_Toilet(String female_Toilet) {
+        Female_Toilet = female_Toilet;
+    }
+
+    public String getDifferently_abled_Toilet_Facility() {
+        return Differently_abled_Toilet_Facility;
+    }
+
+    public void setDifferently_abled_Toilet_Facility(String differently_abled_Toilet_Facility) {
+        Differently_abled_Toilet_Facility = differently_abled_Toilet_Facility;
+    }
+
+    public String getDisaster_Preparedness_Response_Plan() {
+        return Disaster_Preparedness_Response_Plan;
+    }
+
+    public void setDisaster_Preparedness_Response_Plan(String disaster_Preparedness_Response_Plan) {
+        Disaster_Preparedness_Response_Plan = disaster_Preparedness_Response_Plan;
+    }
+
+    public String getFirst_Aid_and_Emergency_Rescue() {
+        return First_Aid_and_Emergency_Rescue;
+    }
+
+    public void setFirst_Aid_and_Emergency_Rescue(String first_Aid_and_Emergency_Rescue) {
+        First_Aid_and_Emergency_Rescue = first_Aid_and_Emergency_Rescue;
+    }
+
+    public String getNational_Building_Code() {
+        return National_Building_Code;
+    }
+
+    public void setNational_Building_Code(String national_Building_Code) {
+        National_Building_Code = national_Building_Code;
+    }
+
+    public String getBuilding_Age_and_State() {
+        return Building_Age_and_State;
+    }
+
+    public void setBuilding_Age_and_State(String building_Age_and_State) {
+        Building_Age_and_State = building_Age_and_State;
+    }
+
+    public String getOccupancy() {
+        return Occupancy;
+    }
+
+    public void setOccupancy(String occupancy) {
+        Occupancy = occupancy;
+    }
+
+    public String getArea_in_Sq_m() {
+        return Area_in_Sq_m;
+    }
+
+    public void setArea_in_Sq_m(String area_in_Sq_m) {
+        Area_in_Sq_m = area_in_Sq_m;
+    }
+
+    public String getBuilt_up_Area_in_Sq_m() {
+        return Built_up_Area_in_Sq_m;
+    }
+
+    public void setBuilt_up_Area_in_Sq_m(String built_up_Area_in_Sq_m) {
+        Built_up_Area_in_Sq_m = built_up_Area_in_Sq_m;
+    }
+
+    public String getBuilt_up_Area_in_Hectare() {
+        return Built_up_Area_in_Hectare;
+    }
+
+    public void setBuilt_up_Area_in_Hectare(String built_up_Area_in_Hectare) {
+        Built_up_Area_in_Hectare = built_up_Area_in_Hectare;
+    }
+
+    public String getArea_in_Hectare() {
+        return Area_in_Hectare;
+    }
+
+    public void setArea_in_Hectare(String area_in_Hectare) {
+        Area_in_Hectare = area_in_Hectare;
+    }
+
+    public String getOpen_Area_in_Sq_m() {
+        return Open_Area_in_Sq_m;
+    }
+
+    public void setOpen_Area_in_Sq_m(String open_Area_in_Sq_m) {
+        Open_Area_in_Sq_m = open_Area_in_Sq_m;
+    }
+
+    public String getOpen_Area_in_Hectare() {
+        return Open_Area_in_Hectare;
+    }
+
+    public void setOpen_Area_in_Hectare(String open_Area_in_Hectare) {
+        Open_Area_in_Hectare = open_Area_in_Hectare;
+    }
+
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public String getWeb() {
+        return Web;
+    }
+
+    public void setWeb(String web) {
+        Web = web;
+    }
+
+    public String getMedicine_in_Stock() {
+        return Medicine_in_Stock;
+    }
+
+    public void setMedicine_in_Stock(String medicine_in_Stock) {
+        Medicine_in_Stock = medicine_in_Stock;
+    }
+
+    public String getBlood_in_Stock() {
+        return Blood_in_Stock;
+    }
+
+    public void setBlood_in_Stock(String blood_in_Stock) {
+        Blood_in_Stock = blood_in_Stock;
+    }
+
+    public String getWard() {
+        return Ward;
+    }
+
+    public void setWard(String ward) {
+        Ward = ward;
+    }
+
+
 
     @Override
     public int describeContents() {
@@ -328,6 +601,7 @@ public class HospitalFacilities implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.hid);
         dest.writeValue(this.fk_common_places);
+        dest.writeValue(this.Ward);
         dest.writeString(this.Category);
         dest.writeString(this.Type);
         dest.writeString(this.Open_Space);
@@ -350,11 +624,34 @@ public class HospitalFacilities implements Parcelable {
         dest.writeString(this.Water_Storage_Capacity_Litre_);
         dest.writeString(this.Emergency_Stock_Capacity);
         dest.writeString(this.ICT_Grading_A_B_C_D);
+
+        dest.writeString(this.No_of_Rooms);
+        dest.writeString(this.No_of_Stories);
+        dest.writeString(this.Emergency_Phone_Number);
+        dest.writeString(this.Male_Toilet);
+        dest.writeString(this.Female_Toilet);
+        dest.writeString(this.Differently_abled_Toilet_Facility);
+        dest.writeString(this.Disaster_Preparedness_Response_Plan);
+        dest.writeString(this.First_Aid_and_Emergency_Rescue);
+        dest.writeString(this.National_Building_Code);
+        dest.writeString(this.Building_Age_and_State);
+        dest.writeString(this.Occupancy);
+        dest.writeString(this.Area_in_Sq_m);
+        dest.writeString(this.Built_up_Area_in_Sq_m);
+        dest.writeString(this.Built_up_Area_in_Hectare);
+        dest.writeString(this.Area_in_Hectare);
+        dest.writeString(this.Open_Area_in_Sq_m);
+        dest.writeString(this.Open_Area_in_Hectare);
+        dest.writeString(this.Email);
+        dest.writeString(this.Web);
+        dest.writeString(this.Medicine_in_Stock);
+        dest.writeString(this.Blood_in_Stock);
     }
 
     protected HospitalFacilities(Parcel in) {
         this.hid = in.readInt();
         this.fk_common_places = (Long) in.readValue(Long.class.getClassLoader());
+        this.Ward = in.readString();
         this.Category = in.readString();
         this.Type = in.readString();
         this.Open_Space = in.readString();
@@ -377,6 +674,28 @@ public class HospitalFacilities implements Parcelable {
         this.Water_Storage_Capacity_Litre_ = in.readString();
         this.Emergency_Stock_Capacity = in.readString();
         this.ICT_Grading_A_B_C_D = in.readString();
+
+        this.No_of_Rooms = in.readString();
+        this.No_of_Stories = in.readString();
+        this.Emergency_Phone_Number = in.readString();
+        this.Male_Toilet = in.readString();
+        this.Female_Toilet = in.readString();
+        this.Differently_abled_Toilet_Facility = in.readString();
+        this.Disaster_Preparedness_Response_Plan = in.readString();
+        this.First_Aid_and_Emergency_Rescue = in.readString();
+        this.National_Building_Code = in.readString();
+        this.Building_Age_and_State = in.readString();
+        this.Occupancy = in.readString();
+        this.Area_in_Sq_m = in.readString();
+        this.Built_up_Area_in_Sq_m = in.readString();
+        this.Built_up_Area_in_Hectare = in.readString();
+        this.Area_in_Hectare = in.readString();
+        this.Open_Area_in_Sq_m = in.readString();
+        this.Open_Area_in_Hectare = in.readString();
+        this.Email = in.readString();
+        this.Web = in.readString();
+        this.Medicine_in_Stock = in.readString();
+        this.Blood_in_Stock = in.readString();
     }
 
     public static final Parcelable.Creator<HospitalFacilities> CREATOR = new Parcelable.Creator<HospitalFacilities>() {
@@ -390,4 +709,6 @@ public class HospitalFacilities implements Parcelable {
             return new HospitalFacilities[size];
         }
     };
+
+
 }
