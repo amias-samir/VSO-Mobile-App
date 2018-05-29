@@ -102,7 +102,7 @@ public class SplashActivity extends AppCompatActivity {
         return pair -> {
             String assetName = (String) pair.first;
             String fileContent = (String) pair.second;
-            Log.i(TAG,fileContent+"");
+            Log.i(TAG, fileContent + "");
             saveGeoJsonDataToDatabase(position, fileContent);
             return repository.getGeoJsonString(position + 1);
         };
@@ -147,9 +147,14 @@ public class SplashActivity extends AppCompatActivity {
         String name = null, address = null, remarks = null;
 
         String category = null, type = null, open_space = null, contact_no = null, contact_pe = null, emergency_service = null, icu_service = null,
-                ambulance = null, number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
+                ward = null, ambulance = null, number_of_beds = null, structure_type = null, earthquake_damage = null, toilet_facility = null,
                 fire_extingiusher = null, evacuation_plan = null, alternative_route = null, no_of_doctors = null, no_of_nurse = null,
-                no_of_health_assistent = null, total_no_of_employees = null, water_storage = null, emergency_stock_capcity = null, ict_grading = null;
+                no_of_health_assistent = null, total_no_of_employees = null, water_storage = null, emergency_stock_capcity = null, ict_grading = null,
+                No_of_Rooms = null, No_of_Stories = null, Emergency_Phone_Number = null, Male_Toilet = null, Female_Toilet = null,
+                Differently_abled_Toilet_Facility = null, Disaster_Preparedness_Response_Plan = null, First_Aid_and_Emergency_Rescue = null,
+                National_Building_Code = null, Building_Age_and_State = null, Occupancy = null, Area_in_Sq_m = null, Built_up_Area_in_Sq_m = null,
+                Built_up_Area_in_Hectare = null, Area_in_Hectare = null, Open_Area_in_Sq_m = null, Open_Area_in_Hectare = null, Email = null,
+                Web = null, Medicine_in_Stock = null, Blood_in_Stock = null;
 
         Long fk_common_places = null;
         Double latitude = 0.0, longitude = 0.0;
@@ -170,6 +175,7 @@ public class SplashActivity extends AppCompatActivity {
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveHospitalData: " + fk_common_places);
 
+                ward = properties.getString("Ward no.");
                 category = properties.getString("Category");
                 type = properties.getString("Type");
                 open_space = properties.getString("Open_Space");
@@ -193,13 +199,35 @@ public class SplashActivity extends AppCompatActivity {
                 emergency_stock_capcity = properties.getString("Emergency_Stock_Capacity");
                 ict_grading = properties.getString("ICT_Grading_A_B_C_D");
 
-                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places,"", category, type, open_space, contact_no,
+                No_of_Rooms = properties.getString("No_of_Rooms");
+                No_of_Stories = properties.getString("No_of_Stories");
+                Emergency_Phone_Number = properties.getString("Emergency_Phone_Number");
+                Male_Toilet = properties.getString("Male_Toilet");
+                Female_Toilet = properties.getString("Female_Toilet");
+                Differently_abled_Toilet_Facility = properties.getString("Differently_abled_Toilet_Facility");
+                Disaster_Preparedness_Response_Plan = properties.getString("Disaster_Preparedness_Response_Plan");
+                First_Aid_and_Emergency_Rescue = properties.getString("First_Aid_and_Emergency_Rescue");
+                National_Building_Code = properties.getString("National_Building_Code");
+                Building_Age_and_State = properties.getString("Building_Age_and_State");
+                Occupancy = properties.getString("Occupancy");
+                Area_in_Sq_m = properties.getString("Area_in_Sq_m");
+                Built_up_Area_in_Sq_m = properties.getString("Built_up_Area_in_Sq_m");
+                Built_up_Area_in_Hectare = properties.getString("Built_up_Area_in_Hectare");
+                Area_in_Hectare = properties.getString("ICT_Grading_A_B_C_D");
+                Open_Area_in_Sq_m = properties.getString("Open_Area_in_Sq_m");
+                Open_Area_in_Hectare = properties.getString("Open_Area_in_Hectare");
+                Email = properties.getString("Email");
+                Web = properties.getString("Web");
+                Medicine_in_Stock = properties.getString("Medicine_in_Stock");
+                Blood_in_Stock = properties.getString("Blood_in_Stock");
+
+                HospitalFacilities hospitalFacilities = new HospitalFacilities(fk_common_places, ward, category, type, open_space, contact_no,
                         contact_pe, emergency_service, icu_service, ambulance, number_of_beds, structure_type, earthquake_damage, toilet_facility,
                         fire_extingiusher, evacuation_plan, alternative_route, no_of_doctors, no_of_nurse, no_of_health_assistent, total_no_of_employees,
-                        water_storage, emergency_stock_capcity, ict_grading,"","","","",
-                        "","","","",""
-                ,"","","","","","","",
-                        "","","","","");
+                        water_storage, emergency_stock_capcity, ict_grading, No_of_Rooms, No_of_Stories, Emergency_Phone_Number, Male_Toilet,
+                        Female_Toilet, Differently_abled_Toilet_Facility, Disaster_Preparedness_Response_Plan, First_Aid_and_Emergency_Rescue,
+                        National_Building_Code, Building_Age_and_State, Occupancy, Area_in_Sq_m, Built_up_Area_in_Sq_m, Built_up_Area_in_Hectare,
+                        Area_in_Hectare,Open_Area_in_Sq_m, Open_Area_in_Hectare, Email, Web, Medicine_in_Stock, Blood_in_Stock);
 
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }

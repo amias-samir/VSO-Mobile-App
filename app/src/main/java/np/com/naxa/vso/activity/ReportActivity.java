@@ -131,6 +131,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 try {
                     JSONObject header = new JSONObject();
 
+                    header.put("status", "pending");
                     header.put("incident_time", incident_time);
                     header.put("incident_type", incident_type);
                     header.put("ward", ward);
