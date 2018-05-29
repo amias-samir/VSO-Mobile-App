@@ -289,15 +289,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        loadAllMarker();
 
-//        try {
+        try {
             if (getIntent().getParcelableArrayListExtra("data") != null) {
                 List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
                 Log.d(TAG, "onCreate: data received");
                 loadFilteredHospitalMarker(hospitalAndCommonList);
             }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 
         initLocationListner();
