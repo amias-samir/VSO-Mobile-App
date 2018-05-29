@@ -601,7 +601,7 @@ public class HospitalFacilities implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.hid);
         dest.writeValue(this.fk_common_places);
-        dest.writeValue(this.Ward);
+        dest.writeString(this.Ward);
         dest.writeString(this.Category);
         dest.writeString(this.Type);
         dest.writeString(this.Open_Space);

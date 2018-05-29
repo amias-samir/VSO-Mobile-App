@@ -273,17 +273,10 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
                     medicineStock, bloodStock, disasterPlan, firstAid, earthquakeResilient).observe(this, new android.arch.lifecycle.Observer<List<HospitalAndCommon>>() {
                 @Override
                 public void onChanged(@Nullable final List<HospitalAndCommon> hospitalFacilities) {
-                    // Update the cached copy of the words in the adapter.
-//                adapter.setWords(words);
+                    // Update the cached copy of the filtered HospitalAndCommon .
 
                     Log.d(TAG, "onChanged: data retrieved " + hospitalFacilities.size());
-
-//                    hospitalFacilitiesWithCommonList.addAll(hospitalFacilities);
                     HomeActivity.start(HospitalFilterActivity.this, (ArrayList) hospitalFacilities);
-
-//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getCommonPlacesAttrb().getName());
-//                    Log.d(TAG, "onChanged: data retrieved " + hospitalFacilitiesWithCommonList.get(0).getHospitalFacilities().getType());
-//                    Log.d("HospitalFiltered", "onChanged: data retrieved " + hospitalFacilities.size());
 
                 }
             });
