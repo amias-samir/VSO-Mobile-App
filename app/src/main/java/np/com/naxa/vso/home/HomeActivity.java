@@ -13,7 +13,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -48,8 +47,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
-import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -85,8 +82,6 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
-import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
 
@@ -130,9 +125,8 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
-import np.com.naxa.vso.utils.NetworkUtils;
 import np.com.naxa.vso.utils.ToastUtils;
-import np.com.naxa.vso.utils.maputils.LocationBus;
+import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
@@ -239,6 +233,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     OpenSpaceViewModel openSpaceViewModel;
     List<OpenSpace> openSpacesList = new ArrayList<>();
 
+    List<HospitalAndCommon> hospitalAndCommonList;
+
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
@@ -290,17 +286,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        loadAllMarker();
 
         try {
+//            get list from filter activity
             if (getIntent().getParcelableArrayListExtra("data") != null) {
-                List<HospitalAndCommon> hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
+                hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
                 Log.d(TAG, "onCreate: data received");
-                loadFilteredHospitalMarker(hospitalAndCommonList);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
 
 
-        initLocationListner();
+        handleLocationPermission();
 
     }
 
@@ -317,8 +313,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 startService(serviceIntent);
 
                 location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location == null)
+                if (location == null) {
                     location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
             }
             if (location != null) {
                 //location known:
@@ -329,10 +326,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 //no location known: hide myLocationOverlay
                 myLocationOverlay.setEnabled(false);
             }
-//        } else {
-//            myLocationOverlay.setLocation((GeoPoint) savedInstanceState.getParcelable("location"));
-//            //TODO: restore other aspects of myLocationOverlay...
-//        }
 
     }
 
@@ -432,6 +425,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         poiMarkers = new RadiusMarkerClusterer(this);
 
         loadMunicipalityBoarder();
+
 
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
             @Override
@@ -790,6 +784,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 myLocationNewOverlay.enableMyLocation();
                 myLocationNewOverlay.enableFollowLocation();
                 mapView.invalidate();
+                initLocationListner();
 
             }
         } else {
@@ -1028,8 +1023,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 BoundingBox boundingBox = new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
                 mapView.zoomToBoundingBox(boundingBox, true);
                 mapView.invalidate();
-
                 mapController.animateTo(centerPoint);
+
+                //load filtered list
+                if(hospitalAndCommonList == null){ }else { loadFilteredHospitalMarker(hospitalAndCommonList); }
+
             });
         }).start();
     }
@@ -1115,7 +1113,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<HospitalAndCommon>() {
                     @Override
                     public void onNext(HospitalAndCommon hospitalAndCommon) {
-                        mapView.getOverlays().add(overlayFromCommonAttr(hospitalAndCommon.getCommonPlacesAttrb()));
+                        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromHospitalAndCommon(HomeActivity.this, hospitalAndCommon));
                         mapView.invalidate();
                     }
 
@@ -1159,7 +1158,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<EducationAndCommon>() {
                     @Override
                     public void onNext(EducationAndCommon educationAndCommon) {
-                        mapView.getOverlays().add(overlayFromCommonAttr(educationAndCommon.getCommonPlacesAttrb()));
+                        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromEductionalAndCommon(HomeActivity.this, educationAndCommon));
                         mapView.invalidate();
                     }
 
@@ -1207,28 +1207,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
-    private ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonAttr(CommonPlacesAttrb commonPlacesAttrb){
-        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        String name = commonPlacesAttrb.getName();
-        double latitude = commonPlacesAttrb.getLatitude();
-        double longitude = commonPlacesAttrb.getLongitude();
-        items.add(new OverlayItem(name, "", new GeoPoint(latitude, longitude)));
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(HomeActivity.this, items,
-                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-                    @Override
-                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemLongPress(int index, OverlayItem item) {
-                        return false;
-                    }
-                });
-
-        return mOverlay;
-    }
 
 
 
