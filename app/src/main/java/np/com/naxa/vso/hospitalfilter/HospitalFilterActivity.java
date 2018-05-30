@@ -127,6 +127,7 @@ public class HospitalFilterActivity extends AppCompatActivity implements OnFormE
     private void setupToolBar() {
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_general);
+        toolbar.setTitle("Hospital Filter");
 //        toolbar.setLogo(getResources().getDrawable(R.drawable.ic_close_24dp));
         setSupportActionBar(toolbar);
 

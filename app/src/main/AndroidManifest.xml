@@ -7,8 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.location.gps" />
 
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:name=".home.VSO"
@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SplashActivity"
+        <activity
+            android:name=".activity.SplashActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,22 +39,21 @@
         <!-- android:resource="@xml/file_paths" /> -->
         <!-- </provider> -->
 
-        <service android:name=".utils.maputils.MyLocationService" android:process=":my_service" />
+        <service
+            android:name=".utils.maputils.MyLocationService"
+            android:process=":my_service" />
 
         <activity
             android:name=".TestFlowChart"
             android:exported="true" />
-
         <activity
             android:name=".activity.ReportActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".home.HomeActivity" />
-
         </activity>
-
         <activity
             android:name=".home.HomeActivity"
             android:exported="true"
@@ -64,13 +64,13 @@
             android:exported="true" />
         <activity
             android:name=".activity.ContactActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activity.OpenSpaceActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".gps.GeoPointActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
 
         <!-- <activity android:name=".NavigarionActivity" -->
         <!-- android:exported="true"> -->
@@ -78,7 +78,8 @@
 
         <activity
             android:name=".hospitalfilter.HospitalFilterActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
+        <activity android:name=".detailspage.MarkerDetailsDisplayActivity"></activity>
     </application>
 
 </manifest>

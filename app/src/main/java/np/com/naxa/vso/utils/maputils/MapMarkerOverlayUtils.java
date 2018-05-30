@@ -1,12 +1,14 @@
 package np.com.naxa.vso.utils.maputils;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -22,6 +24,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
+import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 
 public class MapMarkerOverlayUtils {
     private static final String TAG = "MapMarkerOverlayUtils";
@@ -37,7 +40,6 @@ public class MapMarkerOverlayUtils {
         dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.setContentView(R.layout.marker_tap_popup_layout);
-        //dialog.setTitle("This is my custom dialog box");
 
         dialog.setCancelable(true);
         //there are a lot of settings, for dialog, check them all out!
@@ -46,18 +48,20 @@ public class MapMarkerOverlayUtils {
         TextView map_popup_header = (TextView) dialog.findViewById(R.id.map_popup_header);
         map_popup_header.setText(item.getTitle());
 
-//        TextView map_popup_body = (TextView) dialog.findViewById(R.id.map_popup_body);
-//        map_popup_body.setText(item.getSnippet());
-
         //set up button
         TextView imgMoreInfo = (TextView) dialog.findViewById(R.id.map_more_info_textView);
         imgMoreInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("Clicked", "more info");
+                Bundle bundle = new Bundle();
+                Intent intent = new Intent(context, MarkerDetailsDisplayActivity.class);
+                bundle.putString("data", item.getSnippet());
+                intent.putExtras(bundle);
+                ((Activity)context).startActivity(intent);
+
             }
         });
-        //now that the dialog is set up, it's time to show it
         dialog.show();
     }
 
