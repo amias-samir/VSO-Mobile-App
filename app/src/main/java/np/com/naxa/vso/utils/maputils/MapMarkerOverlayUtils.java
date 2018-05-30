@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
+import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 
 public class MapMarkerOverlayUtils {
     private static final String TAG = "MapMarkerOverlayUtils";
@@ -45,8 +46,8 @@ public class MapMarkerOverlayUtils {
         TextView map_popup_header = (TextView) dialog.findViewById(R.id.map_popup_header);
         map_popup_header.setText(item.getTitle());
 
-        TextView map_popup_body = (TextView) dialog.findViewById(R.id.map_popup_body);
-        map_popup_body.setText(item.getSnippet());
+//        TextView map_popup_body = (TextView) dialog.findViewById(R.id.map_popup_body);
+//        map_popup_body.setText(item.getSnippet());
 
         //set up button
         TextView imgMoreInfo = (TextView) dialog.findViewById(R.id.map_more_info_textView);
@@ -121,4 +122,36 @@ public class MapMarkerOverlayUtils {
 
         return mOverlay;
     }
+
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromOpenSpaceAndCommon(Context context , OpenAndCommon openAndCommon){
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        String name = openAndCommon.getCommonPlacesAttrb().getName()
+                +"\n" +openAndCommon.getCommonPlacesAttrb().getType()
+                +"\n" +openAndCommon.getCommonPlacesAttrb().getAddress();
+        double latitude = openAndCommon.getCommonPlacesAttrb().getLatitude();
+        double longitude = openAndCommon.getCommonPlacesAttrb().getLongitude();
+
+        Gson gson = new Gson();
+        OpenAndCommon obj = openAndCommon;
+        String jsonInString = gson.toJson(obj).toString();
+        Log.d(TAG, "overlayFromOpenAndCommonAndCommon: " + jsonInString);
+
+        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(context, items,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        MarkerOnClickEvent(context, item);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(int index, OverlayItem item) {
+                        return false;
+                    }
+                });
+
+        return mOverlay;
+    }
+
 }
