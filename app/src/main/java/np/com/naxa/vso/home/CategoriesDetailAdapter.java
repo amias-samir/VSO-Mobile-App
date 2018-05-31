@@ -8,9 +8,6 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import java.util.List;
 
 import np.com.naxa.vso.R;
-import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
-import np.com.naxa.vso.home.model.CategoriesDetail;
-import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 
 public class CategoriesDetailAdapter extends BaseQuickAdapter<SortedHospitalItem, BaseViewHolder> {

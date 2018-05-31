@@ -1236,6 +1236,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 //        GeoPoint prevLocation = myLocationOverlay.getLocation();
         myLocationOverlay.setLocation(newLocation);
+        mapView.getOverlays().add(myLocationOverlay);
         myLocationOverlay.setEnabled(true);
         myLocationOverlay.setAccuracy((int) pLoc.getAccuracy());
 
