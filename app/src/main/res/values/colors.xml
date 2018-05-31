@@ -12,6 +12,9 @@
     <color name="mapboxYellow">#d9d838</color>
     <color name="mapboxRed">#b43b71</color>
 
+    <color name="secondaryTextColor">#393939</color>
+    <color name="dividerColor">#8c8b8b</color>
+
 
 
 
