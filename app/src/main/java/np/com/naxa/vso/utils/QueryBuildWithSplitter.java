@@ -3,6 +3,11 @@ package np.com.naxa.vso.utils;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import np.com.naxa.vso.detailspage.MarkerDetailsKeyValue;
+
 public class QueryBuildWithSplitter {
 
     private static final String TAG = "QueryBuildWithSplitter";
@@ -170,6 +175,55 @@ public class QueryBuildWithSplitter {
         Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: lowest " + range[0]);
         Log.d(TAG, "dynamicStringSplitterWithRangeQueryBuild: highest " + range[1]);
         return range;
+    }
+
+
+    public  List<String> splitedStringList(String rawStringData) {
+
+        List<String> splittedStringList = new ArrayList<String>();
+
+        if (!TextUtils.isEmpty(rawStringData)) {
+            String temp;
+            if (rawStringData.contains(",")) {
+                if (rawStringData.contains("{")) {
+                    String trunk = rawStringData;
+                    temp = trunk.replaceAll("[{}]", "");
+                } else {
+                    temp = rawStringData;
+                }
+                String[] splitted_string = temp.split(",");
+                for (int i = 0; i < splitted_string.length; i++) {
+                    splittedStringList.add(splitted_string[i].trim());
+                }
+
+            }
+            Log.d(TAG, "SplittedStringList " + splittedStringList.get(0)+ ", "+splittedStringList.size());
+        }
+        return splittedStringList;
+    }
+
+    public  List<MarkerDetailsKeyValue> splitedKeyValueList(List<String> rawStringList) {
+
+        List<MarkerDetailsKeyValue> splittedStringKeyValueList = new ArrayList<MarkerDetailsKeyValue>();
+
+        if (!rawStringList.equals(null)) {
+                for (int i = 0; i < rawStringList.size(); i++) {
+                   String rawString = rawStringList.get(i);
+                    String temp = rawString.replaceAll("\"", "");
+//                    Log.d(TAG, "SplittedStringList: "+temp);
+
+                    String[] parts = temp.split(":");
+                    String keyPart = parts[0].trim(); // key
+                    String valuePart = parts[1].trim(); // value
+
+                    MarkerDetailsKeyValue markerDetailsKeyValue = new MarkerDetailsKeyValue(keyPart, valuePart);
+                    splittedStringKeyValueList.add(markerDetailsKeyValue);
+
+                    Log.d(TAG, "SplittedStringList key " + splittedStringKeyValueList.get(i).getKey() + " \nvalue "+splittedStringKeyValueList.get(i).getValue());
+                }
+
+        }
+        return splittedStringKeyValueList;
     }
 
 
