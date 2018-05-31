@@ -277,7 +277,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
         } catch (NullPointerException e) {
-
             Log.d(TAG, "Exception: " + e.toString());
         }
 

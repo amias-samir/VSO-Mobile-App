@@ -28,9 +28,6 @@ public class MapDataRepository extends RawAssetLoader {
         return loadTextFromAsset(assetName);
     }
 
-
-
-
     private String getMapAssetName(int pos) {
         String assetName;
         switch (pos) {
@@ -60,8 +57,6 @@ public class MapDataRepository extends RawAssetLoader {
                 .flatMap(new Function<Feature, ObservableSource<String>>() {
                     @Override
                     public ObservableSource<String> apply(Feature feature) throws Exception {
-                        
-
                         return Observable.just(feature.getProperties().toString());
 
                     }
