@@ -277,13 +277,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
         } catch (NullPointerException e) {
-
             Log.d(TAG, "Exception: " + e.toString());
         }
 
         setupFloatingToolbar();
-
-//        loadAllMarker();
 
         try {
 //            get list from filter activity
@@ -329,30 +326,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void loadAllMarker() {
-        Observable.just(0, 1, 2)
-                .flatMap((Function<Integer, ObservableSource<Pair>>) integer -> repo.getGeoJsonString(integer))
-                .subscribe(new DisposableObserver<Pair>() {
-                    @Override
-                    public void onNext(Pair pair) {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-                        loadlayerToMap(fileContent);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
@@ -392,8 +365,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }));
 
         floatingSearchView.setDimBackground(true);
-
-
     }
 
     private void setupMap() {
@@ -444,11 +415,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(0, mapEventsOverlay);
         mapController.setCenter(centerPoint);
 
-
 //        for clustering
         overlaysList = this.mapView.getOverlays();
-
-        showOverlayOnMap(-1);
     }
 
 
@@ -559,11 +527,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             changeDataOverviewText(visbleItemIndex);
         }, 500);
         toggleSliderHeight();
-
     }
 
     private void changeDataOverviewText(int visbleItemIndex) {
-
         switch (visbleItemIndex) {
             case 0:
                 tvDataSet.setText(R.string.browse_data_by_categories);
@@ -588,7 +554,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private String generateDataCardText() {
-
         String string = null;
         try {
             Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
@@ -609,7 +574,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (position) {
             case 0:
                 loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
-
                 hospitalFacilitiesVewModel.getAllHospitalDetailList()
                         .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
                             @Override
@@ -619,7 +583,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onError(Throwable t) {
-
+                                t.printStackTrace();
                             }
 
                             @Override
@@ -629,40 +593,41 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         });
                 return;
             case 1:
+                //Loading data of open spaces from geoJson file
+                repo.getGeoJsonString(position)
+                        .subscribe(new Observer<Pair>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                clearClusterAndMarkers();
+                            }
+
+                            @Override
+                            public void onNext(Pair pair) {
+                                String assetName = (String) pair.first;
+                                String fileContent = (String) pair.second;
+//                              loadLineLayers(assetName, fileContent);
+//                              loadMarkersFromGeoJson(assetName, fileContent);
+                                mapView.getOverlays().clear();
+                                saveGeoJsonDataToDatabase(position, fileContent);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
                 break;
             case 2:
                 loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
                 return;
         }
 
-        repo.getGeoJsonString(position)
-                .subscribe(new Observer<Pair>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        clearClusterAndMarkers();
-                    }
-
-                    @Override
-                    public void onNext(Pair pair) {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-//                        loadLineLayers(assetName, fileContent);
-//                        loadMarkersFromGeoJson(assetName, fileContent);
-                        mapView.getOverlays().clear();
-                        saveGeoJsonDataToDatabase(position, fileContent);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
     }
 
     private void loadLineLayers(String assetName, String fileContent) {
