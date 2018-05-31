@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -42,6 +45,13 @@ public class MapMarkerOverlayUtils {
         dialog.setContentView(R.layout.marker_tap_popup_layout);
 
         dialog.setCancelable(true);
+
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.CENTER;
+        wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        window.setAttributes(wlp);
         //there are a lot of settings, for dialog, check them all out!
 
         //set up text
@@ -65,7 +75,7 @@ public class MapMarkerOverlayUtils {
         dialog.show();
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context , HospitalAndCommon hospitalAndCommon){
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context , HospitalAndCommon hospitalAndCommon, MapView mapView){
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = hospitalAndCommon.getCommonPlacesAttrb().getName()
                 +"\n" +hospitalAndCommon.getHospitalFacilities().getType()
@@ -83,7 +93,9 @@ public class MapMarkerOverlayUtils {
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().animateTo(new GeoPoint(latitude, longitude));
                         MarkerOnClickEvent(context, item);
+
                         return true;
                     }
 
