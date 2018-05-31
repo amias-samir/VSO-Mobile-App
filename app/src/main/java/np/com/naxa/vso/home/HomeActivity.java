@@ -283,8 +283,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupFloatingToolbar();
 
-//        loadAllMarker();
-
         try {
 //            get list from filter activity
             if (getIntent().getParcelableArrayListExtra("data") != null) {
@@ -328,31 +326,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
     }
-
-    private void loadAllMarker() {
-        Observable.just(0, 1, 2)
-                .flatMap((Function<Integer, ObservableSource<Pair>>) integer -> repo.getGeoJsonString(integer))
-                .subscribe(new DisposableObserver<Pair>() {
-                    @Override
-                    public void onNext(Pair pair) {
-                        String assetName = (String) pair.first;
-                        String fileContent = (String) pair.second;
-                        loadlayerToMap(fileContent);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
+    
     private void setupFloatingToolbar() {
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
