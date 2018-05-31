@@ -126,6 +126,7 @@ import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
@@ -595,6 +596,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
+
+
         switch (position) {
             case 0:
                 loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
@@ -651,6 +655,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
                 return;
         }
+
+
 
     }
 
@@ -1018,10 +1024,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
-                BoundingBox boundingBox = new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
-                mapView.zoomToBoundingBox(boundingBox, true);
-                mapView.invalidate();
-                mapController.animateTo(centerPoint);
+                MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
 
                 //load filtered list
                 if (hospitalAndCommonList == null) {
