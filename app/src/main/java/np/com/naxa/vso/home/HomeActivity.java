@@ -31,6 +31,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -100,7 +101,6 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -126,6 +126,7 @@ import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
@@ -179,8 +180,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.floating_search_view)
     FloatingSearchView floatingSearchView;
+
     @BindView(R.id.tv_data_filter)
     TextView tvDataFilter;
+
+    @BindView(R.id.progressbar)
+    ProgressBar progressbar;
+    @BindView(R.id.tv_name_title)
+    TextView tvNameTitle;
+    @BindView(R.id.tv_distance_subtitle)
+    TextView tvDistanceSubtitle;
+    @BindView(R.id.ll_inset_data)
+    LinearLayout llInsetData;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -218,7 +229,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected LocationManager mLocationManager;
     private GeoPoint currentLocation;
     Location location = null;
-
 
 
     CommonPlacesAttribViewModel commonPlacesAttribViewModel;
@@ -288,7 +298,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 hospitalAndCommonList = getIntent().getParcelableArrayListExtra("data");
                 Log.d(TAG, "onCreate: data received");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -304,25 +314,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(myLocationOverlay);
 
 //        if (savedInstanceState == null) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                Intent serviceIntent = new Intent(this, MyLocationService.class);
-                startService(serviceIntent);
+            Intent serviceIntent = new Intent(this, MyLocationService.class);
+            startService(serviceIntent);
 
-                location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location == null) {
-                    location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                }
+            location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location == null) {
+                location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
-            if (location != null) {
-                //location known:
-                onLocationChanged(location);
-                currentLocation = new GeoPoint(location);
+        }
+        if (location != null) {
+            //location known:
+            onLocationChanged(location);
+            currentLocation = new GeoPoint(location);
 
-            } else {
-                //no location known: hide myLocationOverlay
-                myLocationOverlay.setEnabled(false);
-            }
+        } else {
+            //no location known: hide myLocationOverlay
+            myLocationOverlay.setEnabled(false);
+        }
 
     }
 
@@ -463,6 +473,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ExpandableUseActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_open_spaces:
+                    progressbar.setVisibility(View.VISIBLE);
                     routeLocation();
 //                    HospitalFilterActivity.start(HomeActivity.this);
                     break;
@@ -571,6 +582,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(int position) {
+
+        llInsetData.setVisibility(View.GONE);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Stuff that updates the UI
+                Collection<? extends SortedHospitalItem> something = new ArrayList<>();
+                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(something);
+                dataSetInfoText="";
+
+            }
+        });
+
+        MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
+
+
         switch (position) {
             case 0:
                 loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
@@ -578,7 +606,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
                             @Override
                             public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
-                                HospitalWithDIstance(hospitalAndCommonList);
+                                HospitalWithDistance(hospitalAndCommonList);
                             }
 
                             @Override
@@ -608,7 +636,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                              loadLineLayers(assetName, fileContent);
 //                              loadMarkersFromGeoJson(assetName, fileContent);
                                 mapView.getOverlays().clear();
-                                saveGeoJsonDataToDatabase(position, fileContent);
+                                loadlayerToMap(fileContent);
                             }
 
                             @Override
@@ -627,6 +655,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
                 return;
         }
+
+
 
     }
 
@@ -782,17 +812,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.fab_location_toggle:
 //                handleLocationPermission();
-                if(currentLocation == null) {
+                if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
                     initLocationListner();
-                }
-                else {
+
+                } else {
                     myLocationOverlay.setEnabled(true);
                     mapView.getController().animateTo(currentLocation);
                     Intent serviceIntent = new Intent(this, MyLocationService.class);
                     stopService(serviceIntent);
                 }
-
                 break;
         }
     }
@@ -802,11 +831,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         final GeoPoint[] points = new GeoPoint[2];
 
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(myOverLayBoarder);
+
         SortingDistance sortingDistance = new SortingDistance();
 
         points[0] = currentLocation;
+        final String[] nearestOpenSpace = new String[2];
 
         openSpaceViewModel.getAllOpenSpaceList()
+                .subscribeOn(Schedulers.io())
                 .flatMap((Function<List<OpenAndCommon>, Publisher<Polyline>>) openAndCommons -> {
                     LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons,
                             currentLocation.getLatitude(),
@@ -814,23 +848,40 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
                     List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
 
+                    Collection<Float> values = linkedOpenAndCommon.values();
+                    ArrayList<Float> sortedDistanceList = new ArrayList<Float>(values);
+
+                    nearestOpenSpace[0]=sortedOpenlist.get(0).getCommonPlacesAttrb().getName();
+                    Float distance = sortedDistanceList.get(0);
+                    if (sortedDistanceList.get(0) > 1000) {
+                        nearestOpenSpace[1] = (distance / 1000) + " Kms. away";
+                    } else {
+                        nearestOpenSpace[1] = distance + " Meters away";
+                    }
+
                     points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
                             sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
 
                     return routeGenerateObservable(points);
                 })
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSubscriber<Polyline>() {
                     @Override
                     public void onNext(Polyline roadOverlay) {
                         if (roadOverlay.getPoints().size() != 2) {
+
+                            llInsetData.setVisibility(View.VISIBLE);
+                            tvNameTitle.setText(nearestOpenSpace[0]);
+                            tvDistanceSubtitle.setText(nearestOpenSpace[1]);
+
                             mapView.getOverlays().add(getMarkerOverlay(points));
                             mapView.getOverlays().add(roadOverlay);
+                            mapView.getController().animateTo(points[0]);
                             mapView.invalidate();
                         } else {
                             ToastUtils.showToast("Try Again Later");
                         }
+                        progressbar.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -917,18 +968,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void saveGeoJsonDataToDatabase(int pos, String geoJson) {
-        if (pos == 0) {
-            loadlayerToMap(geoJson);
-        }
-        if (pos == 1) {
-            loadlayerToMap(geoJson);
-        }
-        if (pos == 2) {
-            loadlayerToMap(geoJson);
-        }
-    }
-
     private void loadlayerToMap(String geoJson) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
@@ -985,20 +1024,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
-                BoundingBox boundingBox = new BoundingBox(27.728708, 85.525139, 27.656069, 85.396133);
-                mapView.zoomToBoundingBox(boundingBox, true);
-                mapView.invalidate();
-                mapController.animateTo(centerPoint);
+                MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
 
                 //load filtered list
-                if(hospitalAndCommonList == null){ }else { loadFilteredHospitalMarker(hospitalAndCommonList); }
+                if (hospitalAndCommonList == null) {
+                } else {
+                    loadFilteredHospitalMarker(hospitalAndCommonList);
+                }
 
             });
         }).start();
     }
 
 
-    private LinkedHashMap HospitalWithDIstance(List<HospitalAndCommon> hospitalAndCommonList) {
+    private LinkedHashMap HospitalWithDistance(List<HospitalAndCommon> hospitalAndCommonList) {
 
         List<Float> sortedDistanceList = new ArrayList<Float>();
 
@@ -1034,12 +1073,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 // Stuff that updates the UI
                 ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(sortedHospitalItemList);
                 dataSetInfoText = (sortedHospitalItemList.size() + " Hospitals found ");
+                recyclerViewDataDetails.getAdapter().notifyDataSetChanged();
             }
         });
 
         return linkedHospitalAndDistance;
     }
-
 
 
     private void loadFilteredHospitalMarkerFlowable(Flowable<List<HospitalAndCommon>> flowableList) {
@@ -1171,8 +1210,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             HospitalFilterActivity.start(HomeActivity.this);
         }
     }
-
-
 
 
     //------------ LocationListener implementation
