@@ -591,7 +591,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 // Stuff that updates the UI
                 Collection<? extends SortedHospitalItem> something = new ArrayList<>();
                 ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(something);
-                dataSetInfoText="";
+                dataSetInfoText = "";
 
             }
         });
@@ -655,7 +655,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
                 return;
         }
-
 
 
     }
@@ -769,17 +768,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             } else {
 
+                initLocationListner();
+
                 GpsMyLocationProvider provider = new GpsMyLocationProvider(HomeActivity.this);
+                provider.addLocationSource(LocationManager.GPS_PROVIDER);
                 provider.addLocationSource(LocationManager.NETWORK_PROVIDER);
 
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(provider, mapView);
                 myLocationNewOverlay.setDrawAccuracyEnabled(true);
 
+                if (myLocationNewOverlay.getMyLocation() != null) {
+                    currentLocation = new GeoPoint(myLocationNewOverlay.getMyLocation());
+                }
+
                 mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
                 myLocationNewOverlay.enableFollowLocation();
                 mapView.invalidate();
-                initLocationListner();
 
             }
         } else {
@@ -814,10 +819,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                handleLocationPermission();
                 if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
-                    initLocationListner();
-
+//                    initLocationListner();
+                    handleLocationPermission();
                 } else {
-                    myLocationOverlay.setEnabled(true);
+                    myLocationOverlay.setEnabled(false);
+                    handleLocationPermission();
                     mapView.getController().animateTo(currentLocation);
                     Intent serviceIntent = new Intent(this, MyLocationService.class);
                     stopService(serviceIntent);
@@ -851,7 +857,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Collection<Float> values = linkedOpenAndCommon.values();
                     ArrayList<Float> sortedDistanceList = new ArrayList<Float>(values);
 
-                    nearestOpenSpace[0]=sortedOpenlist.get(0).getCommonPlacesAttrb().getName();
+                    nearestOpenSpace[0] = sortedOpenlist.get(0).getCommonPlacesAttrb().getName();
                     Float distance = sortedDistanceList.get(0);
                     if (sortedDistanceList.get(0) > 1000) {
                         nearestOpenSpace[1] = (distance / 1000) + " Kms. away";
@@ -877,6 +883,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             mapView.getOverlays().add(getMarkerOverlay(points));
                             mapView.getOverlays().add(roadOverlay);
                             mapView.getController().animateTo(points[0]);
+                            // handleLocationPermission for current location position overlay
+                            handleLocationPermission();
                             mapView.invalidate();
                         } else {
                             ToastUtils.showToast("Try Again Later");
@@ -891,7 +899,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
-
                     }
                 });
     }
@@ -1239,7 +1246,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        GeoPoint prevLocation = myLocationOverlay.getLocation();
         myLocationOverlay.setLocation(newLocation);
         mapView.getOverlays().add(myLocationOverlay);
-        myLocationOverlay.setEnabled(true);
+        myLocationOverlay.setEnabled(false);
         myLocationOverlay.setAccuracy((int) pLoc.getAccuracy());
 
 //        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
