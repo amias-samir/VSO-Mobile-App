@@ -819,10 +819,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                handleLocationPermission();
                 if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
-//                    initLocationListner();
                     handleLocationPermission();
                 } else {
-                    myLocationOverlay.setEnabled(false);
                     handleLocationPermission();
                     mapView.getController().animateTo(currentLocation);
                     Intent serviceIntent = new Intent(this, MyLocationService.class);
@@ -1238,23 +1236,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         GeoPoint newLocation = new GeoPoint(pLoc);
         currentLocation = newLocation;
-        if (!myLocationOverlay.isEnabled()) {
-            //we get the location for the first time:
-            mapView.getController().animateTo(newLocation);
-        }
-
-//        GeoPoint prevLocation = myLocationOverlay.getLocation();
-        myLocationOverlay.setLocation(newLocation);
-        mapView.getOverlays().add(myLocationOverlay);
-        myLocationOverlay.setEnabled(false);
-        myLocationOverlay.setAccuracy((int) pLoc.getAccuracy());
-
-//        if (prevLocation != null && pLoc.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-//            mSpeed = pLoc.getSpeed() * 3.6;
-//            long speedInt = Math.round(mSpeed);
-//
-//        }
-
     }
 
     @Override
