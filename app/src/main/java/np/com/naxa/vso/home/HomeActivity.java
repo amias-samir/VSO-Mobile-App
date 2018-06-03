@@ -331,7 +331,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         } else {
             //no location known: hide myLocationOverlay
-            myLocationOverlay.setEnabled(false);
+//            myLocationOverlay.setEnabled(false);
         }
 
     }
@@ -783,7 +783,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
-                myLocationNewOverlay.enableFollowLocation();
+//                myLocationNewOverlay.enableFollowLocation();
                 mapView.invalidate();
 
             }
