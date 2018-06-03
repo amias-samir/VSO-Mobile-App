@@ -622,6 +622,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             case 1:
                 //Loading data of open spaces from geoJson file
+                loadFilteredOpenPlacesMarkerFlowable(openSpaceViewModel.getAllOpenSpaceList());
                 repo.getGeoJsonString(position)
                         .subscribe(new Observer<Pair>() {
                             @Override
@@ -1124,6 +1125,59 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(HospitalAndCommon hospitalAndCommon) {
                         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
                         mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromHospitalAndCommon(HomeActivity.this, hospitalAndCommon, mapView));
+                        mapView.invalidate();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void loadFilteredOpenPlacesMarkerFlowable(Flowable<List<OpenAndCommon>> flowableList) {
+        flowableList.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSubscriber<List<OpenAndCommon>>() {
+                    @Override
+                    public void onNext(List<OpenAndCommon> openAndCommons) {
+                        loadFilteredOpenPlacesMarker(openAndCommons);
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void loadFilteredOpenPlacesMarker(List<OpenAndCommon> filteredOpenList) {
+//        mapView.getOverlays().clear();
+//        mapView.getOverlays().add(myOverLayBoarder);
+        Observable.just(filteredOpenList)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapIterable(new Function<List<OpenAndCommon>, Iterable<OpenAndCommon>>() {
+                    @Override
+                    public Iterable<OpenAndCommon> apply(List<OpenAndCommon> openAndCommons) throws Exception {
+                        return openAndCommons;
+                    }
+                })
+                .subscribe(new DisposableObserver<OpenAndCommon>() {
+                    @Override
+                    public void onNext(OpenAndCommon openAndCommon) {
+                        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromOpenSpaceAndCommon(HomeActivity.this, openAndCommon, mapView));
                         mapView.invalidate();
                     }
 
