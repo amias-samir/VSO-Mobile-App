@@ -1168,7 +1168,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onNext(EducationAndCommon educationAndCommon) {
                         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
-                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromEductionalAndCommon(HomeActivity.this, educationAndCommon));
+                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromEductionalAndCommon(HomeActivity.this, educationAndCommon, mapView));
                         mapView.invalidate();
                     }
 

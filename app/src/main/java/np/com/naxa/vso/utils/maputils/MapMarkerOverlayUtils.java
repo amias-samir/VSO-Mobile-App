@@ -29,13 +29,15 @@ import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 
+import static np.com.naxa.vso.R.color.white;
+
 public class MapMarkerOverlayUtils {
     private static final String TAG = "MapMarkerOverlayUtils";
 
-    public void MarkerOnClickEvent(Context context, OverlayItem item){
-        Log.d("Title","Marker Clicked"+ item.getTitle());
-        Log.d("Snippet", "Marker Clicked"+item.getSnippet());
-        Log.d("Id","Marker Clicked"+ item.getUid());
+    public void MarkerOnClickEvent(Context context, OverlayItem item) {
+        Log.d("Title", "Marker Clicked" + item.getTitle());
+        Log.d("Snippet", "Marker Clicked" + item.getSnippet());
+        Log.d("Id", "Marker Clicked" + item.getUid());
 
 
         //set up dialog
@@ -68,18 +70,18 @@ public class MapMarkerOverlayUtils {
                 Intent intent = new Intent(context, MarkerDetailsDisplayActivity.class);
                 bundle.putString("data", item.getSnippet());
                 intent.putExtras(bundle);
-                ((Activity)context).startActivity(intent);
+                ((Activity) context).startActivity(intent);
 
             }
         });
         dialog.show();
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context , HospitalAndCommon hospitalAndCommon, MapView mapView){
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context, HospitalAndCommon hospitalAndCommon, MapView mapView) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = hospitalAndCommon.getCommonPlacesAttrb().getName()
-                +"\n" +hospitalAndCommon.getHospitalFacilities().getType()
-                +"\n" +hospitalAndCommon.getCommonPlacesAttrb().getAddress();
+                + "\n" + hospitalAndCommon.getHospitalFacilities().getType()
+                + "\n" + hospitalAndCommon.getCommonPlacesAttrb().getAddress();
         double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
         double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
 
@@ -89,13 +91,16 @@ public class MapMarkerOverlayUtils {
         Log.d(TAG, "overlayFromHospitalAndCommon: " + jsonInString);
 
         items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(context, items,
+
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
+                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
+                white,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
                         mapView.getController().animateTo(new GeoPoint(latitude, longitude));
                         MarkerOnClickEvent(context, item);
-
                         return true;
                     }
 
@@ -103,16 +108,17 @@ public class MapMarkerOverlayUtils {
                     public boolean onItemLongPress(int index, OverlayItem item) {
                         return false;
                     }
-                });
+                },
+                context);
 
         return mOverlay;
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromEductionalAndCommon(Context context , EducationAndCommon educationAndCommon){
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromEductionalAndCommon(Context context, EducationAndCommon educationAndCommon, MapView mapView) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = educationAndCommon.getCommonPlacesAttrb().getName()
-                +"\n" +educationAndCommon.getCommonPlacesAttrb().getType()
-                +"\n" +educationAndCommon.getCommonPlacesAttrb().getAddress();
+                + "\n" + educationAndCommon.getCommonPlacesAttrb().getType()
+                + "\n" + educationAndCommon.getCommonPlacesAttrb().getAddress();
         double latitude = educationAndCommon.getCommonPlacesAttrb().getLatitude();
         double longitude = educationAndCommon.getCommonPlacesAttrb().getLongitude();
 
@@ -122,10 +128,15 @@ public class MapMarkerOverlayUtils {
         Log.d(TAG, "overlayFromEducationAndCommonAndCommon: " + jsonInString);
 
         items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(context, items,
+
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                context.getResources().getDrawable(R.drawable.ic_marker_education),
+                context.getResources().getDrawable(R.drawable.ic_marker_education),
+                white,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().animateTo(new GeoPoint(latitude, longitude));
                         MarkerOnClickEvent(context, item);
                         return true;
                     }
@@ -134,16 +145,17 @@ public class MapMarkerOverlayUtils {
                     public boolean onItemLongPress(int index, OverlayItem item) {
                         return false;
                     }
-                });
+                },
+                context);
 
         return mOverlay;
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromOpenSpaceAndCommon(Context context , OpenAndCommon openAndCommon){
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromOpenSpaceAndCommon(Context context, OpenAndCommon openAndCommon, MapView mapView) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = openAndCommon.getCommonPlacesAttrb().getName()
-                +"\n" +openAndCommon.getCommonPlacesAttrb().getType()
-                +"\n" +openAndCommon.getCommonPlacesAttrb().getAddress();
+                + "\n" + openAndCommon.getCommonPlacesAttrb().getType()
+                + "\n" + openAndCommon.getCommonPlacesAttrb().getAddress();
         double latitude = openAndCommon.getCommonPlacesAttrb().getLatitude();
         double longitude = openAndCommon.getCommonPlacesAttrb().getLongitude();
 
@@ -153,10 +165,14 @@ public class MapMarkerOverlayUtils {
         Log.d(TAG, "overlayFromOpenAndCommonAndCommon: " + jsonInString);
 
         items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(context, items,
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                context.getResources().getDrawable(R.drawable.ic_marker_openspace),
+                context.getResources().getDrawable(R.drawable.ic_marker_openspace),
+                white,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().animateTo(new GeoPoint(latitude, longitude));
                         MarkerOnClickEvent(context, item);
                         return true;
                     }
@@ -165,7 +181,8 @@ public class MapMarkerOverlayUtils {
                     public boolean onItemLongPress(int index, OverlayItem item) {
                         return false;
                     }
-                });
+                },
+                context);
 
         return mOverlay;
     }
