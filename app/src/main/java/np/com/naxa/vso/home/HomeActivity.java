@@ -1126,6 +1126,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 mapView.getOverlays().add(myOverLayBoarder);
                 MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
 
+
                 //load filtered list
                 if (hospitalAndCommonList == null) {
                 } else {
