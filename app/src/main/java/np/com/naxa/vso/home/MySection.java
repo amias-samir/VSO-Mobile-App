@@ -36,9 +36,14 @@ public class MySection extends SectionEntity<MapDataCategory> {
 
     public static List<MySection> getHazardCatergorySections() {
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, "Industries", "industries_updated_geojson.geojson", MapDataCategory.POINT)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", null, MapDataCategory.POINT)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, "Water Bodies", null, MapDataCategory.BOUNDARY)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_earthquake, "Earthquake", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_landslide, "Land Slides", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_fire, "Fire Hazards", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_floods, "Flood", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_fault_lines, "Fault Lines", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_accident, "Road Accidents", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_epidemic, "Epidemic", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_animal_attack, "Animal Attacks", null, MapDataCategory.POINT)));
 
         return list;
     }
