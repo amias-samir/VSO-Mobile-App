@@ -44,4 +44,9 @@ public class CommonPlacesAttribViewModel extends AndroidViewModel {
     }
 
 
+    public Flowable<List<CommonPlacesAttrb>> getPlaceByType(String type) {
+        return mRepository.getPlaceByType(type);
+    }
+
+
 }

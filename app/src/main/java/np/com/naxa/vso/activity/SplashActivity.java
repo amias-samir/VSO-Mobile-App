@@ -93,6 +93,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onComplete() {
                 Timber.i("Parsing completed sucessfully");
+
                 HomeActivity.start(SplashActivity.this);
             }
         });

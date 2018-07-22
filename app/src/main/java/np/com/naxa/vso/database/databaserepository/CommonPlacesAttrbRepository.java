@@ -59,6 +59,10 @@ public class CommonPlacesAttrbRepository {
         return mCommonPlacesAttrbDao.getPlacesContaining(value);
     }
 
+    public Flowable<List<CommonPlacesAttrb>> getPlaceByType(String type){
+        return mCommonPlacesAttrbDao.getPlaceByType(type);
+    }
+
 
 
 //    private static class insertAsyncTask extends AsyncTask<CommonPlacesAttrb, Void, Void> {
