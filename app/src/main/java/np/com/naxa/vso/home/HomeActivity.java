@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -291,6 +292,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupGridRecycler(MySection.getResourcesCatergorySections());
 
         slidingPanel.setAnchorPoint(0.4f);
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -532,28 +534,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         recyclerDataCategories.setAdapter(sectionAdapter);
 
 
-        sectionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                MySection a = sectionAdapter.getData().get(position);
+        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+            MySection a = sectionAdapter.getData().get(position);
+            MapDataCategory gridItem = a.t;
 
-                if (a.t.getName() == null) {
-                    ToastUtils.showToast("Error loading " + a.t.getName());
-                    return;
-                }
-
-                showOverlayOnMap(a.t.getFileName(), a.t.getType());
-                showDataOnList(a.t.getName());
-                gridPosition = position;
+            if (gridItem.getName() == null) {
+                ToastUtils.showToast("Error loading " + a.t.getName());
+                return;
             }
-        });
 
-//        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-//
-//            showOverlayOnMap(position);
-//            switchViews();
-//            gridPosition = position;
-//        });
+            showOverlayOnMap(a.t.getFileName(), a.t.getType());
+            showDataOnList(a.t.getName());
+
+            gridPosition = position;
+
+        });
+    }
+
+    private void showPointsOnMap(String fileName) {
+
     }
 
     private void showDataOnList(String name) {
@@ -564,7 +563,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onNext(List<CommonPlacesAttrb> commonPlacesAttrbs) {
 
-                        ((CategoryListAdapter) recyclerViewDataDetails.getAdapter()).replaceData(commonPlacesAttrbs);
+                        CategoryListAdapter adapter = ((CategoryListAdapter) recyclerViewDataDetails.getAdapter());
+                        adapter.replaceData(commonPlacesAttrbs);
+                        dataSetInfoText = (commonPlacesAttrbs.size() + " " + name + " found ");
+
 
                     }
 
@@ -645,8 +647,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        loadlayerToMap(fileContent, type);
-                        switchViews();
+                        loadlayerToMap(fileContent, type, name);
+
+                        if (type.equals(MapDataCategory.POINT)) {
+                            switchViews();
+                        }
+
                     }
 
                     @Override
@@ -1055,7 +1061,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void loadlayerToMap(String geoJson, String lineType) {
+    private void loadlayerToMap(String geoJson, String lineType, String name) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
@@ -1064,9 +1070,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
+
+        int color = getResources().getColor(R.color.colorPrimary);
         Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+        defaultMarker.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+
+        List<MySection> gridItems = new ArrayList<>();
+        gridItems.addAll(MySection.getBaseDataCatergorySections());
+        gridItems.addAll(MySection.getHazardCatergorySections());
+        gridItems.addAll(MySection.getResourcesCatergorySections());
+
+
+        // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         poiMarkers.setIcon(defaultBitmap);
+
 
         Style defaultStyle;
 
@@ -1426,7 +1444,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         emulateTabBehavaiour(view.getId());
-        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
     }
 
     private void emulateTabBehavaiour(int tappedID) {

@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -106,7 +107,8 @@ public class SplashActivity extends AppCompatActivity {
         return Observable.just(
                 MySection.getResourcesCatergorySections()
                 , MySection.getHazardCatergorySections()
-                , MySection.getBaseDataCatergorySections())
+                , MySection.getBaseDataCatergorySections()
+        )
                 .flatMapIterable((Function<List<MySection>, Iterable<MySection>>) mySections -> mySections)
                 .filter(mySection -> mySection.t.getFileName() != null)
                 .filter(mySection -> mySection.t.getType().equals(MapDataCategory.POINT))
