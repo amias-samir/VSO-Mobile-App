@@ -558,7 +558,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             showOverlayOnMap(a.t.getFileName(), a.t.getType());
-            showDataOnList(a.t.getName());
+            showDataOnList(a.t.getName(), a.t.getType());
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
             gridPosition = position;
@@ -567,7 +567,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void showDataOnList(String name) {
+    private void showDataOnList(String name, String type) {
         commonPlacesAttribViewModel.getPlaceByType(name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -577,7 +577,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         CategoryListAdapter adapter = ((CategoryListAdapter) recyclerViewDataDetails.getAdapter());
                         adapter.replaceData(commonPlacesAttrbs);
-                        dataSetInfoText = (commonPlacesAttrbs.size() + " " + name + " found ");
+
+                        switch (type) {
+                            case MapDataCategory.POINT:
+                                if (commonPlacesAttrbs.isEmpty()) {
+                                    ToastUtils.showToast(getString(R.string.dataset_overview, "No"));
+                                }
+                                break;
+                            default:
+                                ToastUtils.showToast("Map layer updated");
+                                break;
+                        }
+
+                        dataSetInfoText = getString(R.string.dataset_overview, commonPlacesAttrbs.size() + "");
 
 
                     }
