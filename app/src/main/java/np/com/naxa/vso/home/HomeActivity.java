@@ -319,6 +319,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+
+
     public void initLocationListner() {
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -533,13 +536,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 MySection a = sectionAdapter.getData().get(position);
-                ToastUtils.showToast(a.t.getName());
 
                 if (a.t.getName() == null) {
                     ToastUtils.showToast("Error loading " + a.t.getName());
                     return;
                 }
-
 
                 showOverlayOnMap(a.t.getFileName(), a.t.getType());
 
@@ -1415,6 +1416,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             ((TextView) findViewById(curId)).setTypeface(null, Typeface.NORMAL);
             ((TextView) findViewById(curId)).setTextColor(ContextCompat.getColor(this, R.color.black));
         }
+
 
     }
 }

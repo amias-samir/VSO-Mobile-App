@@ -15,7 +15,9 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
@@ -30,10 +32,13 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
+import np.com.naxa.vso.home.model.MapDataCategory;
+import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
+import timber.log.Timber;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -51,43 +56,90 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_spash);
         repository = new MapDataRepository();
 
-        try {
-            // Get a new or existing ViewModel from the ViewModelProvider.
-            commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
-            hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
-            educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
-            openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
-        } catch (NullPointerException e) {
+        commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
+        hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
+        educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
+        openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
 
-            Log.d(TAG, "Exception: " + e.toString());
-        }
 
-        new Handler().postDelayed(() -> {
-            if (sharedpref.checkIfDataPresent()) {
-                HomeActivity.start(SplashActivity.this);
-            } else {
-                loadDataAndCallHomeActivity();
+//        new Handler().postDelayed(() -> {
+//            if (sharedpref.checkIfDataPresent()) {
+//                HomeActivity.start(SplashActivity.this);
+//            } else {
+//                loadDataAndCallHomeActivity();
+//            }
+//        }, 2000);
+//
+
+        parseAndSaveGeoJSON().subscribe(new Observer<Long>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Timber.i("Starting parser");
             }
-        }, 2000);
 
+            @Override
+            public void onNext(Long id) {
+                Timber.i("Row inserted at %s", id);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e("Parsing failed reason %s", e.getMessage());
+                e.printStackTrace();
+
+                ToastUtils.showToast("Error loading app");
+            }
+
+            @Override
+            public void onComplete() {
+                Timber.i("Parsing completed sucessfully");
+                HomeActivity.start(SplashActivity.this);
+            }
+        });
 
     }
 
-    private Observable<Object> parseAndSaveGeoJSON() {
+    private Observable<Long> parseAndSaveGeoJSON() {
         MapDataRepository repository = new MapDataRepository();
 
-        return Observable.just(MySection.getMapDataCatergorySections()
-                , MySection.getResourcesCatergorySections()
+        return Observable.just(
+                MySection.getResourcesCatergorySections()
                 , MySection.getHazardCatergorySections()
                 , MySection.getBaseDataCatergorySections())
                 .flatMapIterable((Function<List<MySection>, Iterable<MySection>>) mySections -> mySections)
                 .filter(mySection -> mySection.t.getFileName() != null)
-                .flatMap(new Function<MySection, ObservableSource<Pair>>() {
+                .filter(mySection -> mySection.t.getType().equals(MapDataCategory.POINT))
+                .flatMap(new Function<MySection, ObservableSource<Long>>() {
                     @Override
-                    public ObservableSource<Pair> apply(MySection mySection) throws Exception {
-                        return repository.getGeoJsonString(mySection.t.getFileName());
+                    public ObservableSource<Long> apply(MySection mySection) throws Exception {
+                        return repository.getGeoJsonString(mySection.t.getFileName())
+                                .flatMap(new Function<Pair, ObservableSource<Long>>() {
+                                    @Override
+                                    public ObservableSource<Long> apply(Pair pair) throws Exception {
+                                        String fileContent = (String) pair.second;
+                                        JSONObject jsonObject = new JSONObject(fileContent);
+                                        JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+                                        Long id = (long) -2;
+
+                                        for (int i = 0; i < jsonarray.length(); i++) {
+                                            JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                                            String name = properties.getString("name");
+                                            String address = properties.getString("Address");
+                                            double latitude = Double.parseDouble(properties.getString("Y"));
+                                            double longitude = Double.parseDouble(properties.getString("X"));
+                                            String remarks = properties.getString("Remarks");
+
+                                            CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, mySection.t.name, latitude, longitude, remarks);
+                                            id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                                        }
+
+                                        return Observable.just(id);
+                                    }
+                                });
                     }
-                });
+                }).subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+
 
     }
 
