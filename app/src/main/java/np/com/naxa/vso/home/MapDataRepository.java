@@ -1,6 +1,7 @@
 package np.com.naxa.vso.home;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Pair;
 
 
@@ -25,6 +26,10 @@ public class MapDataRepository extends RawAssetLoader {
 
     public Observable<Pair> getGeoJsonString(int pos) {
         String assetName = getMapAssetName(pos);
+        return loadTextFromAsset(assetName);
+    }
+
+    public Observable<Pair> getGeoJsonString(@NonNull String assetName) {
         return loadTextFromAsset(assetName);
     }
 

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -37,6 +39,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -84,6 +87,7 @@ import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,6 +104,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -119,6 +124,7 @@ import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
+import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
@@ -282,7 +288,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupMap();
         setupBottomBar();
         setupListRecycler();
-        setupGridRecycler(MySection.getMapDataCatergorySections());
+        setupGridRecycler(MySection.getResourcesCatergorySections());
 
         slidingPanel.setAnchorPoint(0.4f);
 
@@ -522,12 +528,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
         recyclerDataCategories.setAdapter(sectionAdapter);
 
-        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            
-            showOverlayOnMap(position);
-            switchViews();
-            gridPosition = position;
+
+        sectionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                MySection a = sectionAdapter.getData().get(position);
+                ToastUtils.showToast(a.t.getName());
+
+                if (a.t.getName() == null) {
+                    ToastUtils.showToast("Error loading " + a.t.getName());
+                    return;
+                }
+
+
+                showOverlayOnMap(a.t.getFileName(), a.t.getType());
+
+            }
         });
+
+//        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+//
+//            showOverlayOnMap(position);
+//            switchViews();
+//            gridPosition = position;
+//        });
     }
 
     /**
@@ -588,6 +612,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    private void showOverlayOnMap(String name, String type) {
+        repo.getGeoJsonString(name)
+                .subscribe(new DisposableObserver<Pair>() {
+                    @Override
+                    public void onNext(Pair pair) {
+                        String fileContent = (String) pair.second;
+                        mapView.getOverlays().clear();
+                        loadlayerToMap(fileContent, type);
+                        switchViews();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e("Failed to load geojson ");
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Timber.i("GeoJson loaded sucessfully");
+                    }
+                });
+    }
+
     private void showOverlayOnMap(int position) {
 
         llInsetData.setVisibility(View.GONE);
@@ -644,7 +692,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                              loadLineLayers(assetName, fileContent);
 //                              loadMarkersFromGeoJson(assetName, fileContent);
                                 mapView.getOverlays().clear();
-                                loadlayerToMap(fileContent);
+                                //  loadlayerToMap(fileContent);
                             }
 
                             @Override
@@ -981,7 +1029,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void loadlayerToMap(String geoJson) {
+    private void loadlayerToMap(String geoJson, String lineType) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
@@ -994,7 +1042,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         poiMarkers.setIcon(defaultBitmap);
 
-        final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+        Style defaultStyle;
+
+        switch (lineType) {
+            case MapDataCategory.ROAD:
+                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
+
+                break;
+            case MapDataCategory.RIVER:
+                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
+                break;
+            default:
+                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
+                break;
+        }
 
         myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
         mapView.getOverlays().add(myOverLay);
@@ -1014,7 +1075,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String jsonString = null;
             try {
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changu_ward.geojson");
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -1312,7 +1373,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @OnClick(R.id.fab_map_layer)
+    public void showMapLayerPopup() {
 
+    }
 
     @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
     public void onMainCategoriesViewClicked(View view) {
@@ -1321,7 +1385,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 mainCategoryPosition = 1;
                 setupGridRecycler(MySection.getResourcesCatergorySections());
-               break;
+                break;
 
             case R.id.tv_hazard_and_vulnerability:
                 mainCategoryPosition = 2;
@@ -1333,6 +1397,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 setupGridRecycler(MySection.getBaseDataCatergorySections());
                 break;
         }
+
+        emulateTabBehavaiour(view.getId());
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+    }
+
+    private void emulateTabBehavaiour(int tappedID) {
+        ArrayList<Integer> a = new ArrayList<>();
+        a.add(R.id.tv_resources);
+        a.add(R.id.tv_hazard_and_vulnerability);
+        a.add(R.id.tv_base_data);
+        a.remove((Integer) tappedID);
+
+        ((TextView) findViewById(tappedID)).setTypeface(null, Typeface.BOLD);
+        ((TextView) findViewById(tappedID)).setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        for (Integer curId : a) {
+            ((TextView) findViewById(curId)).setTypeface(null, Typeface.NORMAL);
+            ((TextView) findViewById(curId)).setTextColor(ContextCompat.getColor(this, R.color.black));
+        }
+
     }
 }
 

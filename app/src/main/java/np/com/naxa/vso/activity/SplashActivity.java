@@ -2,7 +2,6 @@ package np.com.naxa.vso.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Handler;
-import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -28,6 +29,7 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
+import np.com.naxa.vso.home.MySection;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
@@ -70,6 +72,25 @@ public class SplashActivity extends AppCompatActivity {
 
 
     }
+
+    private Observable<Object> parseAndSaveGeoJSON() {
+        MapDataRepository repository = new MapDataRepository();
+
+        return Observable.just(MySection.getMapDataCatergorySections()
+                , MySection.getResourcesCatergorySections()
+                , MySection.getHazardCatergorySections()
+                , MySection.getBaseDataCatergorySections())
+                .flatMapIterable((Function<List<MySection>, Iterable<MySection>>) mySections -> mySections)
+                .filter(mySection -> mySection.t.getFileName() != null)
+                .flatMap(new Function<MySection, ObservableSource<Pair>>() {
+                    @Override
+                    public ObservableSource<Pair> apply(MySection mySection) throws Exception {
+                        return repository.getGeoJsonString(mySection.t.getFileName());
+                    }
+                });
+
+    }
+
 
     private void loadDataAndCallHomeActivity() {
         int pos = 0;
@@ -227,7 +248,7 @@ public class SplashActivity extends AppCompatActivity {
                         water_storage, emergency_stock_capcity, ict_grading, No_of_Rooms, No_of_Stories, Emergency_Phone_Number, Male_Toilet,
                         Female_Toilet, Differently_abled_Toilet_Facility, Disaster_Preparedness_Response_Plan, First_Aid_and_Emergency_Rescue,
                         National_Building_Code, Building_Age_and_State, Occupancy, Area_in_Sq_m, Built_up_Area_in_Sq_m, Built_up_Area_in_Hectare,
-                        Area_in_Hectare,Open_Area_in_Sq_m, Open_Area_in_Hectare, Email, Web, Medicine_in_Stock, Blood_in_Stock);
+                        Area_in_Hectare, Open_Area_in_Sq_m, Open_Area_in_Hectare, Email, Web, Medicine_in_Stock, Blood_in_Stock);
 
                 hospitalFacilitiesVewModel.insert(hospitalFacilities);
             }
