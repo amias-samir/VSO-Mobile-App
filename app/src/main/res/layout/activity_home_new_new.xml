@@ -110,6 +110,9 @@
                 android:background="@color/colorWindowBackground" />
 
             <android.support.v7.widget.RecyclerView
+                android:scrollbars="vertical"
+                android:fadeScrollbars="true"
+                android:scrollbarThumbVertical="@color/colorPrimaryDark"
                 android:id="@+id/recylcer_view_categories_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

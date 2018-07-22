@@ -1,7 +1,6 @@
 package np.com.naxa.vso.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +18,6 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -72,7 +70,7 @@ public class SplashActivity extends AppCompatActivity {
 //        }, 2000);
 //
 
-        parseAndSaveGeoJSON().subscribe(new Observer<Long>() {
+        parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Timber.i("Starting parser");
@@ -101,13 +99,18 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
-    private Observable<Long> parseAndSaveGeoJSON() {
+
+    private Observable<Long> parseAndSaveGeoJSONPoints() {
         MapDataRepository repository = new MapDataRepository();
+        List<MySection> list = new ArrayList<>();
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.POINT)));
 
         return Observable.just(
                 MySection.getResourcesCatergorySections()
                 , MySection.getHazardCatergorySections()
                 , MySection.getBaseDataCatergorySections()
+                , list
+
         )
                 .flatMapIterable((Function<List<MySection>, Iterable<MySection>>) mySections -> mySections)
                 .filter(mySection -> mySection.t.getFileName() != null)
@@ -124,23 +127,62 @@ public class SplashActivity extends AppCompatActivity {
                                         JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
                                         Long id = (long) -2;
 
-                                        for (int i = 0; i < jsonarray.length(); i++) {
-                                            JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                                            String name = properties.getString("name");
-                                            String address = properties.getString("Address");
-                                            double latitude = Double.parseDouble(properties.getString("Y"));
-                                            double longitude = Double.parseDouble(properties.getString("X"));
-                                            String remarks = properties.getString("Remarks");
 
-                                            CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, mySection.t.name, latitude, longitude, remarks);
-                                            id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                                        switch ((String) pair.first) {
+                                            case "demo_openspace_changu.geojson":
+                                                for (int i = 0; i < jsonarray.length(); i++) {
+                                                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                                                    String name = properties.getString("Name");
+                                                    double latitude = Double.parseDouble(properties.getString("centroid_y"));
+                                                    double longitude = Double.parseDouble(properties.getString("centroid_x"));
+
+                                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, "", "Open Spaces", latitude, longitude, "");
+                                                    id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+
+                                                    String shape_area = properties.getString("Shape_Area");
+                                                    String shape_leng = properties.getString("Shape_Leng");
+
+                                                    String access_roa = null;
+                                                    String accommodat = null;
+                                                    String area_sqm = null;
+                                                    String hign_tensi = null;
+                                                    String road_access = null;
+                                                    String terrain_ty = null;
+                                                    String toilet_fac = null;
+                                                    String water_faci = null;
+                                                    String wifi_facil = null;
+                                                    OpenSpace openSpace = new OpenSpace(id, access_roa, accommodat, area_sqm, hign_tensi, road_access, shape_area,
+                                                            shape_leng, terrain_ty, toilet_fac, water_faci, wifi_facil);
+
+                                                    openSpaceViewModel.insert(openSpace);
+                                                }
+
+
+                                                break;
+                                            default:
+                                                for (int i = 0; i < jsonarray.length(); i++) {
+                                                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                                                    String name = properties.getString("name");
+                                                    String address = properties.getString("Address");
+                                                    double latitude = Double.parseDouble(properties.getString("Y"));
+                                                    double longitude = Double.parseDouble(properties.getString("X"));
+                                                    String remarks = properties.getString("Remarks");
+
+                                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, mySection.t.name, latitude, longitude, remarks);
+                                                    id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                                                }
+
+                                                break;
                                         }
+
 
                                         return Observable.just(id);
                                     }
                                 });
                     }
-                }).subscribeOn(Schedulers.computation())
+                })
+
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
 
 
