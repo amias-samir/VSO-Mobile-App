@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -15,10 +19,13 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.location.POI;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
@@ -33,6 +40,7 @@ import static np.com.naxa.vso.R.color.white;
 
 public class MapMarkerOverlayUtils {
     private static final String TAG = "MapMarkerOverlayUtils";
+
 
     public void MarkerOnClickEvent(Context context, OverlayItem item) {
         Log.d("Title", "Marker Clicked" + item.getTitle());
@@ -186,5 +194,6 @@ public class MapMarkerOverlayUtils {
 
         return mOverlay;
     }
+
 
 }

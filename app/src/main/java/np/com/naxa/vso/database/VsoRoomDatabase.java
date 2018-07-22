@@ -70,7 +70,6 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
 
     /**
      * Populate the database in the background.
-     * If you want to start with more words, just add them.
      */
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 

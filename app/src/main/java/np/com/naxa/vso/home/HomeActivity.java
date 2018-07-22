@@ -68,7 +68,6 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
@@ -192,6 +191,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvDistanceSubtitle;
     @BindView(R.id.ll_inset_data)
     LinearLayout llInsetData;
+    @BindView(R.id.tv_resources)
+    TextView tvResources;
+    @BindView(R.id.tv_hazard_and_vulnerability)
+    TextView tvHazardAndVulnerability;
+    @BindView(R.id.tv_base_data)
+    TextView tvBaseData;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -222,6 +227,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
     private int gridPosition;
+    private int mainCategoryPosition = 0;
 
     //location listner
     protected DirectedLocationOverlay myLocationOverlay;
@@ -276,7 +282,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupMap();
         setupBottomBar();
         setupListRecycler();
-        setupGridRecycler();
+        setupGridRecycler(MySection.getMapDataCatergorySections());
 
         slidingPanel.setAnchorPoint(0.4f);
 
@@ -510,13 +516,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void setupGridRecycler() {
+    private void setupGridRecycler(List<MySection> mySections) {
         LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
         recyclerDataCategories.setLayoutManager(mLayoutManager);
-        SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, MySection.getMapDataCatergorySections());
+        SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
         recyclerDataCategories.setAdapter(sectionAdapter);
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+            
             showOverlayOnMap(position);
             switchViews();
             gridPosition = position;
@@ -1304,6 +1311,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onProviderDisabled(String s) {
     }
 
+
+
+
+    @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
+    public void onMainCategoriesViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.tv_resources:
+
+                mainCategoryPosition = 1;
+                setupGridRecycler(MySection.getResourcesCatergorySections());
+               break;
+
+            case R.id.tv_hazard_and_vulnerability:
+                mainCategoryPosition = 2;
+                setupGridRecycler(MySection.getHazardCatergorySections());
+                break;
+
+            case R.id.tv_base_data:
+                mainCategoryPosition = 3;
+                setupGridRecycler(MySection.getBaseDataCatergorySections());
+                break;
+        }
+    }
 }
 
 
