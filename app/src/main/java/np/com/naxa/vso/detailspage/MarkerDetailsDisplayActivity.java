@@ -65,6 +65,7 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
                 Bundle extras = intent.getExtras();
                 jsonString = extras.getString("data");
                 Log.d(TAG, "onCreate: after Clicked data received" + jsonString);
+                parseCommonJson(new JSONObject(jsonString));
             }
 
         } catch (Exception e) {

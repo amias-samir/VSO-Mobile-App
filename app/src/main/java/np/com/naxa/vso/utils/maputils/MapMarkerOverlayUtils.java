@@ -34,6 +34,7 @@ import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
+import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 
 import static np.com.naxa.vso.R.color.white;
@@ -85,20 +86,20 @@ public class MapMarkerOverlayUtils {
         dialog.show();
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context, HospitalAndCommon hospitalAndCommon, MapView mapView) {
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context, CommonPlacesAttrb hospitalAndCommon, MapView mapView) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        String name = hospitalAndCommon.getCommonPlacesAttrb().getName()
-                + "\n" + hospitalAndCommon.getHospitalFacilities().getType()
-                + "\n" + hospitalAndCommon.getCommonPlacesAttrb().getAddress();
-        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
-        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
+        String name = hospitalAndCommon.getName()
+                + "\n" + hospitalAndCommon.getType()
+                + "\n" + hospitalAndCommon.getAddress();
+        double latitude = hospitalAndCommon.getLatitude();
+        double longitude = hospitalAndCommon.getLongitude();
 
         Gson gson = new Gson();
-        HospitalAndCommon obj = hospitalAndCommon;
-        String jsonInString = gson.toJson(obj).toString();
-        Log.d(TAG, "overlayFromHospitalAndCommon: " + jsonInString);
+        //  HospitalAndCommon obj = hospitalAndCommon;
+        // String jsonInString = gson.toJson(obj).toString();
+        // Log.d(TAG, "overlayFromHospitalAndCommon: " + jsonInString);
 
-        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+        //items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
 
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
                 context.getResources().getDrawable(R.drawable.ic_marker_hospital),

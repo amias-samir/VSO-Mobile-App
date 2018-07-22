@@ -22,6 +22,7 @@ public class CategoryListAdapter extends BaseQuickAdapter<CommonPlacesAttrb, Bas
     protected void convert(BaseViewHolder helper, CommonPlacesAttrb item) {
         helper.setText(R.id.tv_name, item.getName())
                 .setText(R.id.tv_location, item.getAddress())
-                .setText(R.id.tv_desciption, item.getRemarks());
+                .setText(R.id.tv_desciption, item.getRemarks())
+                .addOnClickListener(R.id.root_layout_item_categories);
     }
 }

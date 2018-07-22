@@ -44,6 +44,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -72,6 +73,7 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
@@ -124,6 +126,7 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
+import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.home.model.MapMarkerItem;
@@ -413,9 +416,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
         mapController = mapView.getController();
         mapController.setZoom(12);
+
 //        mapView.zoomToBoundingBox(boundingBox, true);
 //        mapController.zoomToSpan(boundingBox.getLatitudeSpan(), boundingBox.getLongitudeSpan());
         poiMarkers = new RadiusMarkerClusterer(this);
@@ -525,6 +528,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         CategoryListAdapter categoriesDetailAdapter = new CategoryListAdapter(R.layout.item_catagories_detail, null);
         recyclerViewDataDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewDataDetails.setAdapter(categoriesDetailAdapter);
+
+        categoriesDetailAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                CommonPlacesAttrb item = categoriesDetailAdapter.getData().get(position);
+                Intent intent = new Intent(HomeActivity.this, MarkerDetailsDisplayActivity.class);
+                intent.putExtra("data", new Gson().toJson(item));
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -1072,9 +1085,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         kmlDocument.parseGeoJSON(geoJson);
 
 
-        int color = getResources().getColor(R.color.colorPrimary);
-        Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
-        defaultMarker.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
 
         List<MySection> gridItems = new ArrayList<>();
         gridItems.addAll(MySection.getBaseDataCatergorySections());
@@ -1144,6 +1155,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
                 MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
+
 
                 //load filtered list
                 if (hospitalAndCommonList == null) {
@@ -1236,9 +1248,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<HospitalAndCommon>() {
                     @Override
                     public void onNext(HospitalAndCommon hospitalAndCommon) {
-                        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
-                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromHospitalAndCommon(HomeActivity.this, hospitalAndCommon, mapView));
-                        mapView.invalidate();
+//                        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+//                        mapView.getOverlayFs().add(mapMarkerOverlayUtils.overlayFromHospitalAndCommon(HomeActivity.this, hospitalAndCommon, mapView));
+//                        mapView.invalidate();
                     }
 
                     @Override

@@ -178,7 +178,7 @@ public class QueryBuildWithSplitter {
     }
 
 
-    public  List<String> splitedStringList(String rawStringData) {
+    public List<String> splitedStringList(String rawStringData) {
 
         List<String> splittedStringList = new ArrayList<String>();
 
@@ -197,30 +197,34 @@ public class QueryBuildWithSplitter {
                 }
 
             }
-            Log.d(TAG, "SplittedStringList " + splittedStringList.get(0)+ ", "+splittedStringList.size());
+            Log.d(TAG, "SplittedStringList " + splittedStringList.get(0) + ", " + splittedStringList.size());
         }
         return splittedStringList;
     }
 
-    public  List<MarkerDetailsKeyValue> splitedKeyValueList(List<String> rawStringList) {
+    public List<MarkerDetailsKeyValue> splitedKeyValueList(List<String> rawStringList) {
 
         List<MarkerDetailsKeyValue> splittedStringKeyValueList = new ArrayList<MarkerDetailsKeyValue>();
 
-        if (!rawStringList.equals(null)) {
-                for (int i = 0; i < rawStringList.size(); i++) {
-                   String rawString = rawStringList.get(i);
-                    String temp = rawString.replaceAll("\"", "");
+        if (rawStringList != null) {
+            for (int i = 0; i < rawStringList.size(); i++) {
+                String rawString = rawStringList.get(i);
+                String temp = rawString.replaceAll("\"", "");
 //                    Log.d(TAG, "SplittedStringList: "+temp);
 
-                    String[] parts = temp.split(":");
-                    String keyPart = parts[0].trim(); // key
-                    String valuePart = parts[1].trim(); // value
+                String[] parts = temp.split(":");
 
-                    MarkerDetailsKeyValue markerDetailsKeyValue = new MarkerDetailsKeyValue(keyPart, valuePart);
-                    splittedStringKeyValueList.add(markerDetailsKeyValue);
-
-                    Log.d(TAG, "SplittedStringList key " + splittedStringKeyValueList.get(i).getKey() + " \nvalue "+splittedStringKeyValueList.get(i).getValue());
+                if (parts.length != 2) {
+                    continue;
                 }
+
+                String keyPart = parts[0].trim(); // key
+                String valuePart = parts[1].trim(); // value
+
+                MarkerDetailsKeyValue markerDetailsKeyValue = new MarkerDetailsKeyValue(keyPart, valuePart);
+                splittedStringKeyValueList.add(markerDetailsKeyValue);
+
+            }
 
         }
         return splittedStringKeyValueList;
