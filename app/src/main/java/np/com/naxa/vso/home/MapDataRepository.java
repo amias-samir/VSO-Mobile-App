@@ -55,6 +55,7 @@ public class MapDataRepository extends RawAssetLoader {
     }
 
 
+
     private Observable<String> geoJsonPropertiesParser(FeatureCollection collection) {
 
         return Observable.just(collection.getFeatures())
