@@ -70,9 +70,11 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
 
         repository = new EmergencyContactsRepository();
 
-        list = generateData();
+        getContactList(0);
 
-        adapter = new ExpandableItemAdapter(list);
+//        list = generateData();
+//
+//        adapter = new ExpandableItemAdapter(list);
 
         final GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -157,55 +159,6 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
         }
     }
 
-    private ArrayList<MultiItemEntity> generateData() {
-
-//        int lv0Count = 2;
-//        int lv1Count = 3;
-//        int personCount = 5;
-//
-//        String[] nameList = {"Bob", "Andy", "Lily", "Brown", "Bruce"};
-//        Random random = new Random();
-//
-//
-        ArrayList<MultiItemEntity> res = new ArrayList<>();
-//        Level0Item lv0 = null;
-//        Level1Item lv1 = null;
-//
-//        lv0 = new Level0Item("Hospital", "");
-//        lv1 = new Level1Item("Putali Hospital", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        lv1 = new Level1Item("Sita ram Hospital", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        lv1 = new Level1Item("Sumeru Hospital", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        lv1 = new Level1Item("New Hospital", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        res.add(lv0);
-//
-//        lv0 = new Level0Item("Police", "");
-//        lv1 = new Level1Item("Police HQ", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        lv1 = new Level1Item("Armed Police HQ", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        lv1 = new Level1Item("Civil Police HQ", "01-4251551");
-//        lv0.addSubItem(lv1);
-//
-//        res.add(lv0);
-
-        for (jsonPosition = 0 ; jsonPosition <= 5 ; jsonPosition++){
-            Log.d(TAG, "generateData: "+ jsonPosition);
-            res.add(getContactList(jsonPosition));
-        }
-
-        return res;
-    }
-
     ArrayList<MultiItemEntity> res = new ArrayList<>();
     Level0Item lv0 = null;
     Level1Item lv1 = null;
@@ -217,16 +170,14 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
                     @Override
                     public void onSubscribe(Disposable d) {
                     }
-
                     @Override
                     public void onNext(Pair pair) {
                         String assetName = (String) pair.first;
                         String fileContent = (String) pair.second;
-                        Log.d(TAG, "onNext: "+fileContent);
-                        lv0 = new Level0Item(assetName, "");
+//                        Log.d(TAG, "onNext: "+fileContent);
 
+                        lv0 = new Level0Item(getContactCategoryName(position), "");
                         Gson gson = new Gson();
-
                         try {
                             JSONArray jsonArray = new JSONArray(fileContent);
                             for (int i =0; i < jsonArray.length() ; i++){
@@ -235,14 +186,9 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
                                         (jsonObject.getString("Phone no.") == null) ? (" ") : (jsonObject.getString("Phone no.")));
                                 lv0.addSubItem(lv1);
                             }
-
-
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-
                     }
 
                     @Override
@@ -253,18 +199,44 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
 
                     @Override
                     public void onComplete() {
-//                        jsonPosition++;
-//                        if (jsonPosition > 5){
-//                            return;
-//                        }
-//                        getContactList(jsonPosition);
+                        jsonPosition++;
+                        Log.d(TAG, "onComplete: "+jsonPosition);
 
+                        if (jsonPosition > 6){
+                            list = res;
+                            adapter = new ExpandableItemAdapter(list);
+                            return;
+                        }
+                        res.add(lv0);
+                        getContactList(jsonPosition);
                     }
                 });
-
         return lv0 ;
     }
 
+    private String getContactCategoryName(int position){
+        String categoryName = "";
+        switch (position) {
+            case 0:
+                categoryName = "Chairpersons of Local Units";
+                break;
+            case 1:
+                categoryName = "Chief of Local Level Offices";
+                break;
+            case 2:
+                categoryName = "Elected Representatives";
+                break;
+            case 3:
+                categoryName = "Municipal Executive Members";
+            case 4:
+                categoryName = "Municipality Level Disaster Management Committee";
+                break;
+            case 5:
+                categoryName = "NNTDS's Executive Committee";
+                break;
+        }
+        return categoryName;
+    }
 
 
 }
