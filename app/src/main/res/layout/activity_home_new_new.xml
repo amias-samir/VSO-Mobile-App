@@ -51,43 +51,46 @@
                 android:layout_height="wrap_content">
 
                 <!--categories-->
-                <include layout="@layout/main_categories_list_layout"
-                    android:id="@+id/main_categories_list">
-                </include>
+                <include
+                    android:id="@+id/main_categories_list"
+                    layout="@layout/main_categories_list_layout" />
+
                 <TextView
-                    android:layout_below="@id/main_categories_list"
                     android:id="@+id/tv_data_set"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_below="@id/main_categories_list"
                     android:layout_marginLeft="@dimen/spacing_large"
                     android:layout_marginStart="@dimen/spacing_large"
                     android:gravity="center"
                     android:text="@string/browse_data_by_categories" />
 
                 <TextView
-                    android:layout_below="@id/main_categories_list"
+                    android:padding="@dimen/spacing_medium"
                     android:id="@+id/tv_data_filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@+id/toggle_slide_panel_main_grid"
-                    android:gravity="center"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/main_categories_list"
                     android:layout_centerVertical="true"
+                    android:drawableTop="@drawable/ic_filter_list_black"
+                    android:gravity="center"
                     android:text="@string/filter"
-                    android:visibility="gone"
-                    android:drawableTop="@drawable/ic_filter_list_black"/>
+                    android:visibility="gone" />
 
 
                 <ImageView
-                    android:layout_below="@id/main_categories_list"
                     android:id="@+id/toggle_slide_panel_main_grid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
+                    android:layout_below="@id/main_categories_list"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="@dimen/spacing_large"
                     android:padding="@dimen/spacing_large"
-                    android:src="@drawable/ic_arrow_upward_black_24dp" />
+                    android:src="@drawable/ic_arrow_upward_black_24dp"
+                    android:visibility="gone" />
 
             </RelativeLayout>
 

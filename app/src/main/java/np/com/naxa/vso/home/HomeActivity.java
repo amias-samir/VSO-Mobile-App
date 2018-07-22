@@ -426,6 +426,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
+
                 InfoWindow.closeAllInfoWindowsOn(mapView);
                 slidingPanel.setPanelHeight(110);
                 return false;
@@ -500,7 +501,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void toggleSliderHeight() {
 
         Resources r = getResources();
-        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, r.getDisplayMetrics());
+        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 500, r.getDisplayMetrics());
 
         int listHeight = SlidingUpPanelLayout.LayoutParams.MATCH_PARENT;
         int newHeight;
@@ -545,15 +546,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             showOverlayOnMap(a.t.getFileName(), a.t.getType());
             showDataOnList(a.t.getName());
+            InfoWindow.closeAllInfoWindowsOn(mapView);
 
             gridPosition = position;
 
         });
     }
 
-    private void showPointsOnMap(String fileName) {
-
-    }
 
     private void showDataOnList(String name) {
         commonPlacesAttribViewModel.getPlaceByType(name)
@@ -651,6 +650,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         if (type.equals(MapDataCategory.POINT)) {
                             switchViews();
+                        } else {
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                         }
 
                     }
