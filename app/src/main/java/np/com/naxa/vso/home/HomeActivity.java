@@ -37,6 +37,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -100,6 +101,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -522,12 +524,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
         recyclerDataCategories.setAdapter(sectionAdapter);
 
-        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            
-            showOverlayOnMap(position);
-            switchViews();
-            gridPosition = position;
+
+        sectionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                MySection a = sectionAdapter.getData().get(position);
+                ToastUtils.showToast(a.t.getName());
+
+                if (a.t.getName() == null) {
+                    ToastUtils.showToast("Error loading " + a.t.getName());
+                    return;
+                }
+                showOverlayOnMap(a.t.getFileName());
+
+            }
         });
+
+//        sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+//
+//            showOverlayOnMap(position);
+//            switchViews();
+//            gridPosition = position;
+//        });
     }
 
     /**
@@ -587,6 +605,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return string;
     }
 
+
+    private void showOverlayOnMap(String name) {
+        repo.getGeoJsonString(name)
+                .subscribe(new DisposableObserver<Pair>() {
+                    @Override
+                    public void onNext(Pair pair) {
+                        String fileContent = (String) pair.second;
+                        mapView.getOverlays().clear();
+                        loadlayerToMap(fileContent);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e("Failed to load geojson ");
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Timber.i("GeoJson loaded sucessfully");
+                    }
+                });
+    }
 
     private void showOverlayOnMap(int position) {
 
@@ -1014,7 +1055,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String jsonString = null;
             try {
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changu_ward.geojson");
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -1312,8 +1353,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
     @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
     public void onMainCategoriesViewClicked(View view) {
         switch (view.getId()) {
@@ -1321,7 +1360,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 mainCategoryPosition = 1;
                 setupGridRecycler(MySection.getResourcesCatergorySections());
-               break;
+                break;
 
             case R.id.tv_hazard_and_vulnerability:
                 mainCategoryPosition = 2;
