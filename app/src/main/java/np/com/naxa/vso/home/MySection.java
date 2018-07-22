@@ -23,7 +23,7 @@ public class MySection extends SectionEntity<MapDataCategory> {
     public static List<MySection> getResourcesCatergorySections() {
         List<MySection> list = new ArrayList<>();
 
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_hospital, "Hospital", "government_agencies.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_hospital, "Hospital", "health_facilities.geojson", MapDataCategory.POINT)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.BOUNDARY)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_eductional, "Educational Institution", "educational_Institution_geojson.geojson", MapDataCategory.POINT)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_financial, "Financial Institution", "financial_institution.geojson", MapDataCategory.POINT)));

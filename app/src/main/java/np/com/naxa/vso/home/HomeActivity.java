@@ -261,6 +261,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     List<HospitalAndCommon> hospitalAndCommonList;
 
+    @BindView(R.id.tv_go_back)
+    public TextView tvGoBack;
+
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
@@ -628,12 +631,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case 0:
                 tvDataSet.setText(R.string.browse_data_by_categories);
                 tvDataFilter.setVisibility(View.GONE);
+                tvGoBack.setVisibility(View.GONE);
+
                 clearClusterAndMarkers();
                 break;
             case 1:
 //                tvDataSet.setText(generateDataCardText());
                 tvDataSet.setText(dataSetInfoText);
                 tvDataFilter.setVisibility(View.VISIBLE);
+                tvGoBack.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -907,6 +913,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @OnClick(R.id.tv_go_back)
     @Override
     public void onBackPressed() {
         int visibleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
@@ -1406,6 +1413,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             HospitalFilterActivity.start(HomeActivity.this);
         }
     }
+
+
 
 
     //------------ LocationListener implementation
