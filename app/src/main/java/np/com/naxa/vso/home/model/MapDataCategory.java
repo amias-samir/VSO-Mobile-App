@@ -7,11 +7,18 @@ public class MapDataCategory {
 
     public int image;
     private String filename;
+    private String type;
 
-    public MapDataCategory(int image, String name, String filename) {
+    public static final String ROAD = "ROAD";
+    public static  final String RIVER = "RIVER";
+    public  static final String BOUNDARY = "BOUNDARY";
+    public  static final String POINT = "POINT";
+
+    public MapDataCategory(int image, String name, String filename, String type) {
         this.image = image;
         this.name = name;
         this.filename = filename;
+        this.type = type;
     }
 
     public String getFileName() {
@@ -29,4 +36,7 @@ public class MapDataCategory {
     public String name;
 
 
+    public String getType() {
+        return type;
+    }
 }

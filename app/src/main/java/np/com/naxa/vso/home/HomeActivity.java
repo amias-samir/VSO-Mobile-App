@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -85,6 +87,7 @@ import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,6 +124,7 @@ import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
+import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
@@ -284,7 +288,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupMap();
         setupBottomBar();
         setupListRecycler();
-        setupGridRecycler(MySection.getMapDataCatergorySections());
+        setupGridRecycler(MySection.getResourcesCatergorySections());
 
         slidingPanel.setAnchorPoint(0.4f);
 
@@ -535,7 +539,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ToastUtils.showToast("Error loading " + a.t.getName());
                     return;
                 }
-                showOverlayOnMap(a.t.getFileName());
+
+
+                showOverlayOnMap(a.t.getFileName(), a.t.getType());
 
             }
         });
@@ -606,14 +612,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void showOverlayOnMap(String name) {
+    private void showOverlayOnMap(String name, String type) {
         repo.getGeoJsonString(name)
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        loadlayerToMap(fileContent);
+                        loadlayerToMap(fileContent, type);
+                        switchViews();
                     }
 
                     @Override
@@ -685,7 +692,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                              loadLineLayers(assetName, fileContent);
 //                              loadMarkersFromGeoJson(assetName, fileContent);
                                 mapView.getOverlays().clear();
-                                loadlayerToMap(fileContent);
+                                //  loadlayerToMap(fileContent);
                             }
 
                             @Override
@@ -1022,7 +1029,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void loadlayerToMap(String geoJson) {
+    private void loadlayerToMap(String geoJson, String lineType) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
@@ -1035,7 +1042,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         poiMarkers.setIcon(defaultBitmap);
 
-        final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 5f, 0x20AA1010);
+        Style defaultStyle;
+
+        switch (lineType) {
+            case MapDataCategory.ROAD:
+                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
+
+                break;
+            case MapDataCategory.RIVER:
+                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
+                break;
+            default:
+                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
+                break;
+        }
 
         myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
         mapView.getOverlays().add(myOverLay);
@@ -1353,6 +1373,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @OnClick(R.id.fab_map_layer)
+    public void showMapLayerPopup() {
+
+    }
+
     @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
     public void onMainCategoriesViewClicked(View view) {
         switch (view.getId()) {
@@ -1372,6 +1397,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 setupGridRecycler(MySection.getBaseDataCatergorySections());
                 break;
         }
+
+        emulateTabBehavaiour(view.getId());
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+    }
+
+    private void emulateTabBehavaiour(int tappedID) {
+        ArrayList<Integer> a = new ArrayList<>();
+        a.add(R.id.tv_resources);
+        a.add(R.id.tv_hazard_and_vulnerability);
+        a.add(R.id.tv_base_data);
+        a.remove((Integer) tappedID);
+
+        ((TextView) findViewById(tappedID)).setTypeface(null, Typeface.BOLD);
+        ((TextView) findViewById(tappedID)).setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        for (Integer curId : a) {
+            ((TextView) findViewById(curId)).setTypeface(null, Typeface.NORMAL);
+            ((TextView) findViewById(curId)).setTextColor(ContextCompat.getColor(this, R.color.black));
+        }
+
     }
 }
 

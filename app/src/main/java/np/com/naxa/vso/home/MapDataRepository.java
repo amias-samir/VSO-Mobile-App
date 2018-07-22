@@ -29,15 +29,9 @@ public class MapDataRepository extends RawAssetLoader {
         return loadTextFromAsset(assetName);
     }
 
-
-    private void getMapAssetName(String name){
-
-    }
-
     public Observable<Pair> getGeoJsonString(@NonNull String assetName) {
         return loadTextFromAsset(assetName);
     }
-
 
     private String getMapAssetName(int pos) {
         String assetName;
