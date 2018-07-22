@@ -39,4 +39,7 @@ public interface CommonPlacesAttrbDao {
 
     @Query("SELECT * from commonplacesattrb WHERE name LIKE '%'||:value||'%'")
     Flowable<List<CommonPlacesAttrb>> getPlacesContaining(String value);
+
+    @Query("SELECT * from commonplacesattrb WHERE places_type =:type")
+    Flowable<List<CommonPlacesAttrb>> getPlaceByType(String type);
 }

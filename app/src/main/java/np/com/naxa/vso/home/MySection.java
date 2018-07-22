@@ -20,28 +20,26 @@ public class MySection extends SectionEntity<MapDataCategory> {
     }
 
 
-    public static List<MySection> getMapDataCatergorySections() {
-
-        List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_local_hospital_black_24dp, "Hospital", "government_agencies.geojson", MapDataCategory.POINT)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.BOUNDARY)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Education", "educational_Institution_geojson.geojson", MapDataCategory.POINT)));
-        return list;
-    }
 
     public static List<MySection> getResourcesCatergorySections() {
         List<MySection> list = new ArrayList<>();
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_local_hospital_black_24dp, "Hospital", "government_agencies.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.BOUNDARY)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Educational Institution", "educational_Institution_geojson.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Financial Institution", "financial_institution.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, "Public Toilets", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, "Industries", "industries_updated_geojson.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", null, MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, "Water Bodies", null, MapDataCategory.BOUNDARY)));
         return list;
     }
 
     public static List<MySection> getHazardCatergorySections() {
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_school_black_24dp, "Financial Institution", "financial_institution.geojson", MapDataCategory.POINT)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, "Industries", "industries_updated_geojson.geojson", MapDataCategory.POINT)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, "Public Toilets", null, MapDataCategory.POINT)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", null, MapDataCategory.POINT)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, "Water Bodies", null, MapDataCategory.BOUNDARY)));
+
         return list;
     }
 

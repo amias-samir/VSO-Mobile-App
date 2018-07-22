@@ -319,6 +319,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     public void initLocationListner() {
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -497,7 +498,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void toggleSliderHeight() {
 
         Resources r = getResources();
-        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 325, r.getDisplayMetrics());
+        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, r.getDisplayMetrics());
 
         int listHeight = SlidingUpPanelLayout.LayoutParams.MATCH_PARENT;
         int newHeight;
@@ -516,7 +517,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupListRecycler() {
-        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, null);
+//        CategoriesDetailAdapter categoriesDetailAdapter = new CategoriesDetailAdapter(R.layout.item_catagories_detail, null);
+
+        CategoryListAdapter categoriesDetailAdapter = new CategoryListAdapter(R.layout.item_catagories_detail, null);
         recyclerViewDataDetails.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewDataDetails.setAdapter(categoriesDetailAdapter);
 
@@ -533,16 +536,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 MySection a = sectionAdapter.getData().get(position);
-                ToastUtils.showToast(a.t.getName());
 
                 if (a.t.getName() == null) {
                     ToastUtils.showToast("Error loading " + a.t.getName());
                     return;
                 }
 
-
                 showOverlayOnMap(a.t.getFileName(), a.t.getType());
-
+                showDataOnList(a.t.getName());
+                gridPosition = position;
             }
         });
 
@@ -552,6 +554,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //            switchViews();
 //            gridPosition = position;
 //        });
+    }
+
+    private void showDataOnList(String name) {
+        commonPlacesAttribViewModel.getPlaceByType(name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSubscriber<List<CommonPlacesAttrb>>() {
+                    @Override
+                    public void onNext(List<CommonPlacesAttrb> commonPlacesAttrbs) {
+
+                        ((CategoryListAdapter) recyclerViewDataDetails.getAdapter()).replaceData(commonPlacesAttrbs);
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     /**
@@ -1415,6 +1441,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             ((TextView) findViewById(curId)).setTypeface(null, Typeface.NORMAL);
             ((TextView) findViewById(curId)).setTextColor(ContextCompat.getColor(this, R.color.black));
         }
+
 
     }
 }
