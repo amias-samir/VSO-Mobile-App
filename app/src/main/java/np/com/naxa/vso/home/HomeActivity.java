@@ -561,7 +561,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
 
-            showOverlayOnMap(a.t.getFileName(), a.t.getType());
+            showOverlayOnMap(a.t.getFileName(), a.t.getType(), a.t.getMarker_image());
             showDataOnList(a.t.getName(), a.t.getType());
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
@@ -671,14 +671,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void showOverlayOnMap(String name, String type) {
+    private void showOverlayOnMap(String name, String type, int marker_image) {
         repo.getGeoJsonString(name)
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        loadlayerToMap(fileContent, type, name);
+                        loadlayerToMap(fileContent, type, name, marker_image);
 
                         if (type.equals(MapDataCategory.POINT)) {
                             switchViews();
@@ -1095,7 +1095,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void loadlayerToMap(String geoJson, String lineType, String name) {
+    private void loadlayerToMap(String geoJson, String lineType, String name, int marker_image) {
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
@@ -1139,7 +1139,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay);
+        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay, marker_image);
 
 //        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(HomeActivity.this,
 //                commonPlacesAttrbList, mapView));

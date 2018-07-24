@@ -103,7 +103,7 @@ public class SplashActivity extends AppCompatActivity {
     private Observable<Long> parseAndSaveGeoJSONPoints() {
         MapDataRepository repository = new MapDataRepository();
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.POINT)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "demo_openspace_changu.geojson", MapDataCategory.POINT, R.drawable.marker_openspace)));
 
         return Observable.just(
                 MySection.getResourcesCatergorySections()

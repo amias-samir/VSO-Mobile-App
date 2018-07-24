@@ -20,7 +20,8 @@ public class MapGeoJsonToObject {
     private static final String TAG = "MapGeoJsonToObject";
 
     public List<CommonPlacesAttrb> getCommonPlacesListObj(Context context, String geoJson, String fileName, MapView mapView,
-                                                          MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay){
+                                                          MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
+                                                          int marker_image){
         List<CommonPlacesAttrb> commonPlacesAttrbList = new ArrayList<CommonPlacesAttrb>();
 
         JSONObject jsonObject = null;
@@ -49,7 +50,7 @@ public class MapGeoJsonToObject {
 //                        @Override
 //                        public void run() {
                             mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-                                    commonPlacesAttrb, mapView));
+                                    commonPlacesAttrb, mapView , marker_image));
                             mapView.getOverlays().add(myOverLay);
                             mapView.invalidate();
 //                }
@@ -71,7 +72,7 @@ public class MapGeoJsonToObject {
 //                    @Override
 //                    public void run() {
                         mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-                                commonPlacesAttrb, mapView));
+                                commonPlacesAttrb, mapView, marker_image));
                         mapView.invalidate();
 //                    }
 //                });

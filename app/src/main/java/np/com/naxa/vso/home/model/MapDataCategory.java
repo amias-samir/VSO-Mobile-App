@@ -6,6 +6,7 @@ import java.util.List;
 public class MapDataCategory {
 
     public int image;
+    public int marker_image;
     private String filename;
     private String type;
 
@@ -14,8 +15,9 @@ public class MapDataCategory {
     public  static final String BOUNDARY = "BOUNDARY";
     public  static final String POINT = "POINT";
 
-    public MapDataCategory(int image, String name, String filename, String type) {
+    public MapDataCategory(int image, String name, String filename, String type, int marker_image) {
         this.image = image;
+        this.marker_image = marker_image;
         this.name = name;
         this.filename = filename;
         this.type = type;
@@ -38,5 +40,9 @@ public class MapDataCategory {
 
     public String getType() {
         return type;
+    }
+
+    public int getMarker_image() {
+        return marker_image;
     }
 }

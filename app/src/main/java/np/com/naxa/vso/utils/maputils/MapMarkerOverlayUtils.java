@@ -196,7 +196,7 @@ public class MapMarkerOverlayUtils {
         return mOverlay;
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView) {
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView, int marker_image) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = commonPlacesAttrb.getName()
                 + "\n" + commonPlacesAttrb.getType()
@@ -211,8 +211,8 @@ public class MapMarkerOverlayUtils {
 
         items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
-                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
-                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
+                context.getResources().getDrawable(marker_image),
+                context.getResources().getDrawable(marker_image),
                 white,
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
