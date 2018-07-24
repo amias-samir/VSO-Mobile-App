@@ -136,6 +136,7 @@ import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
+import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
@@ -1133,8 +1134,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
-        mapView.getOverlays().add(myOverLay);
-        mapView.invalidate();
+//        mapView.getOverlays().add(myOverLay);
+//        mapView.invalidate();
+
+        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+        MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
+        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay);
+
+//        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(HomeActivity.this,
+//                commonPlacesAttrbList, mapView));
+//        mapView.invalidate();
+
+
     }
 
     private void loadMunicipalityBoarder() {

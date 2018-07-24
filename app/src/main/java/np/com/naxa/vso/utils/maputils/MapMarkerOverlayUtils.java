@@ -86,18 +86,18 @@ public class MapMarkerOverlayUtils {
         dialog.show();
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context, CommonPlacesAttrb hospitalAndCommon, MapView mapView) {
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromHospitalAndCommon(Context context, HospitalAndCommon hospitalAndCommon, MapView mapView) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-        String name = hospitalAndCommon.getName()
-                + "\n" + hospitalAndCommon.getType()
-                + "\n" + hospitalAndCommon.getAddress();
-        double latitude = hospitalAndCommon.getLatitude();
-        double longitude = hospitalAndCommon.getLongitude();
+        String name = hospitalAndCommon.getCommonPlacesAttrb().getName()
+                + "\n" + hospitalAndCommon.getCommonPlacesAttrb().getType()
+                + "\n" + hospitalAndCommon.getCommonPlacesAttrb().getAddress();
+        double latitude = hospitalAndCommon.getCommonPlacesAttrb().getLatitude();
+        double longitude = hospitalAndCommon.getCommonPlacesAttrb().getLongitude();
 
         Gson gson = new Gson();
-        //  HospitalAndCommon obj = hospitalAndCommon;
-        // String jsonInString = gson.toJson(obj).toString();
-        // Log.d(TAG, "overlayFromHospitalAndCommon: " + jsonInString);
+          HospitalAndCommon obj = hospitalAndCommon;
+         String jsonInString = gson.toJson(obj).toString();
+         Log.d(TAG, "overlayFromHospitalAndCommon: " + jsonInString);
 
         //items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
 
@@ -196,5 +196,40 @@ public class MapMarkerOverlayUtils {
         return mOverlay;
     }
 
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        String name = commonPlacesAttrb.getName()
+                + "\n" + commonPlacesAttrb.getType()
+                + "\n" + commonPlacesAttrb.getAddress();
+        double latitude = commonPlacesAttrb.getLatitude();
+        double longitude = commonPlacesAttrb.getLongitude();
+
+        Gson gson = new Gson();
+        CommonPlacesAttrb obj = commonPlacesAttrb;
+        String jsonInString = gson.toJson(obj).toString();
+        Log.d(TAG, "overlayFromCommon: " + jsonInString);
+
+        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
+                context.getResources().getDrawable(R.drawable.ic_marker_hospital),
+                white,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().animateTo(new GeoPoint(latitude, longitude));
+                        MarkerOnClickEvent(context, item);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(int index, OverlayItem item) {
+                        return false;
+                    }
+                },
+                context);
+
+        return mOverlay;
+    }
 
 }
