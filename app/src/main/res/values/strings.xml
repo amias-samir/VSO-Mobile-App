@@ -26,6 +26,7 @@
     <string name="dialog_error_title_sync_failed">Data Sync Failed (Code: %1$s)</string>
 
     <string name="dialog_action_hide">Hide</string>
+    <string name="specify_other">Specify Other</string>
 
     <string-array name="array_ward">
         <item>1</item>
@@ -44,6 +45,7 @@
         <item>Fire</item>
         <item>Earth</item>
         <item>Water</item>
+        <item>Others</item>
     </string-array>
 
 

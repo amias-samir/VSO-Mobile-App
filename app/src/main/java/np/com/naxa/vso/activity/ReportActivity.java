@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -31,11 +32,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
-import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
-import np.com.naxa.vso.utils.ProgressDialogUtils;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -70,7 +69,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     String imageFilePath = null;
     File imageFileToBeUploaded;
     Boolean hasNewImage = false;
-    String full_name, contact_no, detailed_message, latitude, longitude, incident_type, incident_time, ward;
+    String full_name, contact_no, detailed_message, latitude, longitude, incident_type, incident_type_others, incident_time, ward;
     String jsonToSend = "";
 
     @BindView(R.id.tv_incident_time)
@@ -79,6 +78,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     Spinner spinnerWard;
     @BindView(R.id.spinner_incident_type)
     Spinner spinnerIncidentType;
+    @BindView(R.id.tv_incident_type_others)
+    TextInputLayout tvIncidentTypeOthers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         initToolbar();
 
         setCurrentDate();
+
+        spinnerItemSelectedListner();
 
 //        IcLocationTracker = new LocationTracker(getApplicationContext());
         DcoLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -122,6 +125,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 incident_time = tvIncidentTime.getEditText().getText().toString();
                 incident_type = spinnerIncidentType.getSelectedItem().toString();
                 ward = spinnerWard.getSelectedItem().toString();
+                incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
                 full_name = tvName.getEditText().getText().toString();
                 contact_no = tvContactNumber.getEditText().getText().toString();
                 detailed_message = tvMessage.getEditText().getText().toString();
@@ -134,6 +138,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     header.put("status", "pending");
                     header.put("incident_time", incident_time);
                     header.put("incident_type", incident_type);
+                    header.put("incident_type_others", incident_type_others);
                     header.put("ward", ward);
                     header.put("name", full_name);
                     header.put("contact_no", contact_no);
@@ -152,6 +157,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
             }
         });
+
+
+
     }
 
     private void initToolbar() {
@@ -160,6 +168,28 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         getSupportActionBar().setTitle("Ask a question");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private void spinnerItemSelectedListner (){
+        spinnerIncidentType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                Log.d(TAG, "onItemSelected: "+selectedItem);
+                if(selectedItem.equals("Others"))
+                {
+                    tvIncidentTypeOthers.getEditText().setVisibility(View.VISIBLE);
+                }else {
+                    tvIncidentTypeOthers.getEditText().setVisibility(View.GONE);
+                    tvIncidentTypeOthers.getEditText().setText("");
+                }
+            } // to close the onItemSelected
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
     }
 
     private void initUI() {
@@ -291,19 +321,21 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             public void onResponse(Call<AskForHelpResponse> call, Response<AskForHelpResponse> response) {
                 if (response.body() == null) {
                     Toast.makeText(ReportActivity.this, "null response", Toast.LENGTH_SHORT).show();
-
+                    if (progressDialog.isShowing() && progressDialog != null) {
+                        progressDialog.dismiss();
+                    }
                     return;
                 }
 
                 handleProfileUpdateResponse(response.body());
-                Log.d("", "onResponse: got response data "+response.body().getData().toString());
-                Log.d("", "onResponse: got response status"+response.body().getStatus().toString());
+                Log.d("", "onResponse: got response data " + response.body().getData().toString());
+                Log.d("", "onResponse: got response status" + response.body().getStatus().toString());
             }
 
             private void handleProfileUpdateResponse(AskForHelpResponse askForHelpResponse) {
                 switch (askForHelpResponse.getStatus()) {
                     case REQUEST_OK:
-                        if(progressDialog.isShowing() && progressDialog!=null){
+                        if (progressDialog.isShowing() && progressDialog != null) {
                             progressDialog.dismiss();
                         }
                         handleSuccess(askForHelpResponse);
@@ -318,7 +350,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
 
             private void handleSuccess(AskForHelpResponse askForHelpResponse) {
-                DialogFactory.createMessageDialog(ReportActivity.this,"Success", "Data sent successfully").show();
+                DialogFactory.createMessageDialog(ReportActivity.this, "Success", "Data sent successfully").show();
 //                HomeActivity.start(ReportActivity.this);
                 tvName.getEditText().setText("");
                 tvContactNumber.getEditText().setText("");
@@ -327,7 +359,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
             @Override
             public void onFailure(Call<AskForHelpResponse> call, Throwable t) {
-                if(progressDialog.isShowing() && progressDialog!=null){
+                if (progressDialog.isShowing() && progressDialog != null) {
                     progressDialog.dismiss();
                 }
 
@@ -349,7 +381,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     public void onViewClicked() {
     }
 
-    private void setCurrentDate (){
+    private void setCurrentDate() {
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
         int mm = c.get(Calendar.MONTH);
