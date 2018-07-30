@@ -183,7 +183,9 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
                             for (int i =0; i < jsonArray.length() ; i++){
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 lv1 = new Level1Item(jsonObject.getString("Name"),
-                                        (jsonObject.getString("Phone no.") == null) ? (" ") : (jsonObject.getString("Phone no.")));
+                                        (jsonObject.getString("Phone no.") == null) ? (" ") : (jsonObject.getString("Phone no.")),
+                                        jsonObject.getString("Post")+", "+jsonObject.getString("Organization"),
+                                        jsonObject.getString("Address"));
                                 lv0.addSubItem(lv1);
                             }
                         } catch (JSONException e) {
@@ -199,9 +201,8 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
 
                     @Override
                     public void onComplete() {
-                        jsonPosition++;
                         Log.d(TAG, "onComplete: "+jsonPosition);
-
+                        jsonPosition++;
                         if (jsonPosition > 6){
                             list = res;
                             adapter = new ExpandableItemAdapter(list);
@@ -209,6 +210,7 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
                         }
                         res.add(lv0);
                         getContactList(jsonPosition);
+
                     }
                 });
         return lv0 ;
@@ -228,6 +230,8 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
                 break;
             case 3:
                 categoryName = "Municipal Executive Members";
+                break;
+
             case 4:
                 categoryName = "Municipality Level Disaster Management Committee";
                 break;

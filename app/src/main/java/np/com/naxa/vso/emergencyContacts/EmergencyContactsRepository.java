@@ -34,6 +34,7 @@ public class EmergencyContactsRepository extends RawAssetLoader {
                 break;
             case 3:
                 assetName = "municipal_executive_members.json";
+                break;
             case 4:
                 assetName = "municipality_level_disaster_management_committee.json";
                 break;

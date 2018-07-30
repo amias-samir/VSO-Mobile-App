@@ -10,10 +10,19 @@ import com.chad.library.adapter.base.entity.MultiItemEntity;
 public class Level1Item extends AbstractExpandableItem<Person> implements MultiItemEntity {
     public String title;
     public String subTitle;
+    public String post;
+    public String address;
 
-    public Level1Item(String title, String subTitle) {
-        this.subTitle = subTitle;
+//    public Level1Item(String title, String subTitle) {
+//        this.subTitle = subTitle;
+//        this.title = title;
+//    }
+
+    public Level1Item(String title, String subTitle, String post, String address) {
         this.title = title;
+        this.subTitle = subTitle;
+        this.post = post;
+        this.address = address;
     }
 
     @Override
@@ -32,5 +41,29 @@ public class Level1Item extends AbstractExpandableItem<Person> implements MultiI
 
     public String getSubTitle() {
         return subTitle;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
+    }
+
+    public String getPost() {
+        return post;
+    }
+
+    public void setPost(String post) {
+        this.post = post;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

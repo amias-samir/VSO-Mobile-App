@@ -90,6 +90,8 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                 });
                 holder.setText(R.id.title, lv1.title);
                 holder.setText(R.id.sub_title, lv1.subTitle);
+                holder.setText(R.id.tv_post_and_office, lv1.post);
+                holder.setText(R.id.tv_address, lv1.address);
 
                 break;
             case TYPE_PERSON:

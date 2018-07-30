@@ -43,19 +43,10 @@ public class MapGeoJsonToObject {
                     String remarks = "";
                     CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
-
-
-
-//                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                        @Override
-//                        public void run() {
                             mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
                                     commonPlacesAttrb, mapView , marker_image));
                             mapView.getOverlays().add(myOverLay);
                             mapView.invalidate();
-//                }
-//                    });
-//                    commonPlacesAttrbList.add(commonPlacesAttrb);
 
                 }
             }else {
@@ -68,15 +59,10 @@ public class MapGeoJsonToObject {
                 String remarks = properties.getString("Remarks");
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
-//                new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                    @Override
-//                    public void run() {
-                        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
+
+                mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
                                 commonPlacesAttrb, mapView, marker_image));
                         mapView.invalidate();
-//                    }
-//                });
-                //                commonPlacesAttrbList.add(commonPlacesAttrb);
 
             }
             }

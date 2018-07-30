@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="1dp"
     android:background="@android:color/white"
     android:gravity="center_vertical"
     android:orientation="horizontal"
+    android:paddingTop="@dimen/spacing_medium"
+    android:paddingBottom="@dimen/spacing_medium"
     android:paddingLeft="@dimen/spacing_xxxlarge"
     android:paddingStart="@dimen/spacing_xxxlarge">
 
@@ -14,7 +16,6 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Nishon"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
@@ -23,20 +24,50 @@
         android:id="@+id/sub_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title"
+        android:layout_below="@+id/title"
         android:text="909asdasdas"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-
         />
+
+    <TextView
+        android:id="@+id/tv_post_and_office"
+        android:layout_below="@id/sub_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/iv_call"
+        android:layout_alignParentLeft="true"
+        android:text="Post"
+        android:textSize="@dimen/sp_12"
+        android:textColor="@color/dark_gray"/>
+
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_below="@id/tv_post_and_office"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/iv_call"
+        android:layout_alignParentLeft="true"
+        android:text="Post"
+        android:textSize="@dimen/sp_12"
+        android:textColor="@color/dark_gray"/>
+
 
     <ImageButton
         android:id="@+id/iv_call"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="37dp"
+        android:layout_marginRight="30dp"
         android:background="@color/white"
         android:padding="@dimen/spacing_medium"
         android:src="@drawable/ic_phone_black_24dp" />
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/sub_title"-->
+        <!--android:layout_toLeftOf="@id/iv_call"-->
+        <!--android:orientation="horizontal">-->
+    <!--</LinearLayout>-->
 </RelativeLayout>
