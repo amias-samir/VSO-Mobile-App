@@ -1535,6 +1535,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    int wardCount=0;
     @OnClick(R.id.fab_map_layer)
     public void onViewClicked(View view) {
         PopupMenu popup = new PopupMenu(HomeActivity.this, fabMapLayer);
@@ -1542,7 +1543,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
-                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+                    wardCount++;
+                    if(wardCount%2 == 0){
+                        mapView.getOverlays().remove(myOverLayWardBoarder);
+                        mapView.removeAllViews();
+                        mapView.invalidate();
+                    }else {
+                        showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+                    }
                     break;
                 case R.id.menu_municipal:
                     loadMunicipalityBoarder();
