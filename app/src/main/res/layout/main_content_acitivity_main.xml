@@ -26,58 +26,55 @@
         app:layout_anchorGravity="left" />
 
     <LinearLayout
-        android:visibility="gone"
+        android:id="@+id/ll_inset_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:id="@+id/ll_inset_data"
         android:layout_marginRight="@dimen/spacing_small"
         android:layout_marginTop="100dp"
         android:gravity="left"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
+            android:id="@+id/tv_name_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Place name"
-            android:textColor="@color/black"
-            android:id="@+id/tv_name_title"/>
+            android:textColor="@color/black" />
 
         <TextView
+            android:id="@+id/tv_distance_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
             android:text="Distance Location"
-            android:id="@+id/tv_distance_subtitle"/>
+            android:textColor="@color/black" />
 
 
     </LinearLayout>
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:visibility="gone"
-        android:id="@+id/fab_map_layer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginBottom="320dp"
-        android:layout_marginRight="16dp"
-        android:src="@drawable/ic_layers_black_24dp"
-        app:fabSize="mini"
-        app:layout_anchor="@+id/map"
-        app:layout_anchorGravity="right|bottom" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_location_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
         android:layout_marginRight="16dp"
+        android:layout_marginTop="100dp"
         android:padding="@dimen/spacing_xxlarge"
         android:src="@drawable/ic_my_location_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@+id/map"
         app:layout_anchorGravity="right|top" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_map_layer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="160dp"
+        android:padding="@dimen/spacing_xxlarge"
+        android:src="@drawable/ic_layers_black_24dp"
+        app:fabSize="mini"
+        app:layout_anchor="@+id/fab_location_toggle"
+        app:layout_anchorGravity="right|top" />
 
 </android.support.design.widget.CoordinatorLayout>
