@@ -29,11 +29,11 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="left"
         android:id="@+id/ll_inset_data"
         android:layout_marginRight="@dimen/spacing_small"
         android:layout_marginTop="100dp"
-        android:gravity="right"
+        android:gravity="left"
         android:orientation="vertical">
 
         <TextView
@@ -71,13 +71,13 @@
         android:id="@+id/fab_location_toggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="260dp"
+        android:layout_marginTop="100dp"
         android:layout_marginRight="16dp"
         android:padding="@dimen/spacing_xxlarge"
         android:src="@drawable/ic_my_location_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@+id/map"
-        app:layout_anchorGravity="right|bottom" />
+        app:layout_anchorGravity="right|top" />
 
 
 </android.support.design.widget.CoordinatorLayout>
