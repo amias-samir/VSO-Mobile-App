@@ -1162,25 +1162,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
-        Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
-        // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
-        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-        poiMarkers.setIcon(defaultBitmap);
-
-
         Style defaultStyle;
-        switch (lineType) {
-            case MapDataCategory.ROAD:
-                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
 
-                break;
-            case MapDataCategory.RIVER:
-                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
-                break;
-            default:
-                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
-                break;
-        }
+        defaultStyle = new Style(null, Color.BLACK, 2f, 0x20AA1010);
 
         myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
         mapView.getOverlays().add(myOverLayWardBoarder);
