@@ -74,4 +74,40 @@ public class MapGeoJsonToObject {
 
         return commonPlacesAttrbList;
     }
+
+
+    public void getWardDetailsListObj(Context context, String geoJson, String fileName, MapView mapView,
+                                                          MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
+                                                          int marker_image){
+        List<WardDetailsModel> wardDetailsModelList = new ArrayList<WardDetailsModel>();
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(geoJson);
+            JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+
+            Log.d(TAG, "getCommonPlacesListObj: filename "+fileName);
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                    String name = properties.getString("GaPa_NaPa") + " "+properties.getString("Type_GN") ;
+                    String ward = properties.getString("NEW_WARD_N");
+                    String area = properties.getString("Area_SQKM");
+                    String district = properties.getString("DISTRICT");
+                    double latitude = Double.parseDouble(properties.getString("Cent_Y"));
+                    double longitude = Double.parseDouble(properties.getString("Cent_X"));
+                    WardDetailsModel wardDetailsModel = new WardDetailsModel(name, ward, area, district, latitude, longitude);
+
+                    mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromWardDetailsModel(context,
+                            wardDetailsModel, mapView , marker_image));
+                    mapView.getOverlays().add(myOverLay);
+                    mapView.invalidate();
+
+                }
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        }
 }

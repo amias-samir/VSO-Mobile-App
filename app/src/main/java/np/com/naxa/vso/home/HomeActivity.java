@@ -217,6 +217,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapDataRepository mapDataRepository;
     FolderOverlay myOverLay;
     FolderOverlay myOverLayBoarder;
+    FolderOverlay myOverLayWardBoarder;
     RadiusMarkerClusterer poiMarkers;
     List<Overlay> overlaysList;
 
@@ -405,6 +406,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setupMap() {
         myOverLay = new FolderOverlay();
         myOverLayBoarder = new FolderOverlay();
+        myOverLayWardBoarder = new FolderOverlay();
 
         mapDataRepository = new MapDataRepository();
         centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
@@ -681,12 +683,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        loadlayerToMap(fileContent, type, name, marker_image);
+                        if(name.equals("changunarayan_new_wards.geojson")){
+                            Log.d(TAG, "onNext: changunarayan_new_wards");
+                            loadWardBoarderlayerToMap(fileContent, type, "",
+                                    marker_image);
+                        }else {
+                            loadlayerToMap(fileContent, type, name, marker_image);
 
-                        if (type.equals(MapDataCategory.POINT)) {
-                            switchViews();
-                        } else {
-                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            if (type.equals(MapDataCategory.POINT)) {
+                                switchViews();
+                            } else {
+                                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            }
                         }
 
                     }
@@ -941,6 +949,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
+
+//                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.mapbox_marker_icon_default);
+                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
 //                handleLocationPermission();
                 if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
@@ -1137,16 +1148,45 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
-//        mapView.getOverlays().add(myOverLay);
-//        mapView.invalidate();
 
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
         mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
 
-//        mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(HomeActivity.this,
-//                commonPlacesAttrbList, mapView));
-//        mapView.invalidate();
+
+    }
+
+    private void loadWardBoarderlayerToMap(String geoJson, String lineType, String name, int marker_image) {
+        MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
+
+        final KmlDocument kmlDocument = new KmlDocument();
+        kmlDocument.parseGeoJSON(geoJson);
+
+        Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
+        // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
+        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+        poiMarkers.setIcon(defaultBitmap);
+
+
+        Style defaultStyle;
+        switch (lineType) {
+            case MapDataCategory.ROAD:
+                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
+
+                break;
+            case MapDataCategory.RIVER:
+                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
+                break;
+            default:
+                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
+                break;
+        }
+
+        myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+        mapView.getOverlays().add(myOverLayWardBoarder);
+        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+        MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
+        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay, marker_image);
 
 
     }
@@ -1164,7 +1204,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             String jsonString = null;
             try {
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
+//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -1199,6 +1240,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             });
         }).start();
     }
+
+
 
 
     private LinkedHashMap HospitalWithDistance(List<HospitalAndCommon> hospitalAndCommonList) {
