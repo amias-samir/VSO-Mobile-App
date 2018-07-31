@@ -236,7 +236,7 @@ public class MapMarkerOverlayUtils {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = wardDetailsModel.getName()
                 + "\n" + wardDetailsModel.getDistrict()
-                + "\n" + wardDetailsModel.getWard()
+                + "\n" +"Ward no. : "+ wardDetailsModel.getWard()
                 + "\n" +"Area : "+ wardDetailsModel.getArea()+"Km. Square";
         double latitude = wardDetailsModel.getLatitude();
         double longitude = wardDetailsModel.getLongitude();
@@ -244,7 +244,7 @@ public class MapMarkerOverlayUtils {
         Gson gson = new Gson();
         WardDetailsModel obj = wardDetailsModel;
         String jsonInString = gson.toJson(obj).toString();
-        Log.d(TAG, "overlayFromCommon: " + jsonInString);
+        Log.d(TAG, "overlayFromWardDetailsModel: " + jsonInString);
 
         items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
@@ -301,11 +301,11 @@ public class MapMarkerOverlayUtils {
             @Override
             public void onClick(View v) {
                 Log.d("Clicked", "more info");
-//                Bundle bundle = new Bundle();
-//                Intent intent = new Intent(context, MarkerDetailsDisplayActivity.class);
-//                bundle.putString("data", item.getSnippet());
-//                intent.putExtras(bundle);
-//                ((Activity) context).startActivity(intent);
+                Bundle bundle = new Bundle();
+                Intent intent = new Intent(context, MarkerDetailsDisplayActivity.class);
+                bundle.putString("data", item.getSnippet());
+                intent.putExtras(bundle);
+                ((Activity) context).startActivity(intent);
 
             }
         });

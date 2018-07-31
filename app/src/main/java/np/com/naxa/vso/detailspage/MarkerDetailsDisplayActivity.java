@@ -104,6 +104,11 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
                 parseEducationJson(jsonEducationObject);
             }
 
+            if (jsonObject.has("wardDetailsModel")) {
+                JSONObject jsonEducationObject = new JSONObject(jsonObject.getString("wardDetailsModel"));
+                parseWardDetailsJson(jsonEducationObject);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -132,6 +137,13 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
     }
 
     private void parseEducationJson(JSONObject jsonObject) {
+        Log.d(TAG, "parseEducationJson: " + jsonObject.toString());
+        QueryBuildWithSplitter queryBuildWithSplitter = new QueryBuildWithSplitter();
+        markerDetailsKeyValueListSpecf = queryBuildWithSplitter.splitedKeyValueList(
+                queryBuildWithSplitter.splitedStringList(jsonObject.toString()));
+    }
+
+    private void parseWardDetailsJson(JSONObject jsonObject) {
         Log.d(TAG, "parseEducationJson: " + jsonObject.toString());
         QueryBuildWithSplitter queryBuildWithSplitter = new QueryBuildWithSplitter();
         markerDetailsKeyValueListSpecf = queryBuildWithSplitter.splitedKeyValueList(
