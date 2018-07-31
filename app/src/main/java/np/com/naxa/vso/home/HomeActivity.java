@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -23,17 +22,20 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,7 +75,6 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.NetworkLocationIgnorer;
 import org.osmdroid.views.MapView;
@@ -90,7 +91,6 @@ import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,7 +107,6 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -154,6 +153,8 @@ import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     private static final String TAG = "HomeActivity";
+    private static final String WARD_BOUNDARY = "ward_boundary";
+    private static final String MUNICIPALITY_BOUNDARY = "municipality_boundary";
 
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
@@ -208,6 +209,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvHazardAndVulnerability;
     @BindView(R.id.tv_base_data)
     TextView tvBaseData;
+    @BindView(R.id.fab_map_layer)
+    FloatingActionButton fabMapLayer;
+    @BindView(R.id.card_view)
+    CardView cardView;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -464,6 +469,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
 //            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
 
+
         showOverlayOnMap(-1);
         moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
 
@@ -680,11 +686,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        if(name.equals("changunarayan_new_wards.geojson")){
+                        if (name.equals("changunarayan_new_wards.geojson")) {
                             Log.d(TAG, "onNext: changunarayan_new_wards");
                             loadWardBoarderlayerToMap(fileContent, type, "",
                                     marker_image);
-                        }else {
+                        } else {
                             loadlayerToMap(fileContent, type, name, marker_image);
 
                             if (type.equals(MapDataCategory.POINT)) {
@@ -946,10 +952,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-
-//                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.mapbox_marker_icon_default);
-                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
-//                handleLocationPermission();
+                handleLocationPermission();
                 if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
                     handleLocationPermission();
@@ -1148,7 +1151,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay, marker_image);
+        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
 
 
     }
@@ -1159,31 +1162,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
-        Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
-        // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
-        Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-        poiMarkers.setIcon(defaultBitmap);
-
-
         Style defaultStyle;
-        switch (lineType) {
-            case MapDataCategory.ROAD:
-                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
 
-                break;
-            case MapDataCategory.RIVER:
-                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
-                break;
-            default:
-                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
-                break;
-        }
+        defaultStyle = new Style(null, Color.BLACK, 2f, 0x20AA1010);
 
         myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
         mapView.getOverlays().add(myOverLayWardBoarder);
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay, marker_image);
+        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
 
 
     }
@@ -1200,9 +1187,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             String jsonString = null;
             try {
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -1237,8 +1224,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             });
         }).start();
     }
-
-
 
 
     private LinkedHashMap HospitalWithDistance(List<HospitalAndCommon> hospitalAndCommonList) {
@@ -1469,8 +1454,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
     //------------ LocationListener implementation
     private final NetworkLocationIgnorer mIgnorer = new NetworkLocationIgnorer();
     long mLastTime = 0; // milliseconds
@@ -1552,8 +1535,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
+    @OnClick(R.id.fab_map_layer)
+    public void onViewClicked(View view) {
+        PopupMenu popup = new PopupMenu(HomeActivity.this, fabMapLayer);
+        popup.getMenuInflater().inflate(R.menu.layer_popup_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.menu_ward:
+                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+                    break;
+                case R.id.menu_municipal:
+                    loadMunicipalityBoarder();
+                    break;
+                case R.id.menu_office:
+                    break;
+            }
+            return true;
+        });
+        popup.show();
+    }
 }
 
 
