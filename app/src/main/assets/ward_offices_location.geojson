@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "Wards": "Ward Office 1", "X": 85.41853, "Y": 27.70042 }, "geometry": { "type": "Point", "coordinates": [ 85.41853, 27.70042 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 2", "X": 85.41853, "Y": 27.70042 }, "geometry": { "type": "Point", "coordinates": [ 85.41853, 27.70042 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 3", "X": 85.43583, "Y": 27.70208 }, "geometry": { "type": "Point", "coordinates": [ 85.43583, 27.70208 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 4", "X": 85.425467, "Y": 27.712753 }, "geometry": { "type": "Point", "coordinates": [ 85.425467, 27.712753 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 5", "X": 85.45533, "Y": 27.70353 }, "geometry": { "type": "Point", "coordinates": [ 85.45533, 27.70353 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 6", "X": 85.488681, "Y": 27.710911 }, "geometry": { "type": "Point", "coordinates": [ 85.488681, 27.710911 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 7", "X": 85.49361, "Y": 27.70656 }, "geometry": { "type": "Point", "coordinates": [ 85.49361, 27.70656 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 8", "X": 85.48279, "Y": 27.68608 }, "geometry": { "type": "Point", "coordinates": [ 85.48279, 27.68608 ] } },
+{ "type": "Feature", "properties": { "Wards": "Ward Office 9", "X": 85.49431, "Y": 27.67522 }, "geometry": { "type": "Point", "coordinates": [ 85.49431, 27.67522 ] } }
+]
+}
