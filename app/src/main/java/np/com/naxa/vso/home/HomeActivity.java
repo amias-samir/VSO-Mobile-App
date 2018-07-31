@@ -153,6 +153,8 @@ import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     private static final String TAG = "HomeActivity";
+    private static final String WARD_BOUNDARY = "ward_boundary";
+    private static final String MUNICIPALITY_BOUNDARY = "municipality_boundary";
 
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
@@ -467,6 +469,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
 //            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
 
+
         showOverlayOnMap(-1);
         moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
 
@@ -683,11 +686,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Pair pair) {
                         String fileContent = (String) pair.second;
                         mapView.getOverlays().clear();
-                        if(name.equals("changunarayan_new_wards.geojson")){
+                        if (name.equals("changunarayan_new_wards.geojson")) {
                             Log.d(TAG, "onNext: changunarayan_new_wards");
                             loadWardBoarderlayerToMap(fileContent, type, "",
                                     marker_image);
-                        }else {
+                        } else {
                             loadlayerToMap(fileContent, type, name, marker_image);
 
                             if (type.equals(MapDataCategory.POINT)) {
@@ -949,10 +952,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_location_toggle:
-
-//                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.mapbox_marker_icon_default);
-                showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
-//                handleLocationPermission();
+                handleLocationPermission();
                 if (currentLocation == null) {
                     Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
                     handleLocationPermission();
@@ -1186,7 +1186,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().add(myOverLayWardBoarder);
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils,  myOverLay, marker_image);
+        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
 
 
     }
@@ -1203,9 +1203,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             String jsonString = null;
             try {
+                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
 //                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -1240,8 +1240,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             });
         }).start();
     }
-
-
 
 
     private LinkedHashMap HospitalWithDistance(List<HospitalAndCommon> hospitalAndCommonList) {
@@ -1560,13 +1558,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
-                    ToastUtils.showToast("One");
+                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
                     break;
                 case R.id.menu_municipal:
                     loadMunicipalityBoarder();
                     break;
                 case R.id.menu_office:
-                    ToastUtils.showToast("Three");
                     break;
             }
             return true;
