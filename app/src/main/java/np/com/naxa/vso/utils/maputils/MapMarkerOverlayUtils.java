@@ -232,4 +232,83 @@ public class MapMarkerOverlayUtils {
         return mOverlay;
     }
 
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromWardDetailsModel(Context context, WardDetailsModel wardDetailsModel, MapView mapView, int marker_image) {
+        ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+        String name = wardDetailsModel.getName()
+                + "\n" + wardDetailsModel.getDistrict()
+                + "\n" + wardDetailsModel.getWard()
+                + "\n" +"Area : "+ wardDetailsModel.getArea()+"Km. Square";
+        double latitude = wardDetailsModel.getLatitude();
+        double longitude = wardDetailsModel.getLongitude();
+
+        Gson gson = new Gson();
+        WardDetailsModel obj = wardDetailsModel;
+        String jsonInString = gson.toJson(obj).toString();
+        Log.d(TAG, "overlayFromCommon: " + jsonInString);
+
+        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
+                context.getResources().getDrawable(marker_image),
+                context.getResources().getDrawable(marker_image),
+                white,
+                new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+                    @Override
+                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().animateTo(new GeoPoint(latitude, longitude));
+                        MarkerOnWardClickEvent(context, item);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onItemLongPress(int index, OverlayItem item) {
+                        return false;
+                    }
+                },
+                context);
+
+        return mOverlay;
+    }
+
+    public void MarkerOnWardClickEvent(Context context, OverlayItem item) {
+        Log.d("Title", "Marker Clicked" + item.getTitle());
+        Log.d("Snippet", "Marker Clicked" + item.getSnippet());
+        Log.d("Id", "Marker Clicked" + item.getUid());
+
+
+        //set up dialog
+        Dialog dialog = new Dialog(context);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.setContentView(R.layout.marker_tap_popup_layout);
+
+        dialog.setCancelable(true);
+
+        Window window = dialog.getWindow();
+        WindowManager.LayoutParams wlp = window.getAttributes();
+
+        wlp.gravity = Gravity.CENTER;
+        wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        window.setAttributes(wlp);
+        //there are a lot of settings, for dialog, check them all out!
+
+        //set up text
+        TextView map_popup_header = (TextView) dialog.findViewById(R.id.map_popup_header);
+        map_popup_header.setText(item.getTitle());
+
+        //set up button
+        TextView imgMoreInfo = (TextView) dialog.findViewById(R.id.map_more_info_textView);
+        imgMoreInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Clicked", "more info");
+//                Bundle bundle = new Bundle();
+//                Intent intent = new Intent(context, MarkerDetailsDisplayActivity.class);
+//                bundle.putString("data", item.getSnippet());
+//                intent.putExtras(bundle);
+//                ((Activity) context).startActivity(intent);
+
+            }
+        });
+        dialog.show();
+    }
 }
