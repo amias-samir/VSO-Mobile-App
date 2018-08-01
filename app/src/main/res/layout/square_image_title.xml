@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    card_view:cardUseCompatPadding="true"
-
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardBackgroundColor="@android:color/white">
+    card_view:cardBackgroundColor="@android:color/white"
+    card_view:cardElevation="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,40 +16,39 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_marginTop="24dp"
-            android:layout_centerHorizontal="true"
             android:id="@+id/iv"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="24dp"
             android:scaleType="fitXY"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/iv"
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/iv"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center|bottom"
             android:gravity="center"
+            android:paddingBottom="@dimen/default_padding"
             android:paddingLeft="@dimen/default_padding"
             android:paddingRight="@dimen/default_padding"
-            android:paddingBottom="@dimen/default_padding"
             android:text="C"
             android:textColor="@android:color/black"
             android:textStyle="bold" />
 
         <TextView
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/tv_title"
             android:id="@+id/tv_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center|bottom"
             android:text="C"
-           />
+            android:visibility="gone" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

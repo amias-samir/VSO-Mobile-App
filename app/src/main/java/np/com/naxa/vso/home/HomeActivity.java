@@ -153,8 +153,6 @@ import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     private static final String TAG = "HomeActivity";
-    private static final String WARD_BOUNDARY = "ward_boundary";
-    private static final String MUNICIPALITY_BOUNDARY = "municipality_boundary";
 
     @BindView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingPanel;
@@ -511,12 +509,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
             return true;
         });
+        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 550, getResources().getDisplayMetrics());
+        SlidingUpPanelLayout.LayoutParams params = new SlidingUpPanelLayout.LayoutParams(SlidingUpPanelLayout.LayoutParams.MATCH_PARENT, gridHeight);
+        dragView.setLayoutParams(params);
     }
 
     private void toggleSliderHeight() {
 
         Resources r = getResources();
-        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 500, r.getDisplayMetrics());
+        int gridHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 550, r.getDisplayMetrics());
 
         int listHeight = SlidingUpPanelLayout.LayoutParams.MATCH_PARENT;
         int newHeight;
@@ -602,7 +603,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         dataSetInfoText = getString(R.string.dataset_overview, commonPlacesAttrbs.size() + "");
-
 
                     }
 
@@ -1497,7 +1497,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onMainCategoriesViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_resources:
-
                 mainCategoryPosition = 1;
                 setupGridRecycler(MySection.getResourcesCatergorySections());
                 break;
@@ -1514,7 +1513,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         emulateTabBehavaiour(view.getId());
-        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        }
     }
 
     private void emulateTabBehavaiour(int tappedID) {
@@ -1526,16 +1527,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         ((TextView) findViewById(tappedID)).setTypeface(null, Typeface.BOLD);
         ((TextView) findViewById(tappedID)).setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        ((TextView) findViewById(tappedID)).setBackgroundColor(getResources().getColor(R.color.mapboxWhite));
         for (Integer curId : a) {
+            ((TextView) findViewById(curId)).setBackgroundColor(getResources().getColor(R.color.colorWindowBackground));
             ((TextView) findViewById(curId)).setTypeface(null, Typeface.NORMAL);
             ((TextView) findViewById(curId)).setTextColor(ContextCompat.getColor(this, R.color.black));
         }
-
-
     }
 
 
-    int wardCount=0;
+    int wardCount = 0;
+
     @OnClick(R.id.fab_map_layer)
     public void onViewClicked(View view) {
         PopupMenu popup = new PopupMenu(HomeActivity.this, fabMapLayer);
@@ -1544,13 +1546,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
                     wardCount++;
-                    if(wardCount%2 == 0){
+                    if (wardCount % 2 == 0) {
                         mapView.getOverlays().remove(myOverLayWardBoarder);
                         mapView.removeAllViews();
                         mapView.invalidate();
-                    }else {
-                        showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+                        return true;
                     }
+                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+
                     break;
                 case R.id.menu_municipal:
                     loadMunicipalityBoarder();

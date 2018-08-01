@@ -2,42 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:animateLayoutChanges="true"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     android:orientation="horizontal">
 
 
     <TextView
-        android:textStyle="bold"
-        android:textColor="@color/colorPrimary"
         android:id="@+id/tv_resources"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Resources" />
+        android:text="Resources"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold" />
 
     <TextView
-        android:textColor="@color/black"
         android:id="@+id/tv_hazard_and_vulnerability"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@color/colorWindowBackground"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Hazard and Vulnerability" />
+        android:text="Hazard and Vulnerability"
+        android:textColor="@color/black" />
 
     <TextView
-        android:textColor="@color/black"
         android:id="@+id/tv_base_data"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_weight="1"
+        android:background="@color/colorWindowBackground"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Base data" />
+        android:text="Base data"
+        android:textColor="@color/black" />
 
 </LinearLayout>
