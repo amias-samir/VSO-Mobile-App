@@ -29,7 +29,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -243,7 +242,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
-    private int gridPosition;
+    private int gridPosition = -1;
     private int mainCategoryPosition = 0;
 
     //location listner
@@ -561,6 +560,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+            wardShowCount =0;
             MySection a = sectionAdapter.getData().get(position);
             MapDataCategory gridItem = a.t;
 
@@ -1535,7 +1535,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    int wardCount=0;
+    int wardShowCount =0;
     @OnClick(R.id.fab_map_layer)
     public void onViewClicked(View view) {
         PopupMenu popup = new PopupMenu(HomeActivity.this, fabMapLayer);
@@ -1543,10 +1543,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
-                    wardCount++;
-                    if(wardCount%2 == 0){
+                    wardShowCount++;
+                    if(wardShowCount %2 == 0){
+                        mapView.getOverlays().clear();
                         mapView.getOverlays().remove(myOverLayWardBoarder);
                         mapView.removeAllViews();
+                        mapView.getOverlays().add(myOverLayBoarder);
                         mapView.invalidate();
                     }else {
                         showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
