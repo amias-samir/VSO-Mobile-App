@@ -553,6 +553,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    String geoJsonFileName = "", geoJsonType = "", geoJsonName = "";
+    int geoJsonmarkerImage;
     private void setupGridRecycler(List<MySection> mySections) {
         LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
         recyclerDataCategories.setLayoutManager(mLayoutManager);
@@ -569,6 +571,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 ToastUtils.showToast("Error loading " + a.t.getName());
                 return;
             }
+
+
+            geoJsonFileName = a.t.getFileName();
+            geoJsonName = a.t.getName();
+            geoJsonType = a.t.getType();
+            geoJsonmarkerImage = a.t.getMarker_image();
 
             showOverlayOnMap(a.t.getFileName(), a.t.getType(), a.t.getMarker_image());
             showDataOnList(a.t.getName(), a.t.getType());
@@ -1113,6 +1121,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
+        if(gridPosition != -1 && wardShowCount %2 != 0){
+            mapView.getOverlays().add(myOverLayWardBoarder);
+            mapView.getOverlays().remove(myOverLayBoarder);
+        }
+
         MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
 
         final KmlDocument kmlDocument = new KmlDocument();
@@ -1168,10 +1181,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
         mapView.getOverlays().add(myOverLayWardBoarder);
-        MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
-        MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-        mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
+        mapView.invalidate();
 
+        if(gridPosition == -1) {
+            MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
+            MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
+            mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
+        }
 
     }
 
@@ -1551,9 +1567,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         mapView.removeAllViews();
                         mapView.getOverlays().add(myOverLayBoarder);
                         mapView.invalidate();
+
+                        showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+                        showDataOnList(geoJsonName, geoJsonType);
+
+                        Log.d(TAG, "onViewClicked: hide boundary");
                         return true;
                     }
                     showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+                    showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+                    Log.d(TAG, "onViewClicked: show boundary with dataset");
+                    showDataOnList(geoJsonName, geoJsonType);
 
                     break;
                 case R.id.menu_municipal:
