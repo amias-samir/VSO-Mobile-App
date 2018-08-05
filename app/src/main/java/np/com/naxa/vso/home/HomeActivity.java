@@ -1172,10 +1172,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         final KmlDocument kmlDocument = new KmlDocument();
         kmlDocument.parseGeoJSON(geoJson);
 
-        Style defaultStyle;
 
-        KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
-        myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
+        myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, new OverlayPopupHiddenStyler(), kmlDocument);
         mapView.getOverlays().add(myOverLayWardBoarder);
         mapView.invalidate();
 
