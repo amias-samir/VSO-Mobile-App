@@ -64,6 +64,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
+import org.osmdroid.bonuspack.kml.KmlFeature;
 import org.osmdroid.bonuspack.kml.Style;
 import org.osmdroid.bonuspack.routing.GoogleRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -115,6 +116,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
+import np.com.naxa.vso.OverlayPopupHiddenStyler;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
@@ -136,6 +138,7 @@ import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
+import np.com.naxa.vso.utils.maputils.MyKmlStyler;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
@@ -292,7 +295,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home_new_new);
         ButterKnife.bind(this);
 
-        rlMainCategoryList = (LinearLayout)findViewById(R.id.main_categories_list);
+        rlMainCategoryList = (LinearLayout) findViewById(R.id.main_categories_list);
 
         repo = new MapDataRepository();
 
@@ -546,6 +549,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     String geoJsonFileName = "", geoJsonType = "", geoJsonName = "";
     int geoJsonmarkerImage;
+
     private void setupGridRecycler(List<MySection> mySections) {
         LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
         recyclerDataCategories.setLayoutManager(mLayoutManager);
@@ -554,7 +558,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            wardShowCount =0;
+            wardShowCount = 0;
             MySection a = sectionAdapter.getData().get(position);
             MapDataCategory gridItem = a.t;
 
@@ -1114,7 +1118,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
-        if(gridPosition != -1 && wardShowCount %2 != 0){
+        if (gridPosition != -1 && wardShowCount % 2 != 0) {
             mapView.getOverlays().add(myOverLayWardBoarder);
             mapView.getOverlays().remove(myOverLayBoarder);
         }
@@ -1170,13 +1174,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         Style defaultStyle;
 
-        defaultStyle = new Style(null, Color.BLACK, 2f, 0x20AA1010);
-
-        myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+        KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
+        myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
         mapView.getOverlays().add(myOverLayWardBoarder);
         mapView.invalidate();
 
-        if(gridPosition == -1) {
+        if (gridPosition == -1) {
             MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
             MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
             mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
@@ -1215,9 +1218,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Drawable defaultMarker = getResources().getDrawable(R.drawable.mapbox_marker_icon_default);
             Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
 //
-            final Style defaultStyle = new Style(defaultBitmap, 0x901010AA, 3f, 0x20AA1010);
-//            KmlFeature.Styler styler = new MyKmlStyler();
-            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
+            KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
+            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
 
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
@@ -1546,7 +1548,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    int wardShowCount =0;
+    int wardShowCount = 0;
+
     @OnClick(R.id.fab_map_layer)
     public void onViewClicked(View view) {
         PopupMenu popup = new PopupMenu(HomeActivity.this, fabMapLayer);
@@ -1555,7 +1558,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
                     wardShowCount++;
-                    if(wardShowCount %2 == 0){
+                    if (wardShowCount % 2 == 0) {
                         mapView.getOverlays().clear();
                         mapView.getOverlays().remove(myOverLayWardBoarder);
                         mapView.removeAllViews();
