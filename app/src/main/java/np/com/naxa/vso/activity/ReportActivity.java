@@ -64,6 +64,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     Button vSave;
     LocationManager DcoLocationManager;
     Toolbar toolbar;
+    private boolean specifyOthers;
 
     public static final int GEOPOINT_RESULT_CODE = 1994;
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
@@ -129,6 +130,13 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 }
                 incident_time = tvIncidentTime.getEditText().getText().toString();
 //                incident_type = spinnerIncidentType.getSelectedItem().toString();
+
+                if(specifyOthers){
+                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
+                }else {
+                    incident_type = spinnerIncidentType.getSelectedItem().toString();
+                }
+
                 ward = spinnerWard.getSelectedItem().toString();
                 incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
                 full_name = tvName.getEditText().getText().toString();
@@ -184,12 +192,14 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 Log.d(TAG, "onItemSelected: "+selectedItem);
                 if(selectedItem.equals("Others"))
                 {
+                    specifyOthers = true;
                     tvIncidentTypeOthers.getEditText().setVisibility(View.VISIBLE);
-                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
+//                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
                 }else {
+                    specifyOthers = false;
                     tvIncidentTypeOthers.getEditText().setVisibility(View.GONE);
                     tvIncidentTypeOthers.getEditText().setText("");
-                    incident_type = spinnerIncidentType.getSelectedItem().toString();
+//                    incident_type = spinnerIncidentType.getSelectedItem().toString();
                 }
             } // to close the onItemSelected
             public void onNothingSelected(AdapterView<?> parent)
@@ -395,12 +405,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 if (progressDialog.isShowing() && progressDialog != null) {
                     progressDialog.dismiss();
                 }
-
-                String message = "Internet Connection Error!, please try again later";
-                Log.d("", "onFailure: ");
+                String message = "Error uploading data!, please try again later.\n"+t.getMessage();
+                Log.d("", "onFailure: "+t.getMessage().toString());
 
                 if (t instanceof SocketTimeoutException) {
-                    message = "slow internet connection, please try again later";
+                    message = "Slow internet connection, please try again later";
                 }
 
                 DialogFactory.createSimpleOkErrorDialog(ReportActivity.this, "Sending Failed!!", message).show();
