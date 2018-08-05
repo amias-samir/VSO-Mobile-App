@@ -30,11 +30,16 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import id.zelory.compressor.Compressor;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
+import np.com.naxa.vso.utils.ToastUtils;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -252,7 +257,33 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
 
                 imageFilePath = imageFile.getAbsolutePath();
-                imageFileToBeUploaded = imageFile;
+
+                int file_size = Integer.parseInt(String.valueOf(imageFile.length()/1024));
+                Log.d(TAG, "onImagePicked: "+file_size+" KB");
+
+
+                new Compressor(ReportActivity.this)
+                        .compressToFileAsFlowable(imageFile)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<File>() {
+                            @Override
+                            public void accept(File file) {
+                                imageFileToBeUploaded = file;
+                                int file_size = Integer.parseInt(String.valueOf(imageFileToBeUploaded.length()/1024));
+                                Log.d(TAG, "onImagePicked: "+file_size+" KB");
+
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) {
+                                throwable.printStackTrace();
+//                                showError(throwable.getMessage());
+                                ToastUtils.showToast(throwable.getMessage().toString());
+                                imageFileToBeUploaded = imageFile;
+                            }
+                        });
+
                 Glide
                         .with(getApplicationContext())
                         .load(imageFilePath)
