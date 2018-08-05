@@ -408,7 +408,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         }));
 
-        floatingSearchView.setDimBackground(true);
+
     }
 
     private void setupMap() {
