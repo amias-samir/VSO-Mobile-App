@@ -16,6 +16,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -28,6 +29,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
+import android.util.TimeUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -42,6 +44,7 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -99,6 +102,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -213,6 +217,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fabMapLayer;
     @BindView(R.id.card_view)
     CardView cardView;
+    @BindView(R.id.expand_icon_up_down_toggle)
+    ExpandIconView updownloadToggleIcon;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -311,7 +317,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupGridRecycler(MySection.getResourcesCatergorySections());
 
         slidingPanel.setAnchorPoint(0.4f);
-        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        setupSlidingPanel();
 
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
@@ -1526,6 +1533,46 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
+    }
+
+    private void arrowAnimation( ) {
+
+        final Animation animShake = AnimationUtils.loadAnimation(this, R.anim.shake);
+
+        CountDownTimer timer = new CountDownTimer(TimeUnit.SECONDS.toMillis(20), TimeUnit.SECONDS.toMillis(2)) {
+            public void onTick(long millisUntilFinished) {
+                updownloadToggleIcon.startAnimation(animShake);
+            }
+
+            public void onFinish() {
+            }
+        };
+        timer.start();
+    }
+
+
+    private void setupSlidingPanel() {
+        updownloadToggleIcon.setState(ExpandIconView.LESS, true);
+        arrowAnimation();
+
+        slidingPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                switch (newState) {
+                    case EXPANDED:
+                        updownloadToggleIcon.setState(ExpandIconView.MORE, true);
+                        break;
+                    default:
+                        updownloadToggleIcon.setState(ExpandIconView.LESS, true);
+
+                        break;
+                }
+            }
+        });
     }
 
     private void emulateTabBehavaiour(int tappedID) {
