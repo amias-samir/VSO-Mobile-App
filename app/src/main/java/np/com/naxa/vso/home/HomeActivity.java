@@ -149,7 +149,7 @@ import timber.log.Timber;
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, LocationListener, MapEventsReceiver {
 
     private static final String TAG = "HomeActivity";
 
@@ -245,6 +245,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     //location listner
     protected DirectedLocationOverlay myLocationOverlay;
+    MapEventsOverlay mapEventsOverlay;
     //MyLocationNewOverlay myLocationNewOverlay;
     protected LocationManager mLocationManager;
     private GeoPoint currentLocation;
@@ -268,6 +269,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.tv_go_back)
     public TextView tvGoBack;
 
+    LinearLayout rlMainCategoryList;
+
     public static void start(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
@@ -288,6 +291,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_new_new);
         ButterKnife.bind(this);
+
+        rlMainCategoryList = (LinearLayout)findViewById(R.id.main_categories_list);
+
         repo = new MapDataRepository();
 
         handleStoragePermission();
@@ -434,22 +440,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         loadMunicipalityBoarder();
 
 
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, new MapEventsReceiver() {
-            @Override
-            public boolean singleTapConfirmedHelper(GeoPoint p) {
-
-                InfoWindow.closeAllInfoWindowsOn(mapView);
-                slidingPanel.setPanelHeight(110);
-                return false;
-            }
-
-            @Override
-            public boolean longPressHelper(GeoPoint p) {
-                return false;
-            }
-        });
-
-        mapView.getOverlays().add(0, mapEventsOverlay);
+        mapEventsOverlay = new MapEventsOverlay(this, this);
         mapController.setCenter(centerPoint);
 
 //        for clustering
@@ -655,8 +646,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case 1:
 //                tvDataSet.setText(generateDataCardText());
                 tvDataSet.setText(dataSetInfoText);
-                tvDataFilter.setVisibility(View.VISIBLE);
+                tvDataFilter.setVisibility(View.GONE);
                 tvGoBack.setVisibility(View.VISIBLE);
+                rlMainCategoryList.setVisibility(View.GONE);
                 break;
         }
     }
@@ -952,6 +944,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         } else {
+            rlMainCategoryList.setVisibility(View.VISIBLE);
             switchViews();
         }
     }
@@ -1228,6 +1221,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             runOnUiThread(() -> {
                 mapView.getOverlays().add(myOverLayBoarder);
+                mapView.getOverlays().add(0, mapEventsOverlay);
                 MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
 
 
@@ -1589,6 +1583,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         });
         popup.show();
+    }
+
+
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        Log.d(TAG, "singleTapConfirmedHelper:  ");
+        InfoWindow.closeAllInfoWindowsOn(mapView);
+        InfoWindow.getOpenedInfoWindowsOn(mapView).clear();
+        slidingPanel.setPanelHeight(110);
+        return false;
+    }
+
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+        Log.d(TAG, "longPressHelper: ");
+        return false;
     }
 }
 

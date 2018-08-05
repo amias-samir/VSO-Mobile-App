@@ -123,7 +123,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     return;
                 }
                 incident_time = tvIncidentTime.getEditText().getText().toString();
-                incident_type = spinnerIncidentType.getSelectedItem().toString();
+//                incident_type = spinnerIncidentType.getSelectedItem().toString();
                 ward = spinnerWard.getSelectedItem().toString();
                 incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
                 full_name = tvName.getEditText().getText().toString();
@@ -138,7 +138,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     header.put("status", "pending");
                     header.put("incident_time", incident_time);
                     header.put("incident_type", incident_type);
-                    header.put("incident_type_others", incident_type_others);
+//                    header.put("incident_type_others", incident_type_others);
                     header.put("ward", ward);
                     header.put("name", full_name);
                     header.put("contact_no", contact_no);
@@ -180,9 +180,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 if(selectedItem.equals("Others"))
                 {
                     tvIncidentTypeOthers.getEditText().setVisibility(View.VISIBLE);
+                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
                 }else {
                     tvIncidentTypeOthers.getEditText().setVisibility(View.GONE);
                     tvIncidentTypeOthers.getEditText().setText("");
+                    incident_type = spinnerIncidentType.getSelectedItem().toString();
                 }
             } // to close the onItemSelected
             public void onNothingSelected(AdapterView<?> parent)

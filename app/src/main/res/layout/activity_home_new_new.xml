@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/main_categories_list"
-                    android:layout_toLeftOf="@id/tv_data_filter"
+                    android:layout_alignParentRight="true"
                     android:drawableTop="@drawable/ic_arrow_back_black_24dp"
                     android:gravity="center"
                     android:padding="@dimen/spacing_medium"
