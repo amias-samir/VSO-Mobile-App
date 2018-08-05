@@ -17,15 +17,16 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/view2"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginRight="@dimen/spacing_large"
             android:background="@color/light_gray"
             android:elevation="12dp"
             android:innerRadius="0dp"
             android:shape="ring"
             android:thicknessRatio="1.9"
-            app:cardCornerRadius="40dp">
+            app:cardCornerRadius="30dp"
+            android:layout_gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/imageView1"
@@ -38,7 +39,7 @@
 
         <LinearLayout
             android:id="@+id/linear_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -69,7 +70,13 @@
 
 
         </LinearLayout>
+
+
     </LinearLayout>
 
-
+    <ImageView
+        android:layout_marginBottom="@dimen/spacing_medium"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/warm_grey"/>
 </LinearLayout>
