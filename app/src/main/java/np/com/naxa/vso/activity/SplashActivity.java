@@ -1,6 +1,10 @@
 package np.com.naxa.vso.activity;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +41,8 @@ import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
 public class SplashActivity extends AppCompatActivity {
@@ -48,6 +54,8 @@ public class SplashActivity extends AppCompatActivity {
     private EducationalInstitutesViewModel educationalInstitutesViewModel;
     private OpenSpaceViewModel openSpaceViewModel;
     private DatabaseDataSPClass sharedpref = new DatabaseDataSPClass(this);
+
+    private final int RESULT_STORAGE_PERMISSION = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +77,7 @@ public class SplashActivity extends AppCompatActivity {
 //            }
 //        }, 2000);
 //
+
 
         parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
             @Override
@@ -94,9 +103,37 @@ public class SplashActivity extends AppCompatActivity {
                 Timber.i("Parsing completed sucessfully");
 
                 HomeActivity.start(SplashActivity.this);
+
             }
         });
 
+//        handleStoragePermission();
+
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//                Log.v(TAG, "Permission is granted");
+//                //File write logic here
+//                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+//                finish();
+//            } else {
+//                startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+//                finish();
+//            }
+//        }
+
+
+    }
+
+
+    @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
+    private void handleStoragePermission() {
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+        } else {
+            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
+                    RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 
 

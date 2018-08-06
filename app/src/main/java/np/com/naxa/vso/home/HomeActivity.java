@@ -45,6 +45,7 @@ import android.widget.ViewSwitcher;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.zagum.expandicon.ExpandIconView;
+import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -138,6 +139,7 @@ import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.utils.JSONParser;
+import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
@@ -295,6 +297,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    SharedPreferenceUtils sharedPreferenceUtils;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -302,6 +306,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
 
         rlMainCategoryList = (LinearLayout) findViewById(R.id.main_categories_list);
+
+        sharedPreferenceUtils = new SharedPreferenceUtils(HomeActivity.this);
 
         repo = new MapDataRepository();
 
@@ -312,6 +318,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        setupMapBox();
 
         setupMap();
+
         setupBottomBar();
         setupListRecycler();
         setupGridRecycler(MySection.getResourcesCatergorySections());
@@ -691,6 +698,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showOverlayOnMap(String name, String type, int marker_image) {
+
+        Log.d(TAG, "showOverlayOnMap: "+name);
+
         repo.getGeoJsonString(name)
                 .subscribe(new DisposableObserver<Pair>() {
                     @Override
@@ -898,7 +908,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            mapView.invalidate();
+            Log.d(TAG, "handleStoragePermission: outside ");
+
+            if(sharedPreferenceUtils.getBoolanValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, true)){
+                sharedPreferenceUtils.setValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, false);
+                startActivity(new Intent(HomeActivity.this, HomeActivity.class));
+                Log.d(TAG, "handleStoragePermission: inside ");
+//             finish();
+            }
+
+
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -926,6 +945,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 if (myLocationNewOverlay.getMyLocation() != null) {
                     currentLocation = new GeoPoint(myLocationNewOverlay.getMyLocation());
                 }
+
 
                 mapView.getOverlays().add(myLocationNewOverlay);
                 myLocationNewOverlay.enableMyLocation();
