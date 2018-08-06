@@ -29,7 +29,7 @@ public class MySection extends SectionEntity<MapDataCategory> {
         list.add(new MySection(new MapDataCategory(R.drawable.ic_financial, "Financial Institution", "financial_institution.geojson", MapDataCategory.POINT, R.drawable.marker_bank)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, "Public Toilets", null, MapDataCategory.POINT, R.drawable.marker_toilets)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, "Industries", "industries_updated_geojson.geojson", MapDataCategory.POINT, R.drawable.marker_industry)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", null, MapDataCategory.POINT, R.drawable.marker_transportation)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", null, MapDataCategory.POINT, R.drawable.marker_transportaion)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, "Water Bodies", null, MapDataCategory.BOUNDARY, R.drawable.marker_water)));
         return list;
     }
@@ -52,7 +52,7 @@ public class MySection extends SectionEntity<MapDataCategory> {
         List<MySection> list = new ArrayList<>();
         list.add(new MySection(new MapDataCategory(R.drawable.ic_boundry, "Changunarayan Municipality Boundary", "changunarayan_municipality_boundary.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_wards, "Changunarayan Municipality Wards", "changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, "Road Network", "road_network.geojson", MapDataCategory.ROAD, R.drawable.marker_road)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, "Road Network", "road_network.geojson", MapDataCategory.ROAD, R.drawable.marker_roads)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_river_network, "River Network", "river_network.geojson", MapDataCategory.RIVER, R.drawable.marker_river)));
         return list;
     }
