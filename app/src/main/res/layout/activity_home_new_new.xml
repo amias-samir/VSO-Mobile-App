@@ -26,6 +26,12 @@
         android:focusable="false"
         android:orientation="vertical">
 
+        <com.github.zagum.expandicon.ExpandIconView
+            android:id="@+id/expand_icon_up_down_toggle"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center" />
+
         <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
             android:id="@+id/bnve"
             android:layout_width="match_parent"
@@ -86,8 +92,8 @@
                     android:id="@+id/tv_go_back"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/main_categories_list"
                     android:layout_alignParentRight="true"
+                    android:layout_below="@id/main_categories_list"
                     android:drawableTop="@drawable/ic_arrow_back_black_24dp"
                     android:gravity="center"
                     android:padding="@dimen/spacing_medium"

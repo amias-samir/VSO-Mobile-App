@@ -6,25 +6,32 @@
     android:id="@+id/parent_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:fitsSystemWindows="true"
     tools:context=".home.HomeActivity">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:src="@color/colorPrimary"/>
+        android:src="@color/colorPrimary" />
+
+
+
+
 
     <FrameLayout
-        android:id="@+id/dim_background"
 
+        android:id="@+id/dim_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="50dp">
 
         <com.arlib.floatingsearchview.FloatingSearchView
+
             android:id="@+id/floating_search_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:floatingSearch_close_search_on_keyboard_dismiss="false"
             app:floatingSearch_dimBackground="false"
             app:floatingSearch_dismissOnOutsideTouch="true"
@@ -36,4 +43,6 @@
             app:floatingSearch_showSearchKey="true"
             app:floatingSearch_suggestionsListAnimDuration="250" />
     </FrameLayout>
+
+
 </RelativeLayout>
