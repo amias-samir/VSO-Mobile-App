@@ -9,6 +9,7 @@ import np.com.naxa.vso.network.UrlClass;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -35,6 +36,7 @@ public class NetworkApiClient {
             retrofit = new Retrofit.Builder()
                     .baseUrl(UrlClass.BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .client(okHttpClient)
                     .build();
         }

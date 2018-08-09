@@ -30,15 +30,20 @@ import np.com.naxa.vso.DatabaseDataSPClass;
 import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
+import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
 import np.com.naxa.vso.home.model.MapDataCategory;
+import np.com.naxa.vso.network.model.GeoJsonCategoryDetails;
+import np.com.naxa.vso.network.retrofit.NetworkApiClient;
+import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
+import np.com.naxa.vso.viewmodel.GeoJsonCategoryViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -57,11 +62,20 @@ public class SplashActivity extends AppCompatActivity {
 
     private final int RESULT_STORAGE_PERMISSION = 50;
 
+    private NetworkApiInterface apiInterface;
+    GeoJsonCategoryViewModel geoJsonCategoryViewModel;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spash);
         repository = new MapDataRepository();
+
+        apiInterface = NetworkApiClient.getAPIClient().create(NetworkApiInterface.class);
+        geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+
+
 
         commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
         hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
@@ -122,6 +136,7 @@ public class SplashActivity extends AppCompatActivity {
 //            }
 //        }
 
+        fetchGeoJsonCategoryList();
 
     }
 
@@ -493,5 +508,41 @@ public class SplashActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void fetchGeoJsonCategoryList() {
+        apiInterface
+                .getGeoJsonCategoryDetails()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(new Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>() {
+                    @Override
+                    public ObservableSource<List<GeoJsonCategoryEntity>> apply(GeoJsonCategoryDetails geoJsonCategoryDetails) throws Exception {
+                        return Observable.just(geoJsonCategoryDetails.getData());
+                    }
+                })
+                .flatMapIterable(new Function<List<GeoJsonCategoryEntity>, Iterable<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public Iterable<GeoJsonCategoryEntity> apply(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) throws Exception {
+                        return geoJsonCategoryEntities;
+                    }
+                })
+                .subscribe(new DisposableObserver<GeoJsonCategoryEntity>() {
+                    @Override
+                    public void onNext(GeoJsonCategoryEntity geoJsonCategoryEntity) {
+                        geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 }

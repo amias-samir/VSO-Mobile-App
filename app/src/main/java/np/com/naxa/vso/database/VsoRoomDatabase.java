@@ -11,11 +11,13 @@ import android.support.annotation.NonNull;
 import np.com.naxa.vso.database.dao.CommonPlacesAttrbDao;
 import np.com.naxa.vso.database.dao.ContactDao;
 import np.com.naxa.vso.database.dao.EducationalInstitutesDao;
+import np.com.naxa.vso.database.dao.GeoJsonCategoryDao;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
 import np.com.naxa.vso.database.dao.OpenSpaceDao;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.Contact;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
+import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
@@ -23,7 +25,8 @@ import np.com.naxa.vso.database.entity.OpenSpace;
  * Created by samir on 4/22/2018.
  */
 
-@Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class
+@Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class,
+        GeoJsonCategoryEntity.class
 }, version = 10, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
@@ -33,6 +36,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
     public abstract CommonPlacesAttrbDao commonPlacesAttrbDao();
     public abstract HospitalFacilitiesDao hospitalFacilitiesDao();
     public abstract EducationalInstitutesDao educationalInstitutesDao();
+    public abstract GeoJsonCategoryDao geoJsonCategoryDao();
 
     private static VsoRoomDatabase INSTANCE;
 
@@ -78,6 +82,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
         private final CommonPlacesAttrbDao mCommonPlacesAttrbDao;
         private final HospitalFacilitiesDao mHospitalFacilitiesDao;
         private final EducationalInstitutesDao mEducationalInstitutesDao;
+        private final GeoJsonCategoryDao mGeoJsonCategoryDao;
 
         PopulateDbAsync(VsoRoomDatabase db) {
             mContactDao = db.contactDao();
@@ -85,6 +90,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
             mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
             mHospitalFacilitiesDao = db.hospitalFacilitiesDao();
             mEducationalInstitutesDao = db.educationalInstitutesDao();
+            mGeoJsonCategoryDao = db.geoJsonCategoryDao();
 
         }
 
