@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,7 @@ import np.com.naxa.vso.viewmodel.GeoJsonCategoryViewModel;
 import np.com.naxa.vso.viewmodel.GeoJsonListViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -542,8 +545,22 @@ public class SplashActivity extends AppCompatActivity {
                 .subscribe(new DisposableObserver<ResponseBody>() {
                     @Override
                     public void onNext(ResponseBody s) {
-                        Log.d(TAG, "onNext: GeoJson "+s.source().inputStream().toString());
-                        geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], s.source().inputStream().toString()));
+
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(s.byteStream()));
+                        StringBuilder sb = new StringBuilder();
+                        String line = null;
+                        try {
+
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line).append("\n");
+                            }
+                            reader.close();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG, "onNext: GeoJson "+sb.toString());
+
+                        geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], sb.toString()));
                     }
 
                     @Override
