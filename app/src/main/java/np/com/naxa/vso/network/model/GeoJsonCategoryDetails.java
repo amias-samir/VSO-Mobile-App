@@ -32,4 +32,11 @@ public class GeoJsonCategoryDetails {
         this.data = data;
     }
 
+    @Override
+    public String toString() {
+        return "GeoJsonCategoryDetails{" +
+                "status=" + status +
+                ", data=" + data +
+                '}';
+    }
 }

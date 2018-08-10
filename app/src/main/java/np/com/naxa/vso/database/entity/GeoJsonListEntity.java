@@ -24,11 +24,11 @@ public class GeoJsonListEntity {
     @SerializedName("category_json")
     @ColumnInfo(name = "category_json")
     @Expose
-    private String categoryTable;
+    private String categoryJson;
 
-    public GeoJsonListEntity(String categoryName, String categoryTable) {
+    public GeoJsonListEntity(String categoryName, String categoryJson) {
         this.categoryName = categoryName;
-        this.categoryTable = categoryTable;
+        this.categoryJson = categoryJson;
     }
 
     public String getCategoryName() {
@@ -39,19 +39,19 @@ public class GeoJsonListEntity {
         this.categoryName = categoryName;
     }
 
-    public String getCategoryTable() {
-        return categoryTable;
-    }
-
-    public void setCategoryTable(String categoryTable) {
-        this.categoryTable = categoryTable;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCategoryJson() {
+        return categoryJson;
+    }
+
+    public void setCategoryJson(String categoryJson) {
+        this.categoryJson = categoryJson;
     }
 }

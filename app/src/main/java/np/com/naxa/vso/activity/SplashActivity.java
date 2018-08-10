@@ -2,9 +2,6 @@ package np.com.naxa.vso.activity;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +28,7 @@ import np.com.naxa.vso.database.databaserepository.CommonPlacesAttrbRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
+import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
@@ -44,8 +42,10 @@ import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
 import np.com.naxa.vso.viewmodel.GeoJsonCategoryViewModel;
+import np.com.naxa.vso.viewmodel.GeoJsonListViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
+import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
@@ -64,6 +64,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private NetworkApiInterface apiInterface;
     GeoJsonCategoryViewModel geoJsonCategoryViewModel;
+    GeoJsonListViewModel geoJsonListViewModel;
 
 
     @Override
@@ -74,6 +75,7 @@ public class SplashActivity extends AppCompatActivity {
 
         apiInterface = NetworkApiClient.getAPIClient().create(NetworkApiInterface.class);
         geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+        geoJsonListViewModel = ViewModelProviders.of(this).get(GeoJsonListViewModel.class);
 
 
 
@@ -512,10 +514,10 @@ public class SplashActivity extends AppCompatActivity {
 
 
     private void fetchGeoJsonCategoryList() {
+        final String[] geoJsonName = new String[1];
         apiInterface
                 .getGeoJsonCategoryDetails()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(new Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>() {
                     @Override
                     public ObservableSource<List<GeoJsonCategoryEntity>> apply(GeoJsonCategoryDetails geoJsonCategoryDetails) throws Exception {
@@ -528,14 +530,26 @@ public class SplashActivity extends AppCompatActivity {
                         return geoJsonCategoryEntities;
                     }
                 })
-                .subscribe(new DisposableObserver<GeoJsonCategoryEntity>() {
+                .flatMap(new Function<GeoJsonCategoryEntity, Observable<ResponseBody>>() {
                     @Override
-                    public void onNext(GeoJsonCategoryEntity geoJsonCategoryEntity) {
+                    public Observable<ResponseBody> apply(GeoJsonCategoryEntity geoJsonCategoryEntity) throws Exception {
                         geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
+                        geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
+                        return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<ResponseBody>() {
+                    @Override
+                    public void onNext(ResponseBody s) {
+                        Log.d(TAG, "onNext: GeoJson "+s.source().inputStream().toString());
+                        geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], s.source().inputStream().toString()));
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "onError: "+e.getMessage());
 
                     }
 
