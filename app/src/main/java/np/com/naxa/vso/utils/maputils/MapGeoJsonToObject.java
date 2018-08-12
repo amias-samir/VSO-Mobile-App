@@ -3,6 +3,7 @@ package np.com.naxa.vso.utils.maputils;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -31,31 +32,31 @@ public class MapGeoJsonToObject {
 
             Log.d(TAG, "getCommonPlacesListObj: filename "+fileName);
 
-            if(fileName.equals("open_spaces")){
-                for (int i = 0; i < jsonarray.length(); i++) {
-                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                    String name = properties.getString("name");
-                    String address = " ";
-                    double latitude = Double.parseDouble(properties.getString("y"));
-                    double longitude = Double.parseDouble(properties.getString("x"));
-//                    String remarks = properties.getString("Remarks");
-                    String remarks = "";
-                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
-
-                            mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-                                    commonPlacesAttrb, mapView , marker_image));
-                            mapView.getOverlays().add(myOverLay);
-                            mapView.invalidate();
-
-                }
-            }else {
+//            if(fileName.equals("open_spaces")){
+//                for (int i = 0; i < jsonarray.length(); i++) {
+//                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+//                    String name = properties.getString("name");
+//                    String address = " ";
+//                    double latitude = Double.parseDouble(properties.getString("y"));
+//                    double longitude = Double.parseDouble(properties.getString("x"));
+////                    String remarks = properties.getString("Remarks");
+//                    String remarks = "";
+//                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
+//
+//                            mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
+//                                    commonPlacesAttrb, mapView , marker_image));
+//                            mapView.getOverlays().add(myOverLay);
+//                            mapView.invalidate();
+//
+//                }
+//            }else {
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                String name = properties.getString("Name");
-                String address = properties.getString("Address");
-                double latitude = Double.parseDouble(properties.getString("Y"));
-                double longitude = Double.parseDouble(properties.getString("X"));
-                String remarks = properties.getString("Remarks");
+                String name = properties.has("name")? properties.getString("name"):properties.getString("Name");
+                String address = properties.has("address")? properties.getString("address"):properties.getString("Address");
+                double latitude = properties.has("Y")? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
+                double longitude = properties.has("X")? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+                String remarks = properties.has("remarks")? properties.getString("remarks"):properties.getString("Remarks");;
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
 
@@ -64,7 +65,7 @@ public class MapGeoJsonToObject {
                         mapView.invalidate();
 
             }
-            }
+//            }
 
 
         } catch (JSONException e) {

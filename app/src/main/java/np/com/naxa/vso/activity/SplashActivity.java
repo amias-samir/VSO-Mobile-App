@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -90,40 +91,42 @@ public class SplashActivity extends AppCompatActivity {
 
 
 
- fetchGeoJsonCategoryList();
-
-
-        parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Timber.i("Starting parser");
-            }
-
-            @Override
-            public void onNext(Long id) {
-                Timber.i("Row inserted at %s", id);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e("Parsing failed reason %s", e.getMessage());
-                e.printStackTrace();
-
-                ToastUtils.showToast("Error loading app");
-            }
-
-            @Override
-            public void onComplete() {
-                Timber.i("Parsing completed sucessfully");
-
-                HomeActivity.start(SplashActivity.this);
-
-            }
-        });
 
 
 
-//        handleStoragePermission();
+
+        handleStoragePermission();
+
+        fetchGeoJsonCategoryList();
+
+//        parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
+//            @Override
+//            public void onSubscribe(Disposable d) {
+//                Timber.i("Starting parser");
+//            }
+//
+//            @Override
+//            public void onNext(Long id) {
+//                Timber.i("Row inserted at %s", id);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Timber.e("Parsing failed reason %s", e.getMessage());
+//                e.printStackTrace();
+//
+//                ToastUtils.showToast("Error loading app");
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Timber.i("Parsing completed sucessfully");
+//
+//                HomeActivity.start(SplashActivity.this);
+//
+//            }
+//        });
+
 
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -141,12 +144,12 @@ public class SplashActivity extends AppCompatActivity {
 
 
         new Handler().postDelayed(() -> {
-            if (sharedpref.checkIfDataPresent()) {
+//            if (sharedpref.checkIfDataPresent()) {
                 HomeActivity.start(SplashActivity.this);
-            } else {
-                loadDataAndCallHomeActivity();
-            }
-        }, 2000);
+//            } else {
+//                loadDataAndCallHomeActivity();
+//            }
+        }, 5000);
 
     }
 
@@ -156,7 +159,7 @@ public class SplashActivity extends AppCompatActivity {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
         } else {
-            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
+            EasyPermissions.requestPermissions(this, "Provide storage permission to save data.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
@@ -546,7 +549,7 @@ public class SplashActivity extends AppCompatActivity {
                         return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
                     }
                 })
-                .observeOn(AndroidSchedulers.mainThread())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableObserver<ResponseBody>() {
                     @Override
                     public void onNext(ResponseBody s) {
@@ -563,9 +566,37 @@ public class SplashActivity extends AppCompatActivity {
                         }catch (Exception e){
                             e.printStackTrace();
                         }
+
+                        String geoJsonToString = sb.toString();
                         Log.d(TAG, "onNext: GeoJson "+sb.toString());
 
-                        geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], sb.toString()));
+                        if(!TextUtils.isEmpty(geoJsonToString)) {
+                            geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], geoJsonToString));
+
+//                            json parse and store to database
+                            JSONObject jsonObject = null;
+                            try {
+                                jsonObject = new JSONObject(geoJsonToString);
+
+                                JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
+                                Log.d(TAG, "onNext: "+"save data to database");
+                                for (int i = 0; i < jsonarray.length(); i++) {
+                                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                                    String name = properties.has("name")? properties.getString("name"):properties.getString("Name");
+                                    String address = properties.has("address")? properties.getString("address"):properties.getString("Address");
+                                    double latitude = properties.has("Y")? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
+                                    double longitude = properties.has("X")? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+                                    String remarks = properties.has("remarks")? properties.getString("remarks"):properties.getString("Remarks");;
+
+                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks);
+                                    long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
                     }
 
                     @Override

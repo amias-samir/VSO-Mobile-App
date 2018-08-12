@@ -604,7 +604,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             geoJsonmarkerImage = a.t.getMarker_image();
 
             showOverlayOnMap(a.t.getFileName(), a.t.getType(), a.t.getMarker_image());
-            showDataOnList(a.t.getName(), a.t.getType());
+//            showDataOnList(a.t.getName(), a.t.getType());
+            showDataOnList(geoJsonFileName, a.t.getType());
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
             gridPosition = position;
