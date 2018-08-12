@@ -31,14 +31,13 @@ public class MapGeoJsonToObject {
 
             Log.d(TAG, "getCommonPlacesListObj: filename "+fileName);
 
-            if(fileName.equals("demo_openspace_changu.geojson")){
+            if(fileName.equals("open_spaces")){
                 for (int i = 0; i < jsonarray.length(); i++) {
                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                    String name = properties.getString("Name");
-//                    String address = properties.getString("Shape_Area");
+                    String name = properties.getString("name");
                     String address = " ";
-                    double latitude = Double.parseDouble(properties.getString("centroid_y"));
-                    double longitude = Double.parseDouble(properties.getString("centroid_x"));
+                    double latitude = Double.parseDouble(properties.getString("y"));
+                    double longitude = Double.parseDouble(properties.getString("x"));
 //                    String remarks = properties.getString("Remarks");
                     String remarks = "";
                     CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
@@ -52,7 +51,7 @@ public class MapGeoJsonToObject {
             }else {
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                String name = properties.getString("name");
+                String name = properties.getString("Name");
                 String address = properties.getString("Address");
                 double latitude = Double.parseDouble(properties.getString("Y"));
                 double longitude = Double.parseDouble(properties.getString("X"));

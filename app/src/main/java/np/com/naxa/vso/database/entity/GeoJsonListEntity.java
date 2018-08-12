@@ -8,10 +8,13 @@ import android.arch.persistence.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+
 @Entity(tableName = "GeoJsonListEntity",
         indices = {@Index(value = "category_table",
                 unique = true)})
-public class GeoJsonListEntity {
+public class GeoJsonListEntity{
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -54,4 +57,5 @@ public class GeoJsonListEntity {
     public void setCategoryJson(String categoryJson) {
         this.categoryJson = categoryJson;
     }
+
 }

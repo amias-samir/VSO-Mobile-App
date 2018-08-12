@@ -2,6 +2,9 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -117,6 +120,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -124,6 +128,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.FloatingSuggestion;
 import np.com.naxa.vso.OverlayPopupHiddenStyler;
@@ -134,6 +139,7 @@ import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
+import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
@@ -154,6 +160,7 @@ import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
+import np.com.naxa.vso.viewmodel.GeoJsonListViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -282,6 +289,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     List<HospitalAndCommon> hospitalAndCommonList;
 
+    GeoJsonListViewModel geoJsonListViewModel;
+
     @BindView(R.id.tv_go_back)
     public TextView tvGoBack;
 
@@ -338,6 +347,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
+
+            geoJsonListViewModel = ViewModelProviders.of(this).get(GeoJsonListViewModel.class);
         } catch (NullPointerException e) {
             Log.d(TAG, "Exception: " + e.toString());
         }
@@ -706,13 +717,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d(TAG, "showOverlayOnMap: "+name);
 
-        repo.getGeoJsonString(name)
-                .subscribe(new DisposableObserver<Pair>() {
+        Publisher<GeoJsonListEntity> pub = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(name));
+        Observable.fromPublisher(pub)
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Function<GeoJsonListEntity, ObservableSource<GeoJsonListEntity>>() {
                     @Override
-                    public void onNext(Pair pair) {
-                        String fileContent = (String) pair.second;
+                    public ObservableSource<GeoJsonListEntity> apply(GeoJsonListEntity geoJsonListEntity) throws Exception {
+                        return Observable.just(geoJsonListEntity);
+                    }
+                })
+                .subscribe(new DisposableObserver<GeoJsonListEntity>() {
+                    @Override
+                    public void onNext(GeoJsonListEntity geoJsonListEntity) {
+                        String fileContent = geoJsonListEntity.getCategoryJson();
                         mapView.getOverlays().clear();
-                        if (name.equals("changunarayan_new_wards.geojson")) {
+                        if (name.equals("wards")) {
                             Log.d(TAG, "onNext: changunarayan_new_wards");
                             loadWardBoarderlayerToMap(fileContent, type, "",
                                     marker_image);
@@ -739,6 +758,41 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         Timber.i("GeoJson loaded sucessfully");
                     }
                 });
+
+//
+//        repo.getGeoJsonString(name)
+//                .subscribe(new DisposableObserver<Pair>() {
+//                    @Override
+//                    public void onNext(Pair pair) {
+//                        String fileContent = (String) pair.second;
+//                        mapView.getOverlays().clear();
+//                        if (name.equals("wards")) {
+//                            Log.d(TAG, "onNext: changunarayan_new_wards");
+//                            loadWardBoarderlayerToMap(fileContent, type, "",
+//                                    marker_image);
+//                        } else {
+//                            loadlayerToMap(fileContent, type, name, marker_image);
+//
+//                            if (type.equals(MapDataCategory.POINT)) {
+//                                switchViews();
+//                            } else {
+//                                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+//                            }
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Timber.e("Failed to load geojson ");
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        Timber.i("GeoJson loaded sucessfully");
+//                    }
+//                });
     }
 
     private void showOverlayOnMap(int position) {

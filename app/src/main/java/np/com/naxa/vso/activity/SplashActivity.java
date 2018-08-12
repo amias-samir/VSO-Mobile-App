@@ -2,6 +2,7 @@ package np.com.naxa.vso.activity;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -88,14 +89,8 @@ public class SplashActivity extends AppCompatActivity {
         openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
 
 
-//        new Handler().postDelayed(() -> {
-//            if (sharedpref.checkIfDataPresent()) {
-//                HomeActivity.start(SplashActivity.this);
-//            } else {
-//                loadDataAndCallHomeActivity();
-//            }
-//        }, 2000);
-//
+
+ fetchGeoJsonCategoryList();
 
 
         parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
@@ -126,6 +121,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
+
+
 //        handleStoragePermission();
 
 
@@ -141,7 +138,15 @@ public class SplashActivity extends AppCompatActivity {
 //            }
 //        }
 
-        fetchGeoJsonCategoryList();
+
+
+        new Handler().postDelayed(() -> {
+            if (sharedpref.checkIfDataPresent()) {
+                HomeActivity.start(SplashActivity.this);
+            } else {
+                loadDataAndCallHomeActivity();
+            }
+        }, 2000);
 
     }
 
