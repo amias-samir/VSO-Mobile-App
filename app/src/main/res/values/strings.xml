@@ -27,6 +27,8 @@
 
     <string name="dialog_action_hide">Hide</string>
     <string name="specify_other">Specify Other</string>
+    <string name="ask_for_help">Ask For Help</string>
+    <string name="emergency_contacts">Emergency contacts</string>
 
     <string-array name="array_ward">
         <item>1</item>

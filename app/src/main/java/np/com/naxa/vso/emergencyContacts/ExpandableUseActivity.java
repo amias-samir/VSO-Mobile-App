@@ -33,6 +33,7 @@ import java.util.Random;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -98,10 +99,15 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
         mRecyclerView.setLayoutManager(manager);
 
 
+        initToolbar();
+    }
+
+    private void initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar_general);
         setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle("Emergency contacts");
+        getSupportActionBar().setTitle(ExpandableUseActivity.this.getResources().getString(R.string.emergency_contacts));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @SuppressLint("MissingPermission")
