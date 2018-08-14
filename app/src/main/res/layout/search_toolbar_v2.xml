@@ -12,11 +12,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:src="@color/colorPrimary" />
-
-
-
-
+        android:src="@color/transparent" />
 
     <FrameLayout
 
@@ -24,8 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
-        android:layout_marginTop="7dp"
-        android:layout_marginStart="50dp">
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="7dp">
 
         <com.arlib.floatingsearchview.FloatingSearchView
 
@@ -36,6 +32,7 @@
             app:floatingSearch_dimBackground="false"
             app:floatingSearch_dismissOnOutsideTouch="true"
             app:floatingSearch_leftActionMode="showSearch"
+            app:floatingSearch_menu="@menu/menu_menu"
             app:floatingSearch_searchBarMarginLeft="@dimen/spacing_medium"
             app:floatingSearch_searchBarMarginRight="@dimen/spacing_medium"
             app:floatingSearch_searchBarMarginTop="@dimen/spacing_medium"

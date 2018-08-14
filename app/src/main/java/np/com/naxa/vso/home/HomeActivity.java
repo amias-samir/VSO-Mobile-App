@@ -51,6 +51,7 @@ import android.widget.ViewSwitcher;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.franmontiel.localechanger.LocaleChanger;
+import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -401,6 +402,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupFloatingToolbar() {
+
+        floatingSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
+            @Override
+            public void onActionMenuItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_switch_to_english:
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            LocaleChanger.setLocale(new Locale("en", "US"));
+                            ActivityRecreationHelper.recreate(HomeActivity.this, true);
+                        }
+                        break;
+                    case R.id.action_switch_to_nepali:
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            LocaleChanger.setLocale(new Locale("ne", "NP"));
+                            ActivityRecreationHelper.recreate(HomeActivity.this, true);
+                        }
+                        break;
+                }
+            }
+        });
         floatingSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
             List<FloatingSuggestion> suggestionList = new ArrayList<>();
             if (suggestionList.size() == 0 || newQuery.isEmpty() || oldQuery.isEmpty()) {
@@ -716,7 +737,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void showOverlayOnMap(String name, String type, int marker_image) {
 
-        Log.d(TAG, "showOverlayOnMap: "+name);
+        Log.d(TAG, "showOverlayOnMap: " + name);
 
         Publisher<GeoJsonListEntity> pub = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(name));
         Observable.fromPublisher(pub)
@@ -970,7 +991,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Log.d(TAG, "handleStoragePermission: outside ");
 
-            if(sharedPreferenceUtils.getBoolanValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, true)){
+            if (sharedPreferenceUtils.getBoolanValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, true)) {
                 sharedPreferenceUtils.setValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, false);
                 startActivity(new Intent(HomeActivity.this, HomeActivity.class));
                 Log.d(TAG, "handleStoragePermission: inside ");
@@ -1615,7 +1636,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void arrowAnimation( ) {
+    private void arrowAnimation() {
 
         final Animation animShake = AnimationUtils.loadAnimation(this, R.anim.shake);
 

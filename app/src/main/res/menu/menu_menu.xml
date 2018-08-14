@@ -7,7 +7,7 @@
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_switch_to_nepali"
-        android:title="नेपालि"
+        android:title="नेपाली"
         app:showAsAction="never"/>
 
 </menu>
