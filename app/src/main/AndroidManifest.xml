@@ -61,7 +61,11 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".emergencyContacts.ExpandableUseActivity"
-            android:exported="true" />
+            android:exported="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".home.HomeActivity" />
+        </activity>
         <activity
             android:name=".activity.ContactActivity"
             android:exported="true" />

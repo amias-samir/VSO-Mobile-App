@@ -42,6 +42,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.gps.GeoPointActivity;
+import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
@@ -184,7 +185,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     private void initToolbar() {
         toolbar = findViewById(R.id.toolbar_general);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Ask a question");
+        getSupportActionBar().setTitle(ReportActivity.this.getResources().getString(R.string.ask_for_help));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
@@ -404,6 +405,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 tvName.getEditText().setText("");
                 tvContactNumber.getEditText().setText("");
                 tvMessage.getEditText().setText("");
+                startActivity( new Intent(ReportActivity.this, HomeActivity.class));
+                finish();
+
             }
 
             @Override
