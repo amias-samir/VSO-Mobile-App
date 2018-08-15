@@ -49,6 +49,20 @@
     <string name="municipality_ward_name">Changunarayan Municipality Wards</string>
     <string name="road_network">Road Network</string>
     <string name="river_network">River Network</string>
+    <string name="chairpersons_of_local_units">Chairpersons of Local Units</string>
+    <string name="chief_of_local_level_offices">Chief of Local Level Offices</string>
+    <string name="elected_representatives">Elected Representatives</string>
+    <string name="municipal_executive_members">Municipal Executive Members</string>
+    <string name="municipality_level_disaster_management">Municipality Level Disaster Management Committee</string>
+    <string name="nntds_executive_commitee">NNTDS\'s Executive Committee</string>
+    <string name="full_name">Full Name</string>
+    <string name="contact_number">Contact Number</string>
+    <string name="photo">Photo</string>
+    <string name="location">Location</string>
+    <string name="capture">Capture</string>
+    <string name="record">Record</string>
+    <string name="message">Message</string>
+    <string name="submit">Submit</string>
 
     <string-array name="array_ward">
         <item>1</item>

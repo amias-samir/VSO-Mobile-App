@@ -102,7 +102,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Full Name"
+                    android:hint="@string/full_name"
                     android:textColor="@color/black"
                     android:textColorHint="@color/dark_gray" />
             </android.support.design.widget.TextInputLayout>
@@ -117,7 +117,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Contact Number"
+                    android:hint="@string/contact_number"
                     android:inputType="phone"
                     android:textColor="@color/black"
                     android:textColorHint="@color/dark_gray" />
@@ -137,7 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:clickable="false"
-                android:text="Photo"
+                android:text="@string/photo"
                 android:textColor="@color/dark_gray" />
 
             <TextView
@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:clickable="false"
-                android:text="Location"
+                android:text="@string/location"
                 android:textColor="@color/dark_gray" />
 
         </LinearLayout>
@@ -169,7 +169,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_camera_alt_black_24dp"
-                    android:text=" Capture"
+                    android:text="@string/capture"
                     android:textAllCaps="false"
                     android:textColor="@color/black" />
 
@@ -186,7 +186,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/ic_gps_fixed_black_24dp"
-                    android:text=" Record"
+                    android:text="@string/record"
                     android:textAllCaps="false"
                     android:textColor="@color/black" />
 
@@ -215,7 +215,7 @@
 
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Message"
+                    android:hint="@string/message"
                     android:textColor="@color/black"
                     android:textColorHint="@color/dark_gray" />
             </android.support.design.widget.TextInputLayout>
@@ -226,7 +226,7 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit" />
+            android:text="@string/submit" />
 
     </LinearLayout>
     </ScrollView>

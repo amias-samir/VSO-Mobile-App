@@ -226,23 +226,23 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
         String categoryName = "";
         switch (position) {
             case 0:
-                categoryName = "Chairpersons of Local Units";
+                categoryName = getApplicationContext().getResources().getString(R.string.chairpersons_of_local_units);
                 break;
             case 1:
-                categoryName = "Chief of Local Level Offices";
+                categoryName = getApplicationContext().getResources().getString(R.string.chief_of_local_level_offices);
                 break;
             case 2:
-                categoryName = "Elected Representatives";
+                categoryName = getApplicationContext().getString(R.string.elected_representatives);
                 break;
             case 3:
-                categoryName = "Municipal Executive Members";
+                categoryName = getApplicationContext().getString(R.string.municipal_executive_members);
                 break;
 
             case 4:
-                categoryName = "Municipality Level Disaster Management Committee";
+                categoryName = getApplicationContext().getString(R.string.municipality_level_disaster_management);
                 break;
             case 5:
-                categoryName = "NNTDS's Executive Committee";
+                categoryName = getApplicationContext().getString(R.string.nntds_executive_commitee);
                 break;
         }
         return categoryName;
