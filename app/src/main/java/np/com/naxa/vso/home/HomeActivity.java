@@ -47,7 +47,7 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.franmontiel.localechanger.LocaleChanger;
+
 import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
