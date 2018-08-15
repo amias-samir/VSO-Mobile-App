@@ -12,23 +12,32 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.gpkg.overlay.OsmMapShapeConverter;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import mil.nga.wkb.geom.Geometry;
+import mil.nga.wkb.geom.MultiPolygon;
+import mil.nga.wkb.io.ByteReader;
+import mil.nga.wkb.io.WkbGeometryReader;
 import np.com.naxa.vso.OverlayPopupHiddenStyler;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.home.VSO;
+import np.com.naxa.vso.utils.DialogFactory;
+import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -53,11 +62,39 @@ public class MapActivity extends AppCompatActivity {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             loadOSM();
             setupMapUI();
+
+
             loadGeoJSON("").subscribe(loadGeoJSONSubscriber());
         } else {
             EasyPermissions.requestPermissions(this, "Some rationale",
                     REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
+    }
+
+    private Observer<? super Polygon> loadStringSubscriber() {
+        return new Observer<Polygon>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Polygon json) {
+                ToastUtils.showToast("GeoJSON string read :)");
+                map.getOverlays().add(json);
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                DialogFactory.createGenericErrorDialog(MapActivity.this, e.getMessage()).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
     }
 
     private Observer<? super KmlDocument> loadGeoJSONSubscriber() {
@@ -69,12 +106,15 @@ public class MapActivity extends AppCompatActivity {
 
             @Override
             public void onNext(KmlDocument kmlDocument) {
+
                 putKmlInMap(map, kmlDocument);
+
+                ToastUtils.showToast("GeoJSON plotted on map :)");
             }
 
             @Override
             public void onError(Throwable e) {
-
+                DialogFactory.createGenericErrorDialog(MapActivity.this, e.getMessage()).show();
             }
 
             @Override
@@ -113,16 +153,68 @@ public class MapActivity extends AppCompatActivity {
         KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
         FolderOverlay overlay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(map, null, styler, kmlDocument);
         map.getOverlays().add(overlay);
+
     }
 
+    public void putMultiPolygon(@NonNull MapView map, String json) {
+
+
+        OsmMapShapeConverter covertor = new OsmMapShapeConverter();
+        MultiPolygon multi = new MultiPolygon();
+
+        covertor.toPolygons(multi);
+    }
+
+
+    public Observable<Polygon> loadString() {
+
+        return Observable.create(new ObservableOnSubscribe<Polygon>() {
+            @Override
+            public void subscribe(ObservableEmitter<Polygon> e) throws Exception {
+                try {
+//                    InputStream jsonStream = VSO.getInstance().getAssets().open("wards.geojson");
+                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
+
+                    int size = jsonStream.available();
+                    byte[] buffer = new byte[size];
+                    jsonStream.read(buffer);
+                    jsonStream.close();
+
+                    String jsonString = new String(buffer, "UTF-8");
+
+                    ByteReader reader = new ByteReader(buffer);
+////                    MultiLineString multiLineString = WkbGeometryReader.readMultiLineString(reader, true, false);
+//                    Geometry p = WkbGeometryReader.readMultiPolygon(reader, true, true);
+//
+                    Geometry g = WkbGeometryReader.readGeometry(reader);
+
+                    g.getGeometryType();
+//                    List<Polygon> polygons = new OsmMapShapeConverter().toPolygons(p);
+//                    for(Polygon polygon: polygons){
+//                        e.onNext(polygon);
+//                    }
+
+
+                    e.onComplete();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    e.onError(ex);
+                }
+            }
+        });
+
+
+    }
 
     public io.reactivex.Observable<KmlDocument> loadGeoJSON(String fileName) {
 
         return io.reactivex.Observable.create(e -> {
             try {
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
+
+                InputStream jsonStream = null;
+//                jsonStream = VSO.getInstance().getAssets().open("wards.geojson");
+                jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
+
                 int size = jsonStream.available();
                 byte[] buffer = new byte[size];
                 jsonStream.read(buffer);
@@ -130,9 +222,15 @@ public class MapActivity extends AppCompatActivity {
                 String jsonString = new String(buffer, "UTF-8");
 
                 KmlDocument kmlDocument = new KmlDocument();
-                kmlDocument.parseGeoJSON(jsonString);
+                boolean isSucess = kmlDocument.parseGeoJSON(jsonString);
+
+
+                if (!isSucess) {
+                    throw new RuntimeException("Failed to parse geojson");
+                }
 
                 e.onNext(kmlDocument);
+
                 e.onComplete();
             } catch (IOException ex) {
                 ex.printStackTrace();
