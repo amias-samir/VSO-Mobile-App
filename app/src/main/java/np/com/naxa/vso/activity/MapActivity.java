@@ -8,11 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.gpkg.overlay.OsmMapShapeConverter;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -29,13 +30,11 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.MultiPolygon;
-import mil.nga.wkb.io.ByteReader;
-import mil.nga.wkb.io.WkbGeometryReader;
+
 import np.com.naxa.vso.OverlayPopupHiddenStyler;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.home.VSO;
+import np.com.naxa.vso.multipolygon.FeatureCollection;
 import np.com.naxa.vso.utils.DialogFactory;
 import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -64,7 +63,8 @@ public class MapActivity extends AppCompatActivity {
             setupMapUI();
 
 
-            loadGeoJSON("").subscribe(loadGeoJSONSubscriber());
+//            loadGeoJSON("").subscribe(loadGeoJSONSubscriber());
+            loadString().subscribe(loadStringSubscriber());
         } else {
             EasyPermissions.requestPermissions(this, "Some rationale",
                     REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -82,6 +82,7 @@ public class MapActivity extends AppCompatActivity {
             public void onNext(Polygon json) {
                 ToastUtils.showToast("GeoJSON string read :)");
                 map.getOverlays().add(json);
+
 
             }
 
@@ -156,15 +157,6 @@ public class MapActivity extends AppCompatActivity {
 
     }
 
-    public void putMultiPolygon(@NonNull MapView map, String json) {
-
-
-        OsmMapShapeConverter covertor = new OsmMapShapeConverter();
-        MultiPolygon multi = new MultiPolygon();
-
-        covertor.toPolygons(multi);
-    }
-
 
     public Observable<Polygon> loadString() {
 
@@ -172,28 +164,8 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void subscribe(ObservableEmitter<Polygon> e) throws Exception {
                 try {
-//                    InputStream jsonStream = VSO.getInstance().getAssets().open("wards.geojson");
-                    InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
-
-                    int size = jsonStream.available();
-                    byte[] buffer = new byte[size];
-                    jsonStream.read(buffer);
-                    jsonStream.close();
-
-                    String jsonString = new String(buffer, "UTF-8");
-
-                    ByteReader reader = new ByteReader(buffer);
-////                    MultiLineString multiLineString = WkbGeometryReader.readMultiLineString(reader, true, false);
-//                    Geometry p = WkbGeometryReader.readMultiPolygon(reader, true, true);
-//
-                    Geometry g = WkbGeometryReader.readGeometry(reader);
-
-                    g.getGeometryType();
-//                    List<Polygon> polygons = new OsmMapShapeConverter().toPolygons(p);
-//                    for(Polygon polygon: polygons){
-//                        e.onNext(polygon);
-//                    }
-
+                    String str = readStringFromAsset("wards.geojson");
+                    FeatureCollection featureCollection = new Gson().fromJson(str, FeatureCollection.class);
 
                     e.onComplete();
                 } catch (IOException ex) {
@@ -204,6 +176,18 @@ public class MapActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private String readStringFromAsset(String fileName) throws IOException {
+
+        InputStream jsonStream = VSO.getInstance().getAssets().open(fileName);
+        int size = jsonStream.available();
+        byte[] buffer = new byte[size];
+        jsonStream.read(buffer);
+        jsonStream.close();
+        String jsonString = new String(buffer, "UTF-8");
+
+        return jsonString;
     }
 
     public io.reactivex.Observable<KmlDocument> loadGeoJSON(String fileName) {
