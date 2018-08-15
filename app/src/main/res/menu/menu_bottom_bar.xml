@@ -5,18 +5,18 @@
     <item
         android:id="@+id/menu_emergency_contacts"
         android:icon="@drawable/ic_phone_in_talk_black_24dp"
-        android:title="Emergency contacts"
+        android:title="@string/emergency_contacts"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_ask_for_help"
         android:icon="@drawable/ic_help_outline_black_24dp"
-        android:title="Ask for help"
+        android:title="@string/ask_for_help"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_open_spaces"
         android:icon="@drawable/ic_directions_run_black_24dp"
-        android:title="Nearest open space"
+        android:title="@string/nearest_open_space"
         app:showAsAction="always" />
 
 </menu>

@@ -22,7 +22,7 @@ public class MapGeoJsonToObject {
 
     public List<CommonPlacesAttrb> getCommonPlacesListObj(Context context, String geoJson, String fileName, MapView mapView,
                                                           MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
-                                                          int marker_image){
+                                                          int marker_image) {
         List<CommonPlacesAttrb> commonPlacesAttrbList = new ArrayList<CommonPlacesAttrb>();
 
         JSONObject jsonObject = null;
@@ -30,7 +30,7 @@ public class MapGeoJsonToObject {
             jsonObject = new JSONObject(geoJson);
             JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
 
-            Log.d(TAG, "getCommonPlacesListObj: filename "+fileName);
+            Log.d(TAG, "getCommonPlacesListObj: filename " + fileName);
 
 //            if(fileName.equals("open_spaces")){
 //                for (int i = 0; i < jsonarray.length(); i++) {
@@ -52,18 +52,19 @@ public class MapGeoJsonToObject {
 //            }else {
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                String name = properties.has("name")? properties.getString("name"):properties.getString("Name");
-                String address = properties.has("address")? properties.getString("address"):properties.getString("Address");
-                double latitude = properties.has("Y")? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
-                double longitude = properties.has("X")? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
-                String remarks = properties.has("remarks")? properties.getString("remarks"):properties.getString("Remarks");;
+                String name = properties.has("name") ? properties.getString("name") : properties.getString("Name");
+                String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
+                double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
+                double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+                String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
+                ;
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
 
                 mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-                                commonPlacesAttrb, mapView, marker_image));
-                mapView.getOverlays().add(myOverLay);
-                        mapView.invalidate();
+                        commonPlacesAttrb, mapView, marker_image));
+//                mapView.getOverlays().add(myOverLay);
+                mapView.invalidate();
 
             }
 //            }
@@ -78,8 +79,8 @@ public class MapGeoJsonToObject {
 
 
     public void getWardDetailsListObj(Context context, String geoJson, String fileName, MapView mapView,
-                                                          MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
-                                                          int marker_image){
+                                      MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
+                                      int marker_image) {
         List<WardDetailsModel> wardDetailsModelList = new ArrayList<WardDetailsModel>();
 
         JSONObject jsonObject = null;
@@ -87,28 +88,27 @@ public class MapGeoJsonToObject {
             jsonObject = new JSONObject(geoJson);
             JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
 
-            Log.d(TAG, "getCommonPlacesListObj: filename "+fileName);
-                for (int i = 0; i < jsonarray.length(); i++) {
-                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                    String name = properties.getString("GaPa_NaPa") + " "+properties.getString("Type_GN") ;
-                    String ward = properties.getString("NEW_WARD_N");
-                    String area = properties.getString("Area_SQKM");
-                    String district = properties.getString("DISTRICT");
-                    double latitude = Double.parseDouble(properties.getString("Cent_Y"));
-                    double longitude = Double.parseDouble(properties.getString("Cent_X"));
-                    WardDetailsModel wardDetailsModel = new WardDetailsModel(name, ward, area, district, latitude, longitude);
+            Log.d(TAG, "getCommonPlacesListObj: filename " + fileName);
+            for (int i = 0; i < jsonarray.length(); i++) {
+                JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                String name = properties.getString("GaPa_NaPa") + " " + properties.getString("Type_GN");
+                String ward = properties.getString("NEW_WARD_N");
+                String area = properties.getString("Area_SQKM");
+                String district = properties.getString("DISTRICT");
+                double latitude = Double.parseDouble(properties.getString("Cent_Y"));
+                double longitude = Double.parseDouble(properties.getString("Cent_X"));
+                WardDetailsModel wardDetailsModel = new WardDetailsModel(name, ward, area, district, latitude, longitude);
 
-                    mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromWardDetailsModel(context,
-                            wardDetailsModel, mapView , marker_image));
-                    mapView.getOverlays().add(myOverLay);
-                    mapView.invalidate();
+                mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromWardDetailsModel(context,
+                        wardDetailsModel, mapView, marker_image));
+                mapView.getOverlays().add(myOverLay);
+                mapView.invalidate();
 
-                }
-
+            }
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        }
+    }
 }
