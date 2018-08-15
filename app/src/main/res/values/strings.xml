@@ -29,6 +29,26 @@
     <string name="specify_other">Specify Other</string>
     <string name="ask_for_help">Ask For Help</string>
     <string name="emergency_contacts">Emergency contacts</string>
+    <string name="hospital">Hospital</string>
+    <string name="open_space">Open Spaces</string>
+    <string name="educational_institute">Educational Institution</string>
+    <string name="financial_institute">Financial Institution</string>
+    <string name="public_toilets">Public Toilets</string>
+    <string name="industries">Industries</string>
+    <string name="transportation_utilities">Transportation Utilities</string>
+    <string name="water_bodies">Water Bodies</string>
+    <string name="earthquake">Earthquake</string>
+    <string name="land_slides">Land Slides</string>
+    <string name="fire_hazards">Fire Hazards</string>
+    <string name="flood">Flood</string>
+    <string name="fault_lines">Fault Lines</string>
+    <string name="road_accidents">Road Accidents</string>
+    <string name="epidemic">Epidemic</string>
+    <string name="animal_attacks">Animal Attacks</string>
+    <string name="municipality_boundary_name">Changunarayan Municipality Boundary</string>
+    <string name="municipality_ward_name">Changunarayan Municipality Wards</string>
+    <string name="road_network">Road Network</string>
+    <string name="river_network">River Network</string>
 
     <string-array name="array_ward">
         <item>1</item>
