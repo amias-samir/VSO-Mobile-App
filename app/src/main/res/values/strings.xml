@@ -49,6 +49,13 @@
     <string name="municipality_ward_name">Changunarayan Municipality Wards</string>
     <string name="road_network">Road Network</string>
     <string name="river_network">River Network</string>
+    <string name="ward_boundary">Ward Boundary</string>
+    <string name="municipal_boundary">Municipal Boundary</string>
+    <string name="ward_office">Ward Office</string>
+    <string name="nearest_open_space">Nearest open space</string>
+    <string name="resources">Resources</string>
+    <string name="hazard_and_vulnerability">Hazard and Vulnerability</string>
+    <string name="base_data">Base data</string>
 
     <string-array name="array_ward">
         <item>1</item>

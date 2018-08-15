@@ -1,11 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_ward"
-        android:title="Ward Boundary" />
+        android:title="@string/ward_boundary" />
     <item
         android:id="@+id/menu_municipal"
-        android:title="Municipal Boundary"/>
+        android:title="@string/municipal_boundary"/>
     <item
         android:id="@+id/menu_office"
-        android:title="Ward Office"/>
+        android:title="@string/ward_office"/>
 </menu>

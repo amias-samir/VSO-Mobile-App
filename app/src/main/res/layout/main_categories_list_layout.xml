@@ -15,7 +15,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Resources"
+        android:text="@string/resources"
         android:textColor="@color/colorPrimary"
         android:textStyle="bold" />
 
@@ -27,7 +27,7 @@
         android:background="@color/colorWindowBackground"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Hazard and Vulnerability"
+        android:text="@string/hazard_and_vulnerability"
         android:textColor="@color/black" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:background="@color/colorWindowBackground"
         android:gravity="center"
         android:padding="@dimen/default_padding"
-        android:text="Base data"
+        android:text="@string/base_data"
         android:textColor="@color/black" />
 
 </LinearLayout>
