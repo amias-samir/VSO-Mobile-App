@@ -1,5 +1,5 @@
 
-package np.com.naxa.vso.multipolygon;
+package np.com.naxa.vso.osm_convertor.multipolygon;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

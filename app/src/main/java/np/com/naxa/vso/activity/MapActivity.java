@@ -22,6 +22,8 @@ import org.osmdroid.views.overlay.Polygon;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,11 +36,16 @@ import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.OverlayPopupHiddenStyler;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.home.VSO;
-import np.com.naxa.vso.multipolygon.FeatureCollection;
+import np.com.naxa.vso.osm_convertor.multipolygon.Feature;
+import np.com.naxa.vso.osm_convertor.multipolygon.FeatureCollection;
+import np.com.naxa.vso.osm_convertor.multipolygon.Geometry;
+import np.com.naxa.vso.osm_convertor.multipolygon.Properties;
+import np.com.naxa.vso.osm_convertor.polygon.Properties_;
 import np.com.naxa.vso.utils.DialogFactory;
 import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import timber.log.Timber;
 
 public class MapActivity extends AppCompatActivity {
 
@@ -166,6 +173,50 @@ public class MapActivity extends AppCompatActivity {
                 try {
                     String str = readStringFromAsset("wards.geojson");
                     FeatureCollection featureCollection = new Gson().fromJson(str, FeatureCollection.class);
+
+
+                    for (Feature feature : featureCollection.getFeatures()) {
+                        String type = feature.getGeometry().getType();
+                        Properties props = feature.getProperties();
+
+                        switch (type) {
+                            case "MultiPolygon":
+                                for (int i = 0; i < feature.getGeometry().getCoordinates().size(); i++) {
+                                    np.com.naxa.vso.osm_convertor.polygon.Feature feature1 = new np.com.naxa.vso.osm_convertor.polygon.Feature();
+
+                                    np.com.naxa.vso.osm_convertor.polygon.Geometry geometry = new np.com.naxa.vso.osm_convertor.polygon.Geometry();
+                                    geometry.setCoordinates(feature.getGeometry().getCoordinates().get(i));
+                                    geometry.setType("Polygon");
+
+                                    feature1.setType("Feature");
+                                    feature1.setGeometry(geometry);
+
+
+                                    Properties_ p = new Properties_();
+                                    p.setAreaSqm(11);
+
+                                    feature1.setProperties(p);
+
+                                    List<np.com.naxa.vso.osm_convertor.polygon.Feature> featureList = new ArrayList<>();
+                                    featureList.add(feature1);
+
+
+                                    np.com.naxa.vso.osm_convertor.polygon.FeatureCollection featureCollection1 = new np.com.naxa.vso.osm_convertor.polygon.FeatureCollection();
+
+                                    featureCollection1.setType("FeatureCollection");
+                                    featureCollection1.setName("Wards");
+                                    featureCollection1.setFeatures(featureList);
+
+                                    String polygonStr = new Gson().toJson(featureCollection1);
+
+                                    Timber.i(polygonStr);
+                                }
+
+                                break;
+
+
+                        }
+                    }
 
                     e.onComplete();
                 } catch (IOException ex) {

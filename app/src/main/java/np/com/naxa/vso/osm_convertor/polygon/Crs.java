@@ -1,10 +1,10 @@
 
-package np.com.naxa.vso.multipolygon;
+package np.com.naxa.vso.osm_convertor.polygon;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Feature {
+public class Crs {
 
     @SerializedName("type")
     @Expose
@@ -12,9 +12,6 @@ public class Feature {
     @SerializedName("properties")
     @Expose
     private Properties properties;
-    @SerializedName("geometry")
-    @Expose
-    private Geometry geometry;
 
     public String getType() {
         return type;
@@ -30,14 +27,6 @@ public class Feature {
 
     public void setProperties(Properties properties) {
         this.properties = properties;
-    }
-
-    public Geometry getGeometry() {
-        return geometry;
-    }
-
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
     }
 
 }

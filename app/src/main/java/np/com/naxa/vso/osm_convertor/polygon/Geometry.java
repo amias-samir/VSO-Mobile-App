@@ -1,5 +1,5 @@
 
-package np.com.naxa.vso.multipolygon;
+package np.com.naxa.vso.osm_convertor.polygon;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -12,7 +12,7 @@ public class Geometry {
     private String type;
     @SerializedName("coordinates")
     @Expose
-    private List<List<List<List<Double>>>> coordinates = null;
+    private List<List<List<Double>>> coordinates = null;
 
     public String getType() {
         return type;
@@ -22,11 +22,11 @@ public class Geometry {
         this.type = type;
     }
 
-    public List<List<List<List<Double>>>> getCoordinates() {
+    public List<List<List<Double>>> getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(List<List<List<List<Double>>>> coordinates) {
+    public void setCoordinates(List<List<List<Double>>> coordinates) {
         this.coordinates = coordinates;
     }
 
