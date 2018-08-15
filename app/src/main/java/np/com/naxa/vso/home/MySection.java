@@ -23,37 +23,37 @@ public class MySection extends SectionEntity<MapDataCategory> {
     public static List<MySection> getResourcesCatergorySections() {
         List<MySection> list = new ArrayList<>();
 
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_hospital, "Hospital", "health_facilities", MapDataCategory.POINT, R.drawable.marker_health)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, "Open Spaces", "open_spaces", MapDataCategory.BOUNDARY, R.drawable.marker_openspace)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_eductional, "Educational Institution", "educational_institute", MapDataCategory.POINT, R.drawable.marker_education)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_financial, "Financial Institution", "financial_institute", MapDataCategory.POINT, R.drawable.marker_bank)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, "Public Toilets", null, MapDataCategory.POINT, R.drawable.marker_toilets)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, "Industries", "industries", MapDataCategory.POINT, R.drawable.marker_industry)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, "Transportation Utilities", "transportation_utilities", MapDataCategory.POINT, R.drawable.marker_transportaion)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, "Water Bodies", null, MapDataCategory.BOUNDARY, R.drawable.marker_water)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_hospital, VSO.getInstance().getResources().getString(R.string.hospital), "health_facilities", MapDataCategory.POINT, R.drawable.marker_health)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, VSO.getInstance().getResources().getString(R.string.open_space), "open_spaces", MapDataCategory.BOUNDARY, R.drawable.marker_openspace)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_eductional, VSO.getInstance().getResources().getString(R.string.educational_institute), "educational_institute", MapDataCategory.POINT, R.drawable.marker_education)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_financial, VSO.getInstance().getResources().getString(R.string.financial_institute), "financial_institute", MapDataCategory.POINT, R.drawable.marker_bank)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, VSO.getInstance().getResources().getString(R.string.public_toilets), null, MapDataCategory.POINT, R.drawable.marker_toilets)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, VSO.getInstance().getResources().getString(R.string.industries), "industries", MapDataCategory.POINT, R.drawable.marker_industry)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_transportation, VSO.getInstance().getResources().getString(R.string.transportation_utilities), "transportation_utilities", MapDataCategory.POINT, R.drawable.marker_transportaion)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_water_bodies, VSO.getInstance().getResources().getString(R.string.water_bodies), null, MapDataCategory.BOUNDARY, R.drawable.marker_water)));
         return list;
     }
 
     public static List<MySection> getHazardCatergorySections() {
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_earthquake, "Earthquake", null, MapDataCategory.POINT, R.drawable.marker_earthquake)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_landslide, "Land Slides", null, MapDataCategory.POINT, R.drawable.marker_landslide)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_fire, "Fire Hazards", null, MapDataCategory.POINT, R.drawable.marker_fire)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_floods, "Flood", null, MapDataCategory.POINT, R.drawable.marker_flood)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_fault_lines, "Fault Lines", null, MapDataCategory.POINT, R.drawable.marker_faultlines)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_accident, "Road Accidents", null, MapDataCategory.POINT, R.drawable.marker_accident)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_epidemic, "Epidemic", null, MapDataCategory.POINT, R.drawable.marker_epidemic)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_animal_attack, "Animal Attacks", null, MapDataCategory.POINT, R.drawable.marker_animalattack)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_earthquake, VSO.getInstance().getResources().getString(R.string.earthquake), null, MapDataCategory.POINT, R.drawable.marker_earthquake)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_landslide, VSO.getInstance().getResources().getString(R.string.land_slides), null, MapDataCategory.POINT, R.drawable.marker_landslide)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_fire, VSO.getInstance().getResources().getString(R.string.fire_hazards), null, MapDataCategory.POINT, R.drawable.marker_fire)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_floods, VSO.getInstance().getResources().getString(R.string.flood), null, MapDataCategory.POINT, R.drawable.marker_flood)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_fault_lines, VSO.getInstance().getResources().getString(R.string.fault_lines), null, MapDataCategory.POINT, R.drawable.marker_faultlines)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_accident, VSO.getInstance().getResources().getString(R.string.road_accidents), null, MapDataCategory.POINT, R.drawable.marker_accident)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_epidemic, VSO.getInstance().getResources().getString(R.string.epidemic), null, MapDataCategory.POINT, R.drawable.marker_epidemic)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_animal_attack, VSO.getInstance().getResources().getString(R.string.animal_attacks), null, MapDataCategory.POINT, R.drawable.marker_animalattack)));
 
         return list;
     }
 
     public static List<MySection> getBaseDataCatergorySections() {
         List<MySection> list = new ArrayList<>();
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_boundry, "Changunarayan Municipality Boundary", "changunarayan_municipality_boundary.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_wards, "Changunarayan Municipality Wards", "wards", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, "Road Network", "road", MapDataCategory.ROAD, R.drawable.marker_roads)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_river_network, "River Network", "river", MapDataCategory.RIVER, R.drawable.marker_river)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_boundry, VSO.getInstance().getResources().getString(R.string.municipality_boundary_name), "changunarayan_municipality_boundary.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_wards, VSO.getInstance().getResources().getString(R.string.municipality_ward_name), "wards", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, VSO.getInstance().getResources().getString(R.string.road_network), "road", MapDataCategory.ROAD, R.drawable.marker_roads)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_river_network, VSO.getInstance().getResources().getString(R.string.river_network), "river", MapDataCategory.RIVER, R.drawable.marker_river)));
         return list;
     }
 }
