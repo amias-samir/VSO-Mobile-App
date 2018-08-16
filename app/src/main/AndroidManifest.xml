@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="np.com.naxa.vso">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -11,6 +12,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
+        tools:replace="android:allowBackup"
         android:name=".home.VSO"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -83,7 +85,15 @@
         <activity
             android:name=".hospitalfilter.HospitalFilterActivity"
             android:exported="true" />
-        <activity android:name=".detailspage.MarkerDetailsDisplayActivity"></activity>
+        <activity
+            android:name=".detailspage.MarkerDetailsDisplayActivity"
+            android:exported="true" />
+        <activity
+            android:exported="true"
+            android:name=".activity.MapActivity" />
+        <activity
+            android:exported="true"
+            android:name=".activity.MapBoxActivity" />
     </application>
 
 </manifest>

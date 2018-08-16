@@ -48,23 +48,17 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
+
 import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
+
+
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.osmdroid.api.IMapController;
@@ -141,10 +135,8 @@ import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
 import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.home.model.MapMarkerItem;
-import np.com.naxa.vso.home.model.MapMarkerItemBuilder;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
-import np.com.naxa.vso.utils.JSONParser;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
@@ -159,7 +151,6 @@ import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
@@ -254,7 +245,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private MapDataRepository repo;
     private FusedLocationProviderClient mFusedLocationClient;
-    private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
     private int gridPosition = -1;
@@ -495,27 +485,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void setupMapBox() {
-        Mapbox.getInstance(this, getString(R.string.access_token));
 
-//        mapboxMapview.getMapAsync(mapboxMap -> {
-//            this.mapboxMap = mapboxMap;
-//            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
-//            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
-//            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
-
-
-        showOverlayOnMap(-1);
-        moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
-
-//        });
-    }
-
-    private void moveCamera(LatLng latLng) {
-        if (mapboxMap != null) {
-            mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.8), 2800);
-        }
-    }
 
     private void setupViewSwitcher() {
         Animation out = AnimationUtils.loadAnimation(this, R.anim.bottom_down);
@@ -719,7 +689,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             string = getString(R.string.browse_data_category);
             if (currentDisplayedItems != null) {
                 int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
-                string = getString(R.string.dataset_overview, totalPOI);
+                string = getString(R.string.dataset_overview, "0");
             }
         } catch (NullPointerException e) {
 
@@ -764,13 +734,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.e("Failed to load geojson ");
+                        Log.d(TAG, "onError: Failed to load geojson ");
                         e.printStackTrace();
                     }
 
                     @Override
                     public void onComplete() {
-                        Timber.i("GeoJson loaded sucessfully");
+                        Log.d(TAG, "onError: GeoJson loaded sucessfully");
+
                     }
                 });
 
@@ -889,65 +860,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void loadLineLayers(String assetName, String fileContent) {
-
-        if (mapboxMap.getSource(assetName) == null) {
-            GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
-            mapboxMap.addSource(source);
-            mapboxMap.addLayer(new LineLayer(assetName, assetName));
-            Timber.i("Adding source %s to map", assetName);
-        }
-    }
-
-    private void loadMarkersFromGeoJson(String assetName, String geojson) {
-        Observable<MapMarkerItem> observable = Observable.create(e -> {
-            try {
-                FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
-                List<Feature> features = featureCollection.getFeatures();
-                for (Feature feature : features) {
-                    if (feature.getGeometry() instanceof Point) {
-                        Position coordinates = (Position)
-                                feature.getGeometry().getCoordinates();
-
-
-                        JSONParser jsonParser = new JSONParser(feature.getProperties());
-
-                        MapMarkerItem mapMarkerItem = new MapMarkerItemBuilder()
-                                .setLat(coordinates.getLatitude())
-                                .setLng(coordinates.getLongitude())
-                                .setTitle(jsonParser.getName())
-                                .setSnippet(jsonParser.getAddress())
-                                .setGeoJsonProperties(feature.getProperties().entrySet())
-                                .createMapMarkerItem();
-
-                        e.onNext(mapMarkerItem);
-                    }
-                }
-            } catch (Exception exception) {
-                e.onError(exception);
-            } finally {
-                e.onComplete();
-            }
-        });
-
-        observable
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .toList()
-                .subscribe(new DisposableSingleObserver<List<MapMarkerItem>>() {
-                    @Override
-                    public void onSuccess(List<MapMarkerItem> myItems) {
-                        clusterManagerPlugin.addItems(myItems);
-                        clusterManagerPlugin.cluster();
-//                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-                });
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
