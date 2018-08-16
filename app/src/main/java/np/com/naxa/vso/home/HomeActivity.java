@@ -46,8 +46,10 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
+
 import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -61,10 +63,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
+
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.osmdroid.api.IMapController;
@@ -719,7 +718,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             string = getString(R.string.browse_data_category);
             if (currentDisplayedItems != null) {
                 int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
-                string = getString(R.string.dataset_overview, totalPOI);
+                string = getString(R.string.dataset_overview, "0");
             }
         } catch (NullPointerException e) {
 
@@ -899,55 +898,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void loadMarkersFromGeoJson(String assetName, String geojson) {
-        Observable<MapMarkerItem> observable = Observable.create(e -> {
-            try {
-                FeatureCollection featureCollection = FeatureCollection.fromJson(geojson);
-                List<Feature> features = featureCollection.getFeatures();
-                for (Feature feature : features) {
-                    if (feature.getGeometry() instanceof Point) {
-                        Position coordinates = (Position)
-                                feature.getGeometry().getCoordinates();
-
-
-                        JSONParser jsonParser = new JSONParser(feature.getProperties());
-
-                        MapMarkerItem mapMarkerItem = new MapMarkerItemBuilder()
-                                .setLat(coordinates.getLatitude())
-                                .setLng(coordinates.getLongitude())
-                                .setTitle(jsonParser.getName())
-                                .setSnippet(jsonParser.getAddress())
-                                .setGeoJsonProperties(feature.getProperties().entrySet())
-                                .createMapMarkerItem();
-
-                        e.onNext(mapMarkerItem);
-                    }
-                }
-            } catch (Exception exception) {
-                e.onError(exception);
-            } finally {
-                e.onComplete();
-            }
-        });
-
-        observable
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .toList()
-                .subscribe(new DisposableSingleObserver<List<MapMarkerItem>>() {
-                    @Override
-                    public void onSuccess(List<MapMarkerItem> myItems) {
-                        clusterManagerPlugin.addItems(myItems);
-                        clusterManagerPlugin.cluster();
-//                        ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(myItems);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-                });
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
