@@ -126,8 +126,7 @@ public class MapActivity extends AppCompatActivity {
                     boolean isMultipolygon = str.contains("Multipolygon");
 
 
-
-                    if (true) {
+                    if (isMultipolygon) {
                         FeatureCollection featureCollection = new Gson().fromJson(str, FeatureCollection.class);
                         mapMultilinePolygonToPolygon(featureCollection.getFeatures(), e);
                     } else {
@@ -248,7 +247,6 @@ public class MapActivity extends AppCompatActivity {
         super.onPause();
         map.onPause();
     }
-
 
 
 }
