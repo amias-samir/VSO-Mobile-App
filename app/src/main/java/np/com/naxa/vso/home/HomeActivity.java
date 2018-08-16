@@ -46,26 +46,15 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
-
 import com.github.zagum.expandicon.ExpandIconView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.plugins.cluster.clustering.ClusterManagerPlugin;
-
-
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONException;
@@ -164,7 +153,6 @@ import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import timber.log.Timber;
 
 import static np.com.naxa.vso.activity.OpenSpaceActivity.LOCATION_RESULT;
 
@@ -259,7 +247,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private MapDataRepository repo;
     private FusedLocationProviderClient mFusedLocationClient;
-    private MapboxMap mapboxMap;
     private ClusterManagerPlugin<MapMarkerItem> clusterManagerPlugin;
     private boolean isGridShown = true;
     private int gridPosition = -1;
@@ -501,28 +488,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         overlaysList = this.mapView.getOverlays();
     }
 
-
-    private void setupMapBox() {
-        Mapbox.getInstance(this, getString(R.string.access_token));
-
-//        mapboxMapview.getMapAsync(mapboxMap -> {
-//            this.mapboxMap = mapboxMap;
-//            clusterManagerPlugin = new ClusterManagerPlugin<>(this, mapboxMap);
-//            mapboxMap.addOnCameraIdleListener(clusterManagerPlugin);
-//            mapboxMap.getUiSettings().setAllGesturesEnabled(true);
-
-
-        showOverlayOnMap(-1);
-        moveCamera(new LatLng(27.657531140175244, 85.46161651611328));
-
-//        });
-    }
-
-    private void moveCamera(LatLng latLng) {
-        if (mapboxMap != null) {
-            mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.8), 2800);
-        }
-    }
 
     private void setupViewSwitcher() {
         Animation out = AnimationUtils.loadAnimation(this, R.anim.bottom_down);
@@ -771,13 +736,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.e("Failed to load geojson ");
+                        Log.d(TAG, "onError: Failed to load geojson ");
                         e.printStackTrace();
                     }
 
                     @Override
                     public void onComplete() {
-                        Timber.i("GeoJson loaded sucessfully");
+                        Log.d(TAG, "onError: GeoJson loaded sucessfully");
+
                     }
                 });
 
@@ -894,16 +860,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-    }
-
-    private void loadLineLayers(String assetName, String fileContent) {
-
-        if (mapboxMap.getSource(assetName) == null) {
-            GeoJsonSource source = new GeoJsonSource(assetName, fileContent);
-            mapboxMap.addSource(source);
-            mapboxMap.addLayer(new LineLayer(assetName, assetName));
-            Timber.i("Adding source %s to map", assetName);
-        }
     }
 
 

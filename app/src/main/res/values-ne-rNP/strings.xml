@@ -1,31 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Changunarayan Municipality</string>
-    <string name="search_hint">Search Places</string>
-
-    <string name="speech_prompt">Say Something</string>
-    <string name="speech_not_supported">speech to text doesn\'t seems supported</string>
-    <string name="menu.clear">clear</string>
-    <string name="menu.tts">text to speech</string>
-    <string name="menu.toggle.icon">Icon Visible</string>
-    <string name="menu.icon.type">Icon Type</string>
-    <string name="rationale_gps">Access to device gps is required for this feature.</string>
-    <string name="browse_data_by_categories">Browse data by sub categories</string>
-    <string name="dataset_overview">%1$s dataset found</string>
-    <string name="failed_to_load_geojson">Failed to load data on map.</string>
-    <string name="title_activity_home_new_new">HomeActivityNewNew</string>
-    <string name="browse_data_category">Browse data category</string>
-    <string name="select_ward">वडा छान्नुहोस्</string>
-    <string name="incident_type">घटनाको प्रकार</string>
-    <string name="filter">Filter</string>
-
-
-    <string name="dialog_action_ok">OK</string>
-    <string name="dialog_error_title">Unexpected Error Occured.</string>
-    <string name="dialog_error_title_sync_failed">Data Sync Failed (Code: %1$s)</string>
-
-    <string name="dialog_action_hide">Hide</string>
-    <string name="specify_other">अन्य खुलाउनुहोस</string>
+    <string name="app_name">चाँगुनारायण नगरपालिका</string>
+    <string name="search_hint"> ठाउँहरु खोज्नुहोस्\</string>
+    <string name="speech_prompt"> केहि भन्नुहोस्</string>
+    <string name="speech_not_supported"> श्रुतिबाट लेख्न सकिएन</string>
+    <string name="menu.clear"> सफा गर्नुहोस्</string>
+    <string name="menu.tts"> श्रुतिबाट लेखन</string>
+    <string name="menu.toggle.icon"> आइकन देखिएको छ</string>
+    <string name="menu.icon.type"> आइकनको प्रकार</string>
+    <string name="rationale_gps"> यो सुविधाको लागि जी.पी.एस. चालु गर्नुहोस्.</string>
+    <string name="access_token" translatable="false">pk.eyJ1IjoiY2FtbWFjZSIsImEiOiJjaW9vbGtydnQwMDAwdmRrcWlpdDVoM3pjIn0.Oy_gHelWnV12kJxHQWV7XQ</string>
+    <string name="browse_data_by_categories"> वर्ग अनुसार डाटा हेर्नुहोस्</string>
+    <string name="dataset_overview"> डेटा सेट भेटियो</string>
+    <string name="failed_to_load_geojson"> नक्सामा डाटा लोड असफल</string>
+    <string name="title_activity_home_new_new">गृह गतिविधि नयाँ नयाँ</string>
+    <string name="browse_data_category"> डाटाको वर्ग हेर्नुहोस् </string>
+    <string name="select_ward"> वडा छान्नुहोस्</string>
+    <string name="incident_type"> घटनाको प्रकार </string>
+    <string name="filter">फिल्टर</string>
+    <string name="dialog_action_ok">ठिक छ</string>
+    <string name="dialog_error_title">अप्रत्याशित त्रुटि भयो </string>
+    <string name="dialog_error_title_sync_failed">डाटा सिन्क्रोनिजेसन असफल (Code: %1$s)</string>
+    <string name="dialog_action_hide">लुकाउनुहोस् </string>
+    <string name="specify_other"> अरु निर्दिष्ट गर्नुहोस्</string>
+    <string name="ask_for_help">सहयोग माग्नुहोस्</string>
+    <string name="emergency_contacts">आकस्मिक सम्पर्क</string>
+    <string name="hospital">अस्पताल</string>
+    <string name="open_space">खुल्ला  ठाउँहरु</string>
+    <string name="educational_institute"> शैक्षिक संस्था</string>
+    <string name="financial_institute"> वितिय संस्था </string>
+    <string name="public_toilets"> सार्वजनिक शौचालय</string>
+    <string name="industries"> उद्योग</string>
+    <string name="transportation_utilities">यातायात साधनहरु</string>
+    <string name="water_bodies"> पानीको श्रोत</string>
+    <string name="earthquake"> भूकम्प</string>
+    <string name="land_slides"> पहिरो</string>
+    <string name="fire_hazards">आगलागी</string>
+    <string name="flood"> बाढी</string>
+    <string name="fault_lines">फल्ट रेखाहरु </string>
+    <string name="road_accidents">सडक दुर्घटना</string>
+    <string name="epidemic">महामारी</string>
+    <string name="animal_attacks"> पशु आक्रमण</string>
+    <string name="municipality_boundary_name">चाँगु नारायण नगरपालिका सीमाना</string>
+    <string name="municipality_ward_name">चाँगु नारायण नगरपालिका वडाहरु</string>
+    <string name="road_network"> सडक संजाल</string>
+    <string name="river_network">नदी-नालाहरु</string>
+    <string name="chairpersons_of_local_units"> स्थानीय तहका अध्यक्ष</string>
+    <string name="chief_of_local_level_offices">स्थानीय तहका कार्यालय प्रमुखहरु </string>
+    <string name="elected_representatives"> निर्वाचित प्रतिनिधिहरु</string>
+    <string name="municipal_executive_members">नगरपालिका कार्यकारी सदस्यहरु</string>
+    <string name="municipality_level_disaster_management">नगरपालिका प्रकोप व्यवस्थापन समिति</string>
+    <string name="nntds_executive_commitee"> नगरकोट नाल्दुम पर्यटन विकास समितिका कार्यकारीहरु </string>
+    <string name="full_name"> पुरा नाम</string>
+    <string name="contact_number"> सम्पर्क नम्बर</string>
+    <string name="photo">फोटो</string>
+    <string name="location">अवस्थिति</string>
+    <string name="capture">खिच्निहोस</string>
+    <string name="record">रेकर्ड</string>
+    <string name="message">सन्देश</string>
+    <string name="submit">पेश गर्नुहोस्</string>
+    <string name="ward_boundary">वडा सीमाना</string>
+    <string name="municipal_boundary">नगरपालिका सीमाना</string>
+    <string name="ward_office"> वडा कार्यालय</string>
+    <string name="nearest_open_space">नजिकैको खुल्ला ठाउँ</string>
+    <string name="resources"> स्रोतहरु</string>
+    <string name="hazard_and_vulnerability"> प्रकोप र संकटासन्नती </string>
+    <string name="base_data"> आधारभूत डाटा</string>
 
     <string-array name="array_ward">
         <item>१</item>
