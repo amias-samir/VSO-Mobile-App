@@ -130,8 +130,14 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
-import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultipolygonFeature;
-import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultipolygonFeatureCollection;
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringFeature;
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringFeatureCollection;
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringGeometry;
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.multiLineString.MultiLineStringFeature;
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.multiLineString.MultiLineStringFeatureCollection;
+
+import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultiPolygonFeature;
+import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultiPolygonFeatureCollection;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.polygon.PolygonFeature;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.polygon.PolygonFeatureCollection;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.polygon.PolygonGeometry;
@@ -1232,69 +1238,112 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         JSONObject jsonObject = new JSONObject(categoryJson);
         String type = jsonObject.getJSONArray("features").getJSONObject(0).getJSONObject("geometry").getString("type");
+        switch (type) {
+            case "MultiPolygon":
+                MultiPolygonFeatureCollection multipolygonFeatureCollection = new Gson().fromJson(categoryJson, MultiPolygonFeatureCollection.class);
 
-        if (type.equalsIgnoreCase("MultiPolygon")) {
-            MultipolygonFeatureCollection multipolygonFeatureCollection =
-                    new Gson().fromJson(categoryJson, MultipolygonFeatureCollection.class);
-
-            Observable.just(multipolygonFeatureCollection)
-                    .subscribeOn(Schedulers.io())
-                    .flatMap(new Function<MultipolygonFeatureCollection, ObservableSource<List<MultipolygonFeature>>>() {
-                        @Override
-                        public ObservableSource<List<MultipolygonFeature>> apply(MultipolygonFeatureCollection multipolygonFeatureCollection) throws Exception {
-                            return Observable.just(multipolygonFeatureCollection.getFeatures());
-                        }
-                    })
-                    .flatMapIterable(new Function<List<MultipolygonFeature>, Iterable<MultipolygonFeature>>() {
-                        @Override
-                        public Iterable<MultipolygonFeature> apply(List<MultipolygonFeature> multipolygonFeatures) throws Exception {
-                            return multipolygonFeatures;
-                        }
-                    })
-                    .flatMap(new Function<MultipolygonFeature, ObservableSource<PolygonFeatureCollection>>() {
-                        @Override
-                        public ObservableSource<PolygonFeatureCollection> apply(MultipolygonFeature multipolygonFeature) throws Exception {
+                Observable.just(multipolygonFeatureCollection)
+                        .subscribeOn(Schedulers.io())
+                        .flatMap((Function<MultiPolygonFeatureCollection, ObservableSource<List<MultiPolygonFeature>>>) multipolygonFeatureCollection1 -> Observable.just(multipolygonFeatureCollection1.getFeatures()))
+                        .flatMapIterable((Function<List<MultiPolygonFeature>, Iterable<MultiPolygonFeature>>) multiPolygonFeatures -> multiPolygonFeatures)
+                        .flatMap((Function<MultiPolygonFeature, ObservableSource<PolygonFeatureCollection>>) multiPolygonFeature -> {
                             PolygonFeatureCollection polygonFeatureCollection = new PolygonFeatureCollection();
                             PolygonFeature polygonFeature = new PolygonFeature();
                             PolygonGeometry polygonGeometry = new PolygonGeometry();
                             polygonGeometry.setType("Polygon");
-                            polygonGeometry.setCoordinates(multipolygonFeature.getGeometry().getCoordinates().get(0));
-                            polygonFeature.setType(multipolygonFeature.getType());
-                            polygonFeature.setProperties(multipolygonFeature.getProperties());
+                            polygonGeometry.setCoordinates(multiPolygonFeature.getGeometry().getCoordinates().get(0));
+                            polygonFeature.setType(multiPolygonFeature.getType());
+                            polygonFeature.setProperties(multiPolygonFeature.getProperties());
                             polygonFeature.setGeometry(polygonGeometry);
                             List<PolygonFeature> polygonFeatureList = new ArrayList<>();
                             polygonFeatureList.add(polygonFeature);
                             polygonFeatureCollection.setFeatures(polygonFeatureList);
                             polygonFeatureCollection.setType(multipolygonFeatureCollection.getType());
                             return Observable.just(polygonFeatureCollection);
-                        }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableObserver<PolygonFeatureCollection>() {
-                        @Override
-                        public void onNext(PolygonFeatureCollection polygonFeatureCollection) {
-                            String geoJason = new Gson().toJson(polygonFeatureCollection);
-                            final KmlDocument kmlDocument = new KmlDocument();
-                            kmlDocument.parseGeoJSON(geoJason);
-                            KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
-                            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
-                            mapView.getOverlays().add(myOverLayBoarder);
-                            mapView.getOverlays().add(0, mapEventsOverlay);
-                            MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<PolygonFeatureCollection>() {
+                            @Override
+                            public void onNext(PolygonFeatureCollection polygonFeatureCollection) {
+                                String geoJason = new Gson().toJson(polygonFeatureCollection);
+                                final KmlDocument kmlDocument = new KmlDocument();
+                                kmlDocument.parseGeoJSON(geoJason);
+                                KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
+                                myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
+                                mapView.getOverlays().add(myOverLayBoarder);
+                                mapView.getOverlays().add(0, mapEventsOverlay);
+                                MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
 
-                        }
+                            }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            mapView.invalidate();
-                        }
-                    });
+                            @Override
+                            public void onComplete() {
+                                mapView.invalidate();
+                            }
+                        });
+
+
+                break;
+            case "MultiLineString":
+                MultiLineStringFeatureCollection multiLineStringFeatureCollection = new Gson().fromJson(categoryJson, MultiLineStringFeatureCollection.class);
+                Observable.just(multiLineStringFeatureCollection)
+                        .subscribeOn(Schedulers.io())
+                        .flatMap((Function<MultiLineStringFeatureCollection, ObservableSource<List<MultiLineStringFeature>>>) multiLineStringFeatureCollection1 -> Observable.just(multiLineStringFeatureCollection1.getFeatures()))
+
+                        .flatMapIterable((Function<List<MultiLineStringFeature>, Iterable<MultiLineStringFeature>>) multiLineStringFeatures -> multiLineStringFeatures)
+                        .flatMap(new Function<MultiLineStringFeature, ObservableSource<LineStringFeatureCollection>>() {
+                            @Override
+                            public ObservableSource<LineStringFeatureCollection> apply(MultiLineStringFeature multiLineStringFeature) throws Exception {
+                                LineStringFeatureCollection lineStringFeatureCollection = new LineStringFeatureCollection();
+                                LineStringFeature lineStringFeature = new LineStringFeature();
+                                LineStringGeometry lineStringGeometry = new LineStringGeometry();
+
+                                lineStringGeometry.setType("LineString");
+                                lineStringGeometry.setCoordinates(multiLineStringFeature.getGeometry().getCoordinates().get(0));
+                                lineStringFeature.setType(multiLineStringFeature.getType());
+                                lineStringFeature.setProperties(multiLineStringFeature.getProperties());
+                                lineStringFeature.setGeometry(lineStringGeometry);
+                                List<LineStringFeature> lineStringFeatureList = new ArrayList<>();
+                                lineStringFeatureList.add(lineStringFeature);
+                                lineStringFeatureCollection.setFeatures(lineStringFeatureList);
+                                lineStringFeatureCollection.setType(multiLineStringFeatureCollection.getType());
+                                return Observable.just(lineStringFeatureCollection);
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<LineStringFeatureCollection>() {
+                            @Override
+                            public void onNext(LineStringFeatureCollection lineStringFeatureCollection) {
+                                String geoJason = new Gson().toJson(lineStringFeatureCollection);
+                                final KmlDocument kmlDocument = new KmlDocument();
+                                kmlDocument.parseGeoJSON(geoJason);
+                                KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
+                                myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
+                                mapView.getOverlays().add(myOverLayBoarder);
+                                mapView.getOverlays().add(0, mapEventsOverlay);
+                                MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                mapView.invalidate();
+                            }
+                        });
+
+                break;
         }
+
 
     }
 

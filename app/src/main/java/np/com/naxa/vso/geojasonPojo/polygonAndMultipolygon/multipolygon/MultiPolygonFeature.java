@@ -4,20 +4,20 @@ package np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import np.com.naxa.vso.osm_convertor.multipolygon.Geometry;
+import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.PolygonAndMultipolygonProperties;
 import np.com.naxa.vso.osm_convertor.multipolygon.Properties;
 
-public class MultipolygonFeature {
+public class MultiPolygonFeature {
 
     @SerializedName("type")
     @Expose
     private String type;
     @SerializedName("properties")
     @Expose
-    private Properties properties;
+    private PolygonAndMultipolygonProperties properties;
     @SerializedName("geometry")
     @Expose
-    private MultipolygonGeometry geometry;
+    private MultiPolygonGeometry geometry;
 
     public String getType() {
         return type;
@@ -27,19 +27,19 @@ public class MultipolygonFeature {
         this.type = type;
     }
 
-    public Properties getProperties() {
+    public PolygonAndMultipolygonProperties getProperties() {
         return properties;
     }
 
-    public void setProperties(Properties properties) {
+    public void setProperties(PolygonAndMultipolygonProperties properties) {
         this.properties = properties;
     }
 
-    public MultipolygonGeometry getGeometry() {
+    public MultiPolygonGeometry getGeometry() {
         return geometry;
     }
 
-    public void setGeometry(MultipolygonGeometry geometry) {
+    public void setGeometry(MultiPolygonGeometry geometry) {
         this.geometry = geometry;
     }
 }
