@@ -70,6 +70,14 @@
     <string name="resources">Resources</string>
     <string name="hazard_and_vulnerability">Hazard and Vulnerability</string>
     <string name="base_data">Base data</string>
+    <string name="community_centres">Community Centres</string>
+    <string name="religious_and_heritage">Religious and Heritage</string>
+    <string name="atm">ATM</string>
+    <string name="security_force">Security Force</string>
+    <string name="gas_depo">Gas Depo</string>
+    <string name="urban_utilities">Urban Utilities</string>
+    <string name="pharmacies_and_health_clinics">Pharmacies And Health Clinics</string>
+    <string name="government_agencies">Government Agencies</string>
 
     <string-array name="array_ward">
         <item>1</item>
