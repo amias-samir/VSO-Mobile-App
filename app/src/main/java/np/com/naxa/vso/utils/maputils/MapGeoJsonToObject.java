@@ -11,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,7 @@ public class MapGeoJsonToObject {
                                                           MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
                                                           int marker_image) {
         List<CommonPlacesAttrb> commonPlacesAttrbList = new ArrayList<CommonPlacesAttrb>();
+        FolderOverlay folderOverlay = new FolderOverlay();
 
         JSONObject jsonObject = null;
         try {
@@ -57,18 +60,24 @@ public class MapGeoJsonToObject {
                 double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
                 double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
                 String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
-                ;
+
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
-
-                mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
+                folderOverlay.add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
                         commonPlacesAttrb, mapView, marker_image));
+//                mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
+//                        commonPlacesAttrb, mapView, marker_image));
 //                mapView.getOverlays().add(myOverLay);
-                mapView.invalidate();
 
             }
-//            }
 
+            if (mapView.getOverlays().size() >= 2) {
+                mapView.getOverlays().set(1, folderOverlay);
+            } else {
+                mapView.getOverlays().add(folderOverlay);
+            }
+            mapView.invalidate();
+//            }
 
         } catch (JSONException e) {
             e.printStackTrace();
