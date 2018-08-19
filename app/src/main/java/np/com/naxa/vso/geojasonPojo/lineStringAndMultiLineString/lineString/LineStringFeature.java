@@ -1,24 +1,23 @@
 
-package np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.polygon;
+package np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.LineStringAndMultiLineStringProperties;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.PolygonAndMultipolygonProperties;
-import np.com.naxa.vso.osm_convertor.multipolygon.Geometry;
-import np.com.naxa.vso.osm_convertor.multipolygon.Properties;
 
-public class PolygonFeature {
+public class LineStringFeature {
 
     @SerializedName("type")
     @Expose
     private String type;
     @SerializedName("properties")
     @Expose
-    private PolygonAndMultipolygonProperties properties;
+    private LineStringAndMultiLineStringProperties properties;
     @SerializedName("geometry")
     @Expose
-    private PolygonGeometry geometry;
+    private LineStringGeometry geometry;
 
     public String getType() {
         return type;
@@ -28,19 +27,19 @@ public class PolygonFeature {
         this.type = type;
     }
 
-    public PolygonAndMultipolygonProperties getProperties() {
+    public LineStringAndMultiLineStringProperties getProperties() {
         return properties;
     }
 
-    public void setProperties(PolygonAndMultipolygonProperties properties) {
+    public void setProperties(LineStringAndMultiLineStringProperties properties) {
         this.properties = properties;
     }
 
-    public PolygonGeometry getGeometry() {
+    public LineStringGeometry getGeometry() {
         return geometry;
     }
 
-    public void setGeometry(PolygonGeometry geometry) {
+    public void setGeometry(LineStringGeometry geometry) {
         this.geometry = geometry;
     }
 

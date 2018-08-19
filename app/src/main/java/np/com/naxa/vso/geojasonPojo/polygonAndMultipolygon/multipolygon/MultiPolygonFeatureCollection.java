@@ -1,19 +1,19 @@
 
 package np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class MultipolygonGeometry
-{
+import java.util.List;
+
+public class MultiPolygonFeatureCollection {
 
     @SerializedName("type")
     @Expose
     private String type;
-    @SerializedName("coordinates")
+    @SerializedName("features")
     @Expose
-    private List<List<List<List<Double>>>> coordinates = null;
+    private List<MultiPolygonFeature> features = null;
 
     public String getType() {
         return type;
@@ -23,13 +23,11 @@ public class MultipolygonGeometry
         this.type = type;
     }
 
-    public List<List<List<List<Double>>>> getCoordinates() {
-        return coordinates;
+    public List<MultiPolygonFeature> getFeatures() {
+        return features;
     }
 
-    public void setCoordinates(List<List<List<List<Double>>>> coordinates) {
-        this.coordinates = coordinates;
+    public void setFeatures(List<MultiPolygonFeature> features) {
+        this.features = features;
     }
-
-
 }
