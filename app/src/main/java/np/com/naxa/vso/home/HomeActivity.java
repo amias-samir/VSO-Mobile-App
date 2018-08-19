@@ -1139,6 +1139,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mapView.getOverlays().clear();
         mapView.getOverlays().add(myOverLayBoarder);
 
+        switch (name){
+            case "river":
+                loadBorder("river");
+                return;
+            case "road":
+                loadBorder("road");
+                return;
+        }
+
+
         if (gridPosition != -1 && wardShowCount % 2 != 0) {
             mapView.getOverlays().add(myOverLayWardBoarder);
             mapView.getOverlays().remove(myOverLayBoarder);
@@ -1758,28 +1768,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_ward:
-                    wardShowCount++;
-                    if (wardShowCount % 2 == 0) {
-                        mapView.getOverlays().clear();
-                        mapView.getOverlays().remove(myOverLayWardBoarder);
-                        mapView.removeAllViews();
-                        mapView.getOverlays().add(myOverLayBoarder);
-                        mapView.invalidate();
+                    loadBorder("wards");
 
-                        showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
-                        showDataOnList(geoJsonName, geoJsonType);
-
-                        Log.d(TAG, "onViewClicked: hide boundary");
-                        return true;
-                    }
-                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
-                    showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
-                    Log.d(TAG, "onViewClicked: show boundary with dataset");
-                    showDataOnList(geoJsonName, geoJsonType);
+//                    wardShowCount++;
+//                    if (wardShowCount % 2 == 0) {
+//                        mapView.getOverlays().clear();
+//                        mapView.getOverlays().remove(myOverLayWardBoarder);
+//                        mapView.removeAllViews();
+//                        mapView.getOverlays().add(myOverLayBoarder);
+//                        mapView.invalidate();
+//
+//                        showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+//                        showDataOnList(geoJsonName, geoJsonType);
+//
+//                        Log.d(TAG, "onViewClicked: hide boundary");
+//                        return true;
+//                    }
+//                    showOverlayOnMap("changunarayan_new_wards.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default);
+//                    showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+//                    Log.d(TAG, "onViewClicked: show boundary with dataset");
+//                    showDataOnList(geoJsonName, geoJsonType);
 
                     break;
                 case R.id.menu_municipal:
-                    loadMunicipalityBoarder();
+                    loadBorder("municipal_boundary");
                     break;
                 case R.id.menu_office:
                     break;
