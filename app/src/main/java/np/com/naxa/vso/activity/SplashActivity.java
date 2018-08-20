@@ -83,21 +83,14 @@ public class SplashActivity extends AppCompatActivity {
         geoJsonListViewModel = ViewModelProviders.of(this).get(GeoJsonListViewModel.class);
 
 
-
         commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
         hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
         educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
         openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
 
 
-
-
-
-
-
         handleStoragePermission();
 
-        fetchGeoJsonCategoryList();
 
 //        parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
 //            @Override
@@ -128,7 +121,6 @@ public class SplashActivity extends AppCompatActivity {
 //        });
 
 
-
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 //                Log.v(TAG, "Permission is granted");
@@ -142,22 +134,13 @@ public class SplashActivity extends AppCompatActivity {
 //        }
 
 
-
-        new Handler().postDelayed(() -> {
-//            if (sharedpref.checkIfDataPresent()) {
-                HomeActivity.start(SplashActivity.this);
-//            } else {
-//                loadDataAndCallHomeActivity();
-//            }
-        }, 5000);
-
     }
 
 
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
+            fetchGeoJsonCategoryList();
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to save data.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -529,27 +512,13 @@ public class SplashActivity extends AppCompatActivity {
         apiInterface
                 .getGeoJsonCategoryDetails()
                 .subscribeOn(Schedulers.io())
-                .flatMap(new Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>() {
-                    @Override
-                    public ObservableSource<List<GeoJsonCategoryEntity>> apply(GeoJsonCategoryDetails geoJsonCategoryDetails) throws Exception {
-                        return Observable.just(geoJsonCategoryDetails.getData());
-                    }
+                .flatMap((Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>) geoJsonCategoryDetails -> Observable.just(geoJsonCategoryDetails.getData()))
+                .flatMapIterable((Function<List<GeoJsonCategoryEntity>, Iterable<GeoJsonCategoryEntity>>) geoJsonCategoryEntities -> geoJsonCategoryEntities)
+                .flatMap((Function<GeoJsonCategoryEntity, Observable<ResponseBody>>) geoJsonCategoryEntity -> {
+                    geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
+                    geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
+                    return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
                 })
-                .flatMapIterable(new Function<List<GeoJsonCategoryEntity>, Iterable<GeoJsonCategoryEntity>>() {
-                    @Override
-                    public Iterable<GeoJsonCategoryEntity> apply(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) throws Exception {
-                        return geoJsonCategoryEntities;
-                    }
-                })
-                .flatMap(new Function<GeoJsonCategoryEntity, Observable<ResponseBody>>() {
-                    @Override
-                    public Observable<ResponseBody> apply(GeoJsonCategoryEntity geoJsonCategoryEntity) throws Exception {
-                        geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
-                        geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
-                        return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
-                    }
-                })
-//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableObserver<ResponseBody>() {
                     @Override
                     public void onNext(ResponseBody s) {
@@ -563,14 +532,14 @@ public class SplashActivity extends AppCompatActivity {
                                 sb.append(line).append("\n");
                             }
                             reader.close();
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 
                         String geoJsonToString = sb.toString();
-                        Log.d(TAG, "onNext: GeoJson "+sb.toString());
+                        Log.d(TAG, "onNext: GeoJson " + sb.toString());
 
-                        if(!TextUtils.isEmpty(geoJsonToString)) {
+                        if (!TextUtils.isEmpty(geoJsonToString)) {
                             geoJsonListViewModel.insert(new GeoJsonListEntity(geoJsonName[0], geoJsonToString));
 
 //                            json parse and store to database
@@ -579,14 +548,15 @@ public class SplashActivity extends AppCompatActivity {
                                 jsonObject = new JSONObject(geoJsonToString);
 
                                 JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
-                                Log.d(TAG, "onNext: "+"save data to database");
+                                Log.d(TAG, "onNext: " + "save data to database");
                                 for (int i = 0; i < jsonarray.length(); i++) {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                                    String name = properties.has("name")? properties.getString("name"):properties.getString("Name");
-                                    String address = properties.has("address")? properties.getString("address"):properties.getString("Address");
-                                    double latitude = properties.has("Y")? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
-                                    double longitude = properties.has("X")? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
-                                    String remarks = properties.has("remarks")? properties.getString("remarks"):properties.getString("Remarks");;
+                                    String name = properties.has("name") ? properties.getString("name") : properties.getString("Name");
+                                    String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
+                                    double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
+                                    double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+                                    String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
+                                    ;
 
                                     CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks);
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
@@ -602,13 +572,16 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        Log.d(TAG, "onError: "+e.getMessage());
+                        finish();
+                        Log.d(TAG, "onError: " + e.getMessage());
 
                     }
 
                     @Override
                     public void onComplete() {
-
+                        HomeActivity.start(SplashActivity.this);
+//                        new Handler().postDelayed(() -> {
+//                        }, 5000);
                     }
                 });
     }

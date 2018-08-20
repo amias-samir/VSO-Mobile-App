@@ -330,7 +330,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             hospitalFacilitiesVewModel = ViewModelProviders.of(this).get(HospitalFacilitiesVewModel.class);
             educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
             openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
-
             geoJsonListViewModel = ViewModelProviders.of(this).get(GeoJsonListViewModel.class);
         } catch (NullPointerException e) {
             Log.d(TAG, "Exception: " + e.toString());
@@ -458,8 +457,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setupMap() {
         myOverLay = new FolderOverlay();
         myOverLayBoarder = new FolderOverlay();
-        myOverLayWardBoarder = new FolderOverlay();
-        myOverlayMunicipalityBorder = new FolderOverlay();
 
         centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -484,8 +481,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //        mapController.zoomToSpan(boundingBox.getLatitudeSpan(), boundingBox.getLongitudeSpan());
         poiMarkers = new RadiusMarkerClusterer(this);
 
-        loadBorder("municipal_boundary");
         loadBorder("wards");
+        loadBorder("municipal_boundary");
 
 //        loadMunicipalityBoarder();
 
@@ -960,6 +957,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             rlMainCategoryList.setVisibility(View.VISIBLE);
+            mapView.getOverlays().remove(1);
+            mapView.invalidate();
             switchViews();
         }
     }
@@ -1127,7 +1126,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void loadlayerToMap(String geoJson, String lineType, String name, int marker_image) {
 
-
 //        if (gridPosition != -1 && wardShowCount % 2 != 0) {
 //            mapView.getOverlays().add(myOverLayWardBoarder);
 //            mapView.getOverlays().remove(myOverLayBoarder);
@@ -1195,22 +1193,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadBorder(String key) {
-        int[] liveCounter = {0};
         Publisher<GeoJsonListEntity> publisher = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(key));
         Observable.fromPublisher(publisher)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new DisposableObserver<GeoJsonListEntity>() {
                     @Override
                     public void onNext(GeoJsonListEntity geoJsonListEntity) {
-                        if (liveCounter[0] == 0) {
-                            try {
-                                loadGeoJsonByKml(geoJsonListEntity.getCategoryJson(), key);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                ToastUtils.showToast("Error loading geojson");
-                            }
-                            liveCounter[0]++;
+                        try {
+                            loadGeoJsonByKml(geoJsonListEntity.getCategoryJson(), key);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtils.showToast("Error loading geojson");
                         }
+
                     }
 
                     @Override
@@ -1253,7 +1248,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             return Observable.just(polygonFeatureCollection);
                         })
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new DisposableObserver<PolygonFeatureCollection>() {
+                        .subscribe(new Observer<PolygonFeatureCollection>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                switch (key) {
+                                    case "municipal_boundary":
+                                        myOverlayMunicipalityBorder = new FolderOverlay();
+                                        break;
+                                    case "wards":
+                                        myOverLayWardBoarder = new FolderOverlay();
+                                        break;
+                                }
+                            }
+
                             @Override
                             public void onNext(PolygonFeatureCollection polygonFeatureCollection) {
                                 String geoJason = new Gson().toJson(polygonFeatureCollection);
@@ -1273,16 +1280,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onError(Throwable e) {
-                                e.printStackTrace();
+
                             }
 
                             @Override
                             public void onComplete() {
-                                if (key == "municipal_boundary") {
+                                if (key.equals("municipal_boundary")) {
                                     mapView.getOverlays().add(myOverlayMunicipalityBorder);
                                     MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
                                     mapView.invalidate();
                                 }
+
                             }
                         });
 
