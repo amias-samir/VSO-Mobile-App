@@ -207,22 +207,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.progressbar)
     ProgressBar progressbar;
+
     @BindView(R.id.tv_name_title)
     TextView tvNameTitle;
+
     @BindView(R.id.tv_distance_subtitle)
     TextView tvDistanceSubtitle;
+
     @BindView(R.id.ll_inset_data)
     LinearLayout llInsetData;
+
     @BindView(R.id.tv_resources)
     TextView tvResources;
+
     @BindView(R.id.tv_hazard_and_vulnerability)
     TextView tvHazardAndVulnerability;
+
     @BindView(R.id.tv_base_data)
     TextView tvBaseData;
+
     @BindView(R.id.fab_map_layer)
     FloatingActionButton fabMapLayer;
+
     @BindView(R.id.card_view)
     CardView cardView;
+
     @BindView(R.id.expand_icon_up_down_toggle)
     ExpandIconView updownloadToggleIcon;
 
@@ -319,7 +328,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         fabLocationToggle.setOnClickListener(this);
 
         overlaysList = new ArrayList<>();
-        
+
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
@@ -934,7 +943,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             rlMainCategoryList.setVisibility(View.VISIBLE);
-            mapView.getOverlays().remove(1);
+            if (mapView.getOverlays().size() >= 2) {
+                mapView.getOverlays().remove(1);
+            }
             mapView.invalidate();
             switchViews();
         }
@@ -1264,7 +1275,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onComplete() {
                                 if (key.equals("municipal_boundary")) {
-                                    mapView.getOverlays().add(myOverlayMunicipalityBorder);
+                                    if (mapView.getOverlays().size() >= 1) {
+                                        mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
+                                    } else {
+                                        mapView.getOverlays().add(myOverlayMunicipalityBorder);
+                                    }
                                     MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
                                     mapView.invalidate();
                                 }
@@ -1762,16 +1777,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_municipal:
-                    if (mapView.getOverlays().get(0) == myOverLayWardBoarder) {
-                        mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
-                        mapView.invalidate();
-                    }
+                    mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
+                    mapView.invalidate();
                     break;
                 case R.id.menu_ward:
-                    if (mapView.getOverlays().get(0) == myOverlayMunicipalityBorder) {
-                        mapView.getOverlays().set(0, myOverLayWardBoarder);
-                        mapView.invalidate();
-                    }
+                    mapView.getOverlays().set(0, myOverLayWardBoarder);
+                    mapView.invalidate();
                     break;
                 case R.id.menu_office:
                     break;
