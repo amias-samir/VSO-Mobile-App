@@ -316,14 +316,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         repo = new MapDataRepository();
 
-        handleStoragePermission();
-
         fabLocationToggle.setOnClickListener(this);
 
         overlaysList = new ArrayList<>();
-
-//        setupMapBox();
-
+        
         try {
             // Get a new or existing ViewModel from the ViewModelProvider.
             commonPlacesAttribViewModel = ViewModelProviders.of(this).get(CommonPlacesAttribViewModel.class);
@@ -886,25 +882,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
-    private void handleStoragePermission() {
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            Log.d(TAG, "handleStoragePermission: outside ");
-
-            if (sharedPreferenceUtils.getBoolanValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, true)) {
-                sharedPreferenceUtils.setValue(SharedPreferenceUtils.IS_STORAGE_PERMISSION_GRANTED, false);
-                startActivity(new Intent(HomeActivity.this, HomeActivity.class));
-                Log.d(TAG, "handleStoragePermission: inside ");
-//             finish();
-            }
-
-
-        } else {
-            EasyPermissions.requestPermissions(this, "Provide storage permission to load map.",
-                    RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-    }
-
     @AfterPermissionGranted(RESULT_LOCATION_PERMISSION)
     private void handleLocationPermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -1211,6 +1188,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
+                        Log.i("Shree", e.getMessage());
                     }
 
                     @Override
