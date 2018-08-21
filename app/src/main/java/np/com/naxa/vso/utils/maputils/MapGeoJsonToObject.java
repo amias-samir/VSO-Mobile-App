@@ -6,6 +6,8 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.JsonParseException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,15 +55,16 @@ public class MapGeoJsonToObject {
 //
 //                }
 //            }else {
+            String remarks = "";
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                 String name = properties.has("name") ? properties.getString("name") :properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
                 String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
                 double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
                 double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
-                
-                String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
-
+                if(properties.has("remarks") || properties.has("Remarks")) {
+                    remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
+                }
                 CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
 
                 folderOverlay.add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
