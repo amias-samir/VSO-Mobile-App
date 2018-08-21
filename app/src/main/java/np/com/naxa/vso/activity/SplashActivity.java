@@ -551,7 +551,7 @@ public class SplashActivity extends AppCompatActivity {
                                 Log.d(TAG, "onNext: " + "save data to database");
                                 for (int i = 0; i < jsonarray.length(); i++) {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                                    String name = properties.has("name") ? properties.getString("name") : properties.getString("Name");
+                                    String name = properties.has("name") ? properties.getString("name") :properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
                                     String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
                                     double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
                                     double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));

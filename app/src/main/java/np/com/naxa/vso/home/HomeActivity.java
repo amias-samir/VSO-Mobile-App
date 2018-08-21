@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.multidex.MultiDex;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -1121,8 +1122,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
 
-        final KmlDocument kmlDocument = new KmlDocument();
-        kmlDocument.parseGeoJSON(geoJson);
+        try {
+            final KmlDocument kmlDocument = new KmlDocument();
+            kmlDocument.parseGeoJSON(geoJson);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
 
         Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);

@@ -1,6 +1,8 @@
 package np.com.naxa.vso.detailspage;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -8,16 +10,23 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.franmontiel.localechanger.LocaleChanger;
+import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 
 public class MarkerDetailsDisplayActivity extends AppCompatActivity {
@@ -157,4 +166,48 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
 
         ((MarkerDetailedDisplayAdapter) recylcerViewItemDetail.getAdapter()).replaceData(markerDetailsKeyValueWholeList);
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_switch_to_english:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    LocaleChanger.setLocale(new Locale("en", "US"));
+                    ActivityRecreationHelper.recreate(MarkerDetailsDisplayActivity.this, true);
+                }
+                return true;
+            case R.id.action_switch_to_nepali:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    LocaleChanger.setLocale(new Locale("ne", "NP"));
+                    ActivityRecreationHelper.recreate(MarkerDetailsDisplayActivity.this, true);
+                }
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        newBase = LocaleChanger.configureBaseContext(newBase);
+        super.attachBaseContext(newBase);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // code here to show dialog
+        super.onBackPressed();  // optional depending on your needs
+    }
+
 }
