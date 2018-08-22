@@ -99,5 +99,73 @@
         <item>Others</item>
     </string-array>
 
+    <!-- sudur string resource -->
+    <string name="app_homepage_name">गृह पृष्ठ</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="cheese_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
+    cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian
+    bergkase cream cheese fromage frais cheesy feet port-salut airedale.</string>
+    <string name="form_sent_np">फारम पठाइयो</string>
+    <string name="form_not_sent_np">Unexpected error occured. </string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="about_us">About Us</string>
+
+    <string name="expand">पुरा पढ्नुहोस</string>
+    <string name="collapse">बन्द गर्नुहोस </string>
+
+
+    <!--expandable list view items-->
+    <string name="mission">सुदूरपश्चिम क्षेत्रमा रहेका विकासका अवसर र सम्भावनाहरुको पहिचान गरि उपलब्ध श्रोत साधनहरुको सन्तुलित रुपमा अधिकतम परिचालनबाट यस क्षेत्रलाई समग्र राष्ट्रिय विकास प्रवाहको समान स्तरमा पुर्याई सामाजिक, आर्थिक एवं मानविय विकासको दृष्टिले आत्मनिर्भर, गतिशिल तथा विकासोन्मुख क्षेत्रको रुपमा स्थापित गर्ने ।</string>
+    <string name="vision">क्षेत्रमा विद्यमान गरिबी, पछौटेपन र विकासका बाधा अवरोधहरुलाई हटाउँदै प्राप्त अवसर र संभावनाहरुको महत्तम (Optimum) उपयोगद्वारा २०२२ सम्ममा बिकासको राष्ट्रिय स्तर मा पुर्याई २०३० सम्ममा “सुन्दर सुदूरपश्चिमलाई समृद्ध सुदूरपश्चिम” बनाउने । </string>
+    <string name="objective">यस आयोगको गठनको उद्देश्य निम्नानुसार रहेको छ ।  </string>
+    <string name="objective1">&#8226; सुदूरपश्चिम क्षेत्रको सर्वाङ्गीण एवं दिगो विकासका लागि आवश्यक विकास नीति एवं योजनाहरु तर्जुमा गर्ने तथा सो को कार्यान्वयनमा प्रमुख भूमिका खेल्ने ।</string>
+    <string name="objective2">&#8226;  मुलुकको समग्र विकासको आवधिक योजना अनुरुप सुदूरपश्चिम क्षेत्रको विकास लक्ष्य र प्राथमिकता निर्धारण गरी यस क्षेत्रको समग्र विकासको सम्भावना र अवसरहरुको पहिचान गरि तदनुरुपको योजना तर्जूमा, कार्यान्वयन, अनुगमन, मूल्यांकन तथा आवश्यक समन्वय गर्ने ।</string>
+    <string name="main_works">आयोगको मुख्य मुख्य कामहरु </string>
+    <string name="main_works1">&#8226; अल्पकालिन, मध्यकलिन र दीर्धकालिन योजनाको तर्जुमा, अनुगमन र मूल्याङ्कन गर्ने ।  </string>
+    <string name="main_works2">&#8226; विकास योजनाको तर्जुमा, कार्यन्वयन, अनुगमन र मूल्याङ्कन गर्नको लागि उपयुक्त संरचना तथा संयन्त्रको निर्माण र विकास गर्ने । </string>
+    <string name="main_works3">&#8226; क्षेत्रको समग्र आर्थिक एवं सामाजिक विकसका लागि क्षेत्रगत निति तर्जुमा, अनुगमन तथा मूल्याङ्कन गर्ने ।</string>
+    <string name="main_works4">&#8226; क्षेत्रको आर्थिक, सामाजिक विकासका समग्र पक्षका बारेमा तथ्यांक संकलन, प्रशोधन, अध्ययन, अनुसन्धान गरी-गराई सम्प्रेसण गर्ने गराउने ।   </string>
+    <string name="main_works5">&#8226; क्षेत्रको समग्र विकासको लागि अवलम्बन गर्नुपर्ने नितिका सम्बन्धमा नेपाल सरकारलाई सुझाव दिनु ।  </string>
+    <string name="main_works6">&#8226; गरिबी निवारणको रणनिती तर्जुमा गरी निश्चित अवधी भित्र निरपेक्ष गरिबी अन्त्य गर्न कार्यक्रम सञ्चालन गराउन । </string>
+    <string name="main_works7">&#8226; विभिन्न विकास आयोजनाको कार्यन्वयन र प्रतिफलको समिक्षा गरी नेपाल सरकार समक्ष प्रतिवेदन पेश गर्ने ।  </string>
+    <string name="main_works8">&#8226; मुलुकको आवधिक योजना अनुरुप सुदूरपश्चिम क्षेत्रको वार्षिक विकास कार्यक्रम, लक्ष्य तथा प्राथमिकता निर्धारण गर्ने ।  </string>
+    <string name="main_works9">&#8226; नेपाल सरकारका विभिन्न निकायहरु संग समन्वय गरी वार्षिक विकास कार्यक्रमका लागि वजेट सिमा निर्धारण गर्ने । </string>
+    <string name="main_works10">&#8226; क्षेत्रगत मन्त्रालय, सचिवालय, विभाग तथा निकायहरुले तयार गरेका सुदूर पश्चिम क्षेत्रको योजनाको स्वीकृतिका लागि सहमति दिने र क्षेत्रगत नीति तर्जुमा गर्न सहयोग पुर्याई कार्यान्वयनका लागि सुझाव तथा निर्देशन दिन । </string>
+    <string name="main_works11">&#8226; स्वीकृत कार्यक्रम प्रभावकारी रुपमा कार्यान्वयन गर्न सम्बन्धित निकायलाई निर्देशन दिने ।</string>
+
+
+    <string-array name="business_type">
+        <item>"होटल व्यवसाय"</item>
+        <item>"खुद्रा व्यापार"</item>
+        <item>"होलसेल पसल"</item>
+        <item>"औषधि व्यवसाय"</item>
+        <item>"स्वास्थ्य केन्द्र"</item>
+        <item>"शैक्षिक संस्था"</item>
+        <item>"परामर्श सेवा केन्द्र"</item>
+        <item>"निर्माण व्यवसाय कार्यालय"</item>
+        <item>"अन्य"</item>
+    </string-array>
+
+    <string-array name="district_name">
+        <item>"आछाम"</item>
+        <item>"कन्चनपुर"</item>
+        <item>"कैलाली"</item>
+        <item>"डडेल्धुरा"</item>
+        <item>"डोटी"</item>
+        <item>"दार्चुला"</item>
+        <item>"बझांग"</item>
+        <item>"बाजुरा"</item>
+        <item>"बैतडी"</item>
+    </string-array>
+
+
+
+
+    <string name="facebook_app_id">392524947816591</string>
+    <string name="fb_login_protocol_scheme">fb392524947816591</string>
+    <!-- end of sudur resource -->
+
 
 </resources>

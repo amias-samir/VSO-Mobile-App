@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +25,6 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import np.com.naxa.vso.R;
-import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 
 public class MarkerDetailsDisplayActivity extends AppCompatActivity {
@@ -170,7 +168,7 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_menu, menu);
+        getMenuInflater().inflate(R.menu.main_menu_menu, menu);
         return true;
     }
 

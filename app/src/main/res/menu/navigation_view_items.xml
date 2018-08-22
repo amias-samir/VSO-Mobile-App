@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:title="Home"
+        android:id="@+id/nav_item_home"
+        android:icon="@drawable/ic_home"/>
+
+    <!--<item android:title="Others">-->
+        <!--<menu>-->
+            <!--<item android:title="About FWDC"-->
+                <!--android:id="@+id/nav_item_aboutFWDC"-->
+                <!--android:icon="@drawable/inbox" />-->
+            <!--<item android:title="News and Events"-->
+                <!--android:id="@+id/nav_item_news_and_events"-->
+                <!--android:icon="@drawable/newsfeed"/>-->
+        <!--</menu>-->
+    <!--</item>-->
+
+    <group android:id="@+id/group_settings_id">
+
+        <item android:title="About us"
+            android:icon="@drawable/help"
+            android:id="@+id/nav_item_about_us" />
+
+        <item android:title="@string/privacy_policy"
+            android:icon="@drawable/settings"
+            android:id="@+id/nav_item_privacy_policy"/>
+    </group>
+
+    <item android:title="all rights reserved © 2016 FWDC"> </item>
+
+
+</menu>

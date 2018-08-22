@@ -36,4 +36,30 @@
     <color name="colorFormMasterElementTextValue">#000000</color>
     <color name="colorFormMasterDivider">#DDDDDD</color>
 
+    <!--sudur color resource-->
+    <color name="primary">#aaafcf</color>
+    <color name="primary_dark">#0288D1</color>
+    <color name="primary_darker">#FF5252</color>
+    <color name="accent">#FF5252</color>
+    <!--<color name="accent">#0fcc08</color>-->
+
+    <color name="tabIconColor">#BDBDBD</color>
+    <color name="black">#000000</color>
+    <color name="jet">#222222</color>
+    <color name="iron">#CCCCCC</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="transparent">#00e040fb</color>
+
+
+    <color name="divider_grey">#D4D4D4</color>
+
+    <color name="nliveo_black">#000000</color>
+    <color name="nliveo_white">#ffffff</color>
+    <color name="textColor">#282828</color>
+
+    <color name="light_balck">#616161</color>
+    <color name="black_alpha_40">#bf000000</color>
+    <!-- end of sudur color resource-->
+
 </resources>

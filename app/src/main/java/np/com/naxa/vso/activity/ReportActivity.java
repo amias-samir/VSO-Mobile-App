@@ -463,7 +463,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_menu, menu);
+        getMenuInflater().inflate(R.menu.main_menu_menu, menu);
         return true;
     }
 
