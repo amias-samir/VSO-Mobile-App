@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--<android.support.v7.widget.CardView-->
+        <!--android:id="@+id/cardview_poltician_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:backgroundTint="@color/nliveo_white"-->
+        <!--card_view:cardCornerRadius="2dp"-->
+        <!--card_view:cardElevation="3dp">-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+
+            <ImageView
+                android:id="@+id/img_thumbnail"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp" />
+
+            <ImageView
+                android:id="@+id/image_error"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="19dp"
+                android:layout_marginRight="19dp"
+                android:layout_toLeftOf="@+id/name_layout"
+                android:layout_toStartOf="@+id/name_layout"
+                android:src="@drawable/ic_image_none"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:id="@+id/name_layout"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/img_thumbnail"
+                android:layout_toRightOf="@+id/img_thumbnail"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textview_label_poltical_party_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="नाम:"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView_poltical_party_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toEndOf="@+id/textview_label_poltical_party_name"
+                    android:layout_toRightOf="@+id/textview_label_poltical_party_name"
+                    android:text="asascac"
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="14dp" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:src="@color/divider_grey" />
+        <!--</android.support.v7.widget.CardView>-->
+    </LinearLayout>
+
+</LinearLayout>

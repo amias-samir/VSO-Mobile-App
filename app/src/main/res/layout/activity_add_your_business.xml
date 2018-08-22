@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_add_your_business"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".activities.AddYourBusinessActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_sudur"></include>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:theme="@style/AppTheme.AddYourOffice">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/textView_office_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:hint="कार्यलय अथवा व्यवसायको नाम"
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/light_balck" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@color/divider_grey"
+                    />
+
+                <TextView
+                    android:id="@+id/textView_office_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_below="@id/textView_office_name"
+                    android:hint="व्यवसायको अथवा कार्यलयको वर्ग"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/jet"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp">
+
+                    <Spinner
+                        android:id="@+id/category_list_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="right"
+                        android:theme="@style/SpinnerDropDownItem"
+                        android:entries="@array/business_type"
+                         />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@color/divider_grey"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="कार्यालय जिल्ला"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/jet"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+
+                <Spinner
+                    android:id="@+id/district_list_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="right"
+                    android:theme="@style/SpinnerDropDownItem"
+                    android:entries="@array/district_name"/>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@color/divider_grey"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+
+                <EditText
+                    android:id="@+id/textView_office_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="कार्यालय ठेगाना"
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/light_balck"
+
+                    />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@color/divider_grey"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textview_label_office_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="व्यवसायको अथवा कार्यलयको फोटो लिनुहोस् "
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/jet"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <ImageButton
+                    android:id="@+id/btn_take_office_photo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:scaleType="fitCenter"
+                    android:background="@drawable/camera_pressed"
+                    android:src="@drawable/ic_add_photo_red"
+                    android:layout_alignParentTop="true"
+                    android:foregroundGravity="center"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+            </RelativeLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@color/divider_grey"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="नक्सामा स्थान छान्नुहोस्"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="15dp"
+                android:textStyle="bold"
+                android:textColor="@color/nliveo_black"
+                android:textColorHint="@color/jet"
+                />
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_pressed"
+                android:src="@drawable/ic_buis_map"
+                android:id="@+id/map_button"
+                android:scaleType="centerInside"
+                android:layout_gravity="center_horizontal" />
+
+            <ImageView
+                android:id="@+id/imgPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:layout_margin="10dp"
+                android:visibility="gone" />
+
+                <!-- To display picture taken -->
+
+
+            <!--&lt;!&ndash;get Gps Location House hold&ndash;&gt;-->
+            <!--<android.support.v7.widget.CardView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:cardBackgroundColor="@color/nliveo_white"-->
+            <!--app:cardElevation="1dp"-->
+            <!--android:layout_margin="20dp">-->
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:padding="5dp">-->
+
+            <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_margin="@dimen/layout_margin"-->
+            <!--android:padding="5dp">-->
+
+            <!--<Button-->
+            <!--android:id="@+id/poaching_GpsStart"-->
+            <!--android:layout_width="212dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:gravity="center"-->
+            <!--android:background="@color/accent"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:text="Get gps location" />-->
+
+            <!--</RelativeLayout>-->
+
+            <!--<Button-->
+            <!--android:layout_width="212dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Preview Map"-->
+            <!--android:background="@color/accent"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:id="@+id/poaching_preview_map" />-->
+
+
+            <!--</LinearLayout>-->
+            <!--</android.support.v7.widget.CardView>-->
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@color/divider_grey"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
+
+                <EditText
+                    android:id="@+id/textView_office_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="कार्यालयको बारेमा (बढीमा ५० शब्द)"
+                    android:maxLength="200"
+                    android:textColor="@color/nliveo_black"
+                    android:textColorHint="@color/light_balck" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:src="@color/divider_grey"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/layout_margin"
+                    android:padding="5dp">
+
+                    <Button
+                        android:id="@+id/btn_office_send"
+                        android:layout_width="212dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/button_pressed"
+                        android:gravity="center"
+                        android:text="पठाउनुहोस्"
+                        android:textColor="#ffffff" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

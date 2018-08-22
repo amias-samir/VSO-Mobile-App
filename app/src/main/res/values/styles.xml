@@ -118,6 +118,14 @@
         <item name="android:textColorHint">@color/accent</item>
         <item name="colorButtonNormal">@color/primary_darker</item>
     </style>
+
+    <!-- collapsed ToolBar -->
+    <style name="CollapsedActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">@color/accent</item>
+        <item name="titleTextColor">@color/accent</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
     <!-- end of sudur style resource-->
 
 </resources>

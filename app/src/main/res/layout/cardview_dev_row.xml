@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_gravity="center"
+        android:background="@color/nliveo_white">
+
+        <ImageView
+            android:id="@+id/project_imageView"
+            android:layout_width="130dp"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="3dp"
+            android:background="@drawable/construction_img_default"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/dev_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/project_imageView"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="sdfsdaffsad "
+            android:textColor="@color/nliveo_black"
+            android:textSize="14dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_project_short_desc"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dev_title"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/project_imageView"
+            android:layout_toRightOf="@+id/project_imageView"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="10dp"
+            android:maxLines="3"/>
+
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dev_title"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/project_imageView"
+            android:layout_toRightOf="@+id/project_imageView"
+            android:text="ठेकेदारको नाम : "
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_contractor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/dev_title"
+            android:layout_marginRight="10dp"
+            android:layout_toEndOf="@+id/textView9"
+            android:layout_toRightOf="@+id/textView9"
+            android:text="Small Text"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#5a5a5a"
+            android:textSize="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView9"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/project_imageView"
+            android:layout_toRightOf="@+id/project_imageView"
+            android:text="बजेट : "
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_budget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView9"
+            android:layout_marginRight="10dp"
+            android:layout_toEndOf="@+id/textView10"
+            android:layout_toRightOf="@+id/textView10"
+            android:text="budget"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#5a5a5a"
+            android:textSize="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView10"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@+id/project_imageView"
+            android:layout_toRightOf="@+id/project_imageView"
+            android:text="जिल्ला : "
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="10dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_district"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView10"
+            android:layout_marginRight="10dp"
+            android:layout_toEndOf="@+id/textView10"
+            android:layout_toRightOf="@+id/textView10"
+            android:text="Small Text"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#5a5a5a"
+            android:textSize="10dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/primary" />
+
+</LinearLayout>
