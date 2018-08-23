@@ -145,6 +145,7 @@ import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
+import np.com.naxa.vso.sudur.activities.SplashScreenActivity;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
@@ -1788,6 +1789,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.menu_ward:
                     mapView.getOverlays().set(0, myOverLayWardBoarder);
                     mapView.invalidate();
+                    break;
+                case R.id.menu_sudur:
+                    startActivity(new Intent(HomeActivity.this, SplashScreenActivity.class));
                     break;
                 case R.id.menu_office:
                     break;

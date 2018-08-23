@@ -2,18 +2,17 @@ package np.com.naxa.vso.sudur.model.rest;
 
 import com.github.simonpercic.oklog3.OkLogInterceptor;
 
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.schedulers.Schedulers;
 
 
 public class ApiClient {
 
     private static final String BASE_URL = "http://naxa.com.np/sudurapi/";
     private static Retrofit retrofit = null;
-    private static RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
+//    private static RxJavaCallAdapterFactory rxAdapter = RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
 
     public static Retrofit getClient() {
 
@@ -23,7 +22,7 @@ public class ApiClient {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL).client(okHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create()).addCallAdapterFactory(rxAdapter)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;

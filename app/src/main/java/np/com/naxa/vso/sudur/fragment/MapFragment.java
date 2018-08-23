@@ -174,32 +174,55 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        try {
+
+            mMapView.onPause();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        try {
+
+            mMapView.onDestroy();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        try {
+            mMapView.onSaveInstanceState(outState);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        try {
+
+            mMapView.onLowMemory();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.getMapAsync(this);
-        mMapView.onResume();
+        try {
+            mMapView.getMapAsync(this);
+            mMapView.onResume();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -12,10 +12,11 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.naxa.nepal.sudurpaschimanchal.R;
 
 import java.util.HashMap;
 import java.util.List;
+
+import np.com.naxa.vso.R;
 
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {

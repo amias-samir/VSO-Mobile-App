@@ -16,12 +16,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.naxa.nepal.sudurpaschimanchal.R;
-import com.naxa.nepal.sudurpaschimanchal.model.Constants;
-import com.naxa.nepal.sudurpaschimanchal.model.Home_List_Model;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import np.com.naxa.vso.R;
+import np.com.naxa.vso.sudur.model.Constants;
+import np.com.naxa.vso.sudur.model.Home_List_Model;
 
 /**
  * Created by SAmir on 9/30/2016.

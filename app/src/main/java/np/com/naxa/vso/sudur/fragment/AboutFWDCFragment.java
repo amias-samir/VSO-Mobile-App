@@ -23,10 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.naxa.nepal.sudurpaschimanchal.R;
-import com.naxa.nepal.sudurpaschimanchal.activities.GathanAadeshPdfActivity;
-import com.naxa.nepal.sudurpaschimanchal.adapter.ExpandableListAdapter;
-import com.naxa.nepal.sudurpaschimanchal.model.UrlClass;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +44,10 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import at.blogc.android.views.ExpandableTextView;
+import np.com.naxa.vso.R;
+import np.com.naxa.vso.sudur.activities.GathanAadeshPdfActivity;
+import np.com.naxa.vso.sudur.adapter.ExpandableListAdapter;
+import np.com.naxa.vso.sudur.model.UrlClass;
 
 /**
  * Created by Nishon Tandukar on 27 Jun 2017 .

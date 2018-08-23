@@ -11,12 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.naxa.nepal.sudurpaschimanchal.R;
-import com.naxa.nepal.sudurpaschimanchal.model.Constants;
-import com.naxa.nepal.sudurpaschimanchal.model.Project_Status_Model;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import np.com.naxa.vso.R;
+import np.com.naxa.vso.sudur.model.Constants;
+import np.com.naxa.vso.sudur.model.Project_Status_Model;
 
 /**
  * Created by Samir on 3/14/2017.

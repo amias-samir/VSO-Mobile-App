@@ -16,9 +16,10 @@
 
 package np.com.naxa.vso.sudur.model;
 
-import com.naxa.nepal.sudurpaschimanchal.R;
 
 import java.util.Random;
+
+import np.com.naxa.vso.R;
 
 public class DefaultPOJONewsFeed {
 

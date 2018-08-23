@@ -94,6 +94,348 @@
         <activity
             android:exported="true"
             android:name=".activity.MapBoxActivity" />
+
+
+
+        <!--sudur manifest code-->
+        <activity android:name=".sudur.activities.SplashScreenActivity">
+        </activity>
+        <activity android:name=".sudur.SudurMainActivity">
+        </activity>
+        <activity
+            android:name=".sudur.activities.IntroductionActivity"
+            android:parentActivityName=".sudur.SudurMainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AboutFWDCActivity"
+            android:exported="true">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.IntroductionUpdateActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.MapPointActivity"
+            android:parentActivityName="sudur.SudurMainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.HamroSudurPaschimActivity"
+            android:exported="true"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AskForHelpActivity"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.YouTubeActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.ReligiousPlacesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:value=".HamroSudurPaschimActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AddYourBusinessActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.RajnitikAwasthaActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.DevelopmentProjectListActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCT_UL0lI6qa0UYcWUyAg9eTgmA3wNY1B8" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".sudur.activities.ProjectDetailsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.AboutFWDCActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NewsDetailsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.FWDRCompletedProjectsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.FWDROngoingProjectActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.FWDRFutureProjectsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AttractionDetailsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+        </activity>
+        <activity
+            android:name=".sudur.activities.HistoricalPlacesActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.CulturalPlacesActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NaturalPlacesActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.HamroSudurPaschimActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.SocioEconomicActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.PieChartDetailsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.SocioEconomicActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.BarChartDetailsActivity"
+            android:screenOrientation="landscape"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.SocioEconomicActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.PrivacyPolicyActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AboutUsActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.AboutFWDCpdfDetailsWebActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.AboutFWDCActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NagarBudgetDistrict"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.BikashGatibitiActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NagarBudgetActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.NagarBudgetDistrict" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.DistrictProgramActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.BikashGatibitiActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.BikashGatibitiActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.IntroductionUpdateActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.IntroductionRegionActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.IntroductionUpdateActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.IntroductionDevelopmentActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.IntroductionUpdateActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NameListOfRepresentativeActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.RajnitikAwasthaActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.MajorDevelopmentProjectsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.BikashGatibitiActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.DevelopmentINGOsOrganizationActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.BikashGatibitiActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NGODetailsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.BikashGatibitiActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.GathanAadeshPdfActivity"
+            android:screenOrientation="portrait"
+            android:value=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.AboutFWDCActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.MajorProjectDetailsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.MajorDevelopmentProjectsActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.ProposedDevelopmentProjectsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.MajorDevelopmentProjectsActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.NgoIngoDetailsActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.activities.DevelopmentINGOsOrganizationActivity" />
+        </activity>
+        <activity
+            android:name=".sudur.activities.BusinessPlacesMapActivity"
+            android:exported="true">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".sudur.SudurMainActivity" />
+
+        </activity>
+        <!--end of sudur manifest code-->
     </application>
 
 </manifest>
