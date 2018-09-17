@@ -27,9 +27,26 @@ public class GeoJsonCategoryEntity {
     @Expose
     private String categoryTable;
 
-    public GeoJsonCategoryEntity(String categoryName, String categoryTable) {
+    @SerializedName("category_type")
+    @ColumnInfo(name = "category_type")
+    @Expose
+    private String categoryType;
+
+    @SerializedName("category_photo")
+    @ColumnInfo(name = "category_photo")
+    @Expose
+    private String categoryPhoto;
+
+//    public GeoJsonCategoryEntity(String categoryName, String categoryTable) {
+//        this.categoryName = categoryName;
+//        this.categoryTable = categoryTable;
+//    }
+
+    public GeoJsonCategoryEntity(String categoryName, String categoryTable, String categoryType, String categoryPhoto) {
         this.categoryName = categoryName;
         this.categoryTable = categoryTable;
+        this.categoryType = categoryType;
+        this.categoryPhoto = categoryPhoto;
     }
 
     public String getCategoryName() {
@@ -54,5 +71,21 @@ public class GeoJsonCategoryEntity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(String categoryType) {
+        this.categoryType = categoryType;
+    }
+
+    public String getCategoryPhoto() {
+        return categoryPhoto;
+    }
+
+    public void setCategoryPhoto(String categoryPhoto) {
+        this.categoryPhoto = categoryPhoto;
     }
 }

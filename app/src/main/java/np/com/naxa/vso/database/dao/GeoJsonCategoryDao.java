@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
+import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 
 @Dao
 public interface GeoJsonCategoryDao {
@@ -18,6 +19,9 @@ public interface GeoJsonCategoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(GeoJsonCategoryEntity geoJsonCategoryEntity);
+
+    @Query("SELECT * from GeoJsonCategoryEntity WHERE category_type =:category_type")
+    LiveData<List<GeoJsonCategoryEntity>> getGeoJsonListByCategoryType(String category_type);
 
     @Query("DELETE FROM GeoJsonCategoryEntity")
     void deleteAll();

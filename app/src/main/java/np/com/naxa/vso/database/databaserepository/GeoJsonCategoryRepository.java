@@ -21,6 +21,7 @@ public class GeoJsonCategoryRepository {
 
     private GeoJsonCategoryDao mGeoJsonCategoryDao;
     private LiveData<List<GeoJsonCategoryEntity>> mAllGeoJsonCategoryEntity;
+    private LiveData<List<GeoJsonCategoryEntity>> mSpecificTypeGeoJsonCategoryEntity;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -36,6 +37,11 @@ public class GeoJsonCategoryRepository {
     // Observed LiveData will notify the observer when the data has changed.
     public LiveData<List<GeoJsonCategoryEntity>> getAllGeoJsonCategoryEntity() {
         return mAllGeoJsonCategoryEntity;
+    }
+
+    public LiveData<List<GeoJsonCategoryEntity>> getSpecificTypeGeoJsonCategoryEntity(String category_type) {
+        mSpecificTypeGeoJsonCategoryEntity = mGeoJsonCategoryDao.getGeoJsonListByCategoryType(category_type);
+        return mSpecificTypeGeoJsonCategoryEntity;
     }
 
     // You must call this on a non-UI thread or your app will crash.

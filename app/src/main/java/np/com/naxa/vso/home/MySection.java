@@ -25,7 +25,7 @@ public class MySection extends SectionEntity<MapDataCategory> {
 
         list.add(new MySection(new MapDataCategory(R.drawable.ic_hospital, VSO.getInstance().getResources().getString(R.string.hospital), "health_facilities", MapDataCategory.POINT, R.drawable.marker_health)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_open_space, VSO.getInstance().getResources().getString(R.string.open_space), "open_spaces", MapDataCategory.BOUNDARY, R.drawable.marker_openspace)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_eductional, VSO.getInstance().getResources().getString(R.string.educational_institute), "educational_institute", MapDataCategory.POINT, R.drawable.marker_education)));
+        list.add(new MySection(new MapDataCategory(R.drawable.ic_eductional, VSO.getInstance().getResources().getString(R.string.educational_institute), "educatinal_institutions", MapDataCategory.POINT, R.drawable.marker_education)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_financial, VSO.getInstance().getResources().getString(R.string.financial_institute), "financial_institute", MapDataCategory.POINT, R.drawable.marker_bank)));
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_public_toilets, VSO.getInstance().getResources().getString(R.string.public_toilets), null, MapDataCategory.POINT, R.drawable.marker_toilets)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_industry, VSO.getInstance().getResources().getString(R.string.industries), "industries", MapDataCategory.POINT, R.drawable.marker_industry)));

@@ -14,5 +14,6 @@
     <item
         android:id="@+id/menu_sudur"
         android:title="Load Sudur"
+        android:visible="false"
         />
 </menu>
