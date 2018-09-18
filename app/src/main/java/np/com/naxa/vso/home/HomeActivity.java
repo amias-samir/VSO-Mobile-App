@@ -23,7 +23,6 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.multidex.MultiDex;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -135,7 +134,6 @@ import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.Line
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringGeometry;
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.multiLineString.MultiLineStringFeature;
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.multiLineString.MultiLineStringFeatureCollection;
-
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultiPolygonFeature;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.multipolygon.MultiPolygonFeatureCollection;
 import np.com.naxa.vso.geojasonPojo.polygonAndMultipolygon.polygon.PolygonFeature;
@@ -715,6 +713,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d(TAG, "showOverlayOnMap: " + name);
 
+        if (type == "BOUNDARY") {
+            switch (name) {
+                case "wards":
+                    mapView.getOverlays().set(0, myOverLayWardBoarder);
+                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    mapView.invalidate();
+                    return;
+                case "changunarayan_municipality_boundary.geojson":
+                    mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
+                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    mapView.invalidate();
+                    return;
+            }
+        }
+
         Publisher<GeoJsonListEntity> pub = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(name));
         Observable.fromPublisher(pub)
                 .subscribeOn(Schedulers.io())
@@ -1126,7 +1139,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         try {
             final KmlDocument kmlDocument = new KmlDocument();
             kmlDocument.parseGeoJSON(geoJson);
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
