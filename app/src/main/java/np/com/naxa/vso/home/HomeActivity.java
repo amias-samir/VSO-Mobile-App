@@ -711,7 +711,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void showOverlayOnMap(String name, String type, int marker_image) {
+    private void showOverlayOnMap (String name, String type, int marker_image) {
 
         Log.d(TAG, "showOverlayOnMap: " + name);
 

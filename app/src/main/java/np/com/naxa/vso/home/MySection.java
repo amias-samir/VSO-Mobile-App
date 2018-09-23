@@ -61,7 +61,7 @@ public class MySection extends SectionEntity<MapDataCategory> {
         List<MySection> list = new ArrayList<>();
         list.add(new MySection(new MapDataCategory(R.drawable.ic_boundry, VSO.getInstance().getResources().getString(R.string.municipality_boundary_name), "changunarayan_municipality_boundary.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_wards, VSO.getInstance().getResources().getString(R.string.municipality_ward_name), "wards", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
-        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, VSO.getInstance().getResources().getString(R.string.road_network), "road", MapDataCategory.ROAD, R.drawable.marker_roads)));
+//        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, VSO.getInstance().getResources().getString(R.string.road_network), "road", MapDataCategory.ROAD, R.drawable.marker_roads)));
         list.add(new MySection(new MapDataCategory(R.drawable.ic_river_network, VSO.getInstance().getResources().getString(R.string.river_network), "river", MapDataCategory.RIVER, R.drawable.marker_river)));
         return list;
     }
