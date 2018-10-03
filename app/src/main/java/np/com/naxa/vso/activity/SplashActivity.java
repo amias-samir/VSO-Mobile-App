@@ -2,6 +2,9 @@ package np.com.naxa.vso.activity;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -140,7 +143,16 @@ public class SplashActivity extends AppCompatActivity {
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            fetchGeoJsonCategoryList();
+            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+                //we are connected to a network
+                fetchGeoJsonCategoryList();
+            }else {
+                // redirect to homepage
+                HomeActivity.start(SplashActivity.this);
+            }
+
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to save data.",
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -553,8 +565,8 @@ public class SplashActivity extends AppCompatActivity {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                                     String name = properties.has("name") ? properties.getString("name") :properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
                                     String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
-                                    double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
-                                    double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+                                    double latitude = properties.has("y") ? Double.parseDouble(properties.getString("y")) : Double.parseDouble(properties.getString("Y"));
+                                    double longitude = properties.has("x") ? Double.parseDouble(properties.getString("x")) : Double.parseDouble(properties.getString("X"));
                                     String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
                                     ;
 

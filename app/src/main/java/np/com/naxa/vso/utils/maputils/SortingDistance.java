@@ -13,12 +13,13 @@ import java.util.Map;
 
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
+import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.OpenSpace;
 
 public class SortingDistance {
     private static final String TAG = "SortingDistance";
 
-    Map<OpenAndCommon, Float> hashMapOpenWithDistance;
+    Map<CommonPlacesAttrb, Float> hashMapOpenWithDistance;
     Map<HospitalAndCommon, Float> hashMapHospitalWithDistance;
     List<OpenSpace> sortedOpenSpacesList;
     List<Float> sortedOpenSpacesDistanceList;
@@ -26,15 +27,15 @@ public class SortingDistance {
     LinkedHashMap sortedMap = new LinkedHashMap();
 
 
-    public LinkedHashMap sortingOpenSpaceDistanceData(List<OpenAndCommon> openSpaceList, Double myLat, Double myLong ) {
+    public LinkedHashMap sortingOpenSpaceDistanceData(List<CommonPlacesAttrb> openSpaceList, Double myLat, Double myLong ) {
 
-        hashMapOpenWithDistance = new HashMap<OpenAndCommon, Float>();
+        hashMapOpenWithDistance = new HashMap<CommonPlacesAttrb, Float>();
 
                 if (openSpaceList.size() > 1) {
                     for (int i = 0; i < openSpaceList.size(); i++) {
 
-                        double latfirst = openSpaceList.get(i).getCommonPlacesAttrb().getLatitude();
-                        double longfirst = openSpaceList.get(i).getCommonPlacesAttrb().getLongitude();
+                        double latfirst = openSpaceList.get(i).getLatitude();
+                        double longfirst = openSpaceList.get(i).getLongitude();
 //                        double latfirst = 27.1254545;
 //                        double longfirst = 85.3265655;
 
@@ -141,7 +142,7 @@ public class SortingDistance {
                 if (comp1.equals(comp2)) {
                     passedMap.remove(key);
                     mapKeys.remove(key);
-                    sortedMap.put((OpenAndCommon) key, (Float) val);
+                    sortedMap.put((CommonPlacesAttrb) key, (Float) val);
                     break;
                 }
             }

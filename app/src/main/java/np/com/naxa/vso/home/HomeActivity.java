@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -997,19 +998,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         points[0] = currentLocation;
         final String[] nearestOpenSpace = new String[2];
 
-        openSpaceViewModel.getAllOpenSpaceList()
+        commonPlacesAttribViewModel.getPlaceByType("open_spaces")
                 .subscribeOn(Schedulers.io())
-                .flatMap((Function<List<OpenAndCommon>, Publisher<Polyline>>) openAndCommons -> {
+                .flatMap((Function<List<CommonPlacesAttrb>, Publisher<Polyline>>) openAndCommons -> {
                     LinkedHashMap linkedOpenAndCommon = sortingDistance.sortingOpenSpaceDistanceData(openAndCommons,
                             currentLocation.getLatitude(),
                             currentLocation.getLongitude());
-                    Set<OpenAndCommon> keySet = linkedOpenAndCommon.keySet();
-                    List<OpenAndCommon> sortedOpenlist = new ArrayList<OpenAndCommon>(keySet);
+                    Set<CommonPlacesAttrb> keySet = linkedOpenAndCommon.keySet();
+                    List<CommonPlacesAttrb> sortedOpenlist = new ArrayList<CommonPlacesAttrb>(keySet);
 
                     Collection<Float> values = linkedOpenAndCommon.values();
                     ArrayList<Float> sortedDistanceList = new ArrayList<Float>(values);
 
-                    nearestOpenSpace[0] = sortedOpenlist.get(0).getCommonPlacesAttrb().getName();
+                    nearestOpenSpace[0] = sortedOpenlist.get(0).getName();
                     Float distance = sortedDistanceList.get(0);
                     if (sortedDistanceList.get(0) > 1000) {
                         nearestOpenSpace[1] = (distance / 1000) + " Kms. away";
@@ -1017,8 +1018,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         nearestOpenSpace[1] = distance + " Meters away";
                     }
 
-                    points[1] = new GeoPoint(sortedOpenlist.get(0).getCommonPlacesAttrb().getLatitude(),
-                            sortedOpenlist.get(0).getCommonPlacesAttrb().getLongitude());
+                    points[1] = new GeoPoint(sortedOpenlist.get(0).getLatitude(),
+                            sortedOpenlist.get(0).getLongitude());
 
                     return routeGenerateObservable(points);
                 })
@@ -1064,6 +1065,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 waypoints.add(points[0]);
                 waypoints.add(points[1]);
 
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
                 Road road = roadManager.getRoad(waypoints);
 
                 final int[] step = {1};
@@ -1103,7 +1106,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         });
 
                 Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-
                 e.onNext(roadOverlay);
             } catch (Exception ex) {
                 e.onError(ex);
