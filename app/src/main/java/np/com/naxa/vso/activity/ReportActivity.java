@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -436,28 +437,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     }
 
     private void setCurrentDate() {
-        final Calendar c = Calendar.getInstance();
-        int yy = c.get(Calendar.YEAR);
-        int mm = c.get(Calendar.MONTH);
-        int dd = c.get(Calendar.DAY_OF_MONTH);
-
-        int actual_month = mm+1;
 
         Date date = Calendar.getInstance(new Locale("en", "US")).getTime();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         String formattedDate = df.format(date);
-
-//        String day = (dd+"".length() == 2)?("0"+dd): (dd+"");
-//        String month = (mm+"".length() == 2)?("0"+actual_month): (actual_month+"");
-//
-//        // set current date into textview
-//        tvIncidentTime.getEditText().setText((new StringBuilder()
-//                // Month is 0 based, just add 1
-//                .append(yy).append("").append("-").append(month).append("-")
-//                .append(day)));
-
         tvIncidentTime.getEditText().setText(formattedDate);
-        tvIncidentTime.setVisibility(View.VISIBLE);
     }
 
 
