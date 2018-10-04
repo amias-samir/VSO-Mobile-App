@@ -13,7 +13,7 @@
     sothree:umanoScrollableView="@+id/recylcer_view_categories_detail"
     sothree:umanoShadowHeight="0dp">
 
-    <include layout="@layout/main_content_acitivity_main" />
+    <include layout="@layout/main_content_activitiy_main" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
