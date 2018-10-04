@@ -69,10 +69,6 @@ public class MapGeoJsonToObject {
 
                 folderOverlay.add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
                         commonPlacesAttrb, mapView, marker_image));
-//                mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-//                        commonPlacesAttrb, mapView, marker_image));
-//                mapView.getOverlays().add(myOverLay);
-
             }
 
             if (mapView.getOverlays().size() >= 2) {

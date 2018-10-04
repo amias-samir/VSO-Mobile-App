@@ -2,6 +2,7 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -123,8 +124,11 @@ import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
+import np.com.naxa.vso.database.dao.GeoJsonCategoryDao;
+import np.com.naxa.vso.database.databaserepository.GeoJsonCategoryRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
+import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
@@ -155,6 +159,7 @@ import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
+import np.com.naxa.vso.viewmodel.GeoJsonCategoryViewModel;
 import np.com.naxa.vso.viewmodel.GeoJsonListViewModel;
 import np.com.naxa.vso.viewmodel.HospitalFacilitiesVewModel;
 import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
@@ -343,7 +348,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         setupBottomBar();
         setupListRecycler();
-        setupGridRecycler(MySection.getResourcesCatergorySections());
+
+        GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+
+
+        geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
+                .subscribeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                        setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
 
         slidingPanel.setAnchorPoint(0.4f);
         slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -1160,9 +1189,33 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
 
         List<MySection> gridItems = new ArrayList<>();
+        GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+
+//        gridItems.addAll(MySection.getResourcesCatergorySections(geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data")));
+        geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                        setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
         gridItems.addAll(MySection.getBaseDataCatergorySections());
         gridItems.addAll(MySection.getHazardCatergorySections());
-        gridItems.addAll(MySection.getResourcesCatergorySections());
 
         // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
@@ -1721,7 +1774,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.tv_resources:
                 mainCategoryPosition = 1;
-                setupGridRecycler(MySection.getResourcesCatergorySections());
+                GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+//                setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data")));
+
                 break;
 
             case R.id.tv_hazard_and_vulnerability:

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -21,7 +22,7 @@ public class GeoJsonCategoryRepository {
 
     private GeoJsonCategoryDao mGeoJsonCategoryDao;
     private LiveData<List<GeoJsonCategoryEntity>> mAllGeoJsonCategoryEntity;
-    private LiveData<List<GeoJsonCategoryEntity>> mSpecificTypeGeoJsonCategoryEntity;
+    private Maybe<List<GeoJsonCategoryEntity>> mSpecificTypeGeoJsonCategoryEntity;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -39,7 +40,7 @@ public class GeoJsonCategoryRepository {
         return mAllGeoJsonCategoryEntity;
     }
 
-    public LiveData<List<GeoJsonCategoryEntity>> getSpecificTypeGeoJsonCategoryEntity(String category_type) {
+    public Maybe<List<GeoJsonCategoryEntity>> getSpecificTypeListGeoJsonCategoryEntity(String category_type) {
         mSpecificTypeGeoJsonCategoryEntity = mGeoJsonCategoryDao.getGeoJsonListByCategoryType(category_type);
         return mSpecificTypeGeoJsonCategoryEntity;
     }
