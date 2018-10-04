@@ -1042,7 +1042,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             myOverLay.add(getMarkerOverlay(points));
 
                             addOrReplaceSecondaryLayer(myOverLay);
-
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                             mapView.getController().animateTo(points[0]);
 
                             // handleLocationPermission for current location position overlay
