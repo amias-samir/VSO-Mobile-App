@@ -2,6 +2,9 @@ package np.com.naxa.vso.home;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Looper;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseSectionQuickAdapter;
@@ -35,12 +38,12 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
 
 
 
-                io.reactivex.Observable.just(mapDataCategory.image)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new DisposableObserver<String>() {
-                            @Override
-                            public void onNext(String s) {
+//                io.reactivex.Observable.just(mapDataCategory.image)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new DisposableObserver<String>() {
+//                            @Override
+//                            public void onNext(String s) {
 //                                try {
 //                                    Bitmap theBitmap = Glide.
 //                                            with(VSO.getInstance()).
@@ -55,19 +58,49 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
 //                                } catch (ExecutionException e) {
 //                                    e.printStackTrace();
 //                                }
-                            }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        });
 
-                            @Override
-                            public void onError(Throwable e) {
 
-                            }
+                new AsyncTask<Void, Void, Void>() {
+                    Bitmap theBitmap;
 
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-
+                    @Override
+                    protected Void doInBackground(Void... params) {
+//                        Looper.prepare();
+                        try {
+                            theBitmap = Glide.
+                                    with(VSO.getInstance()).
+                                    load(mapDataCategory.image).
+                                    asBitmap().
+                                    into(-1,-1).
+                                    get();
+                        } catch (final ExecutionException e) {
+                            Log.e(TAG, e.getMessage());
+                        } catch (final InterruptedException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void dummy) {
+                        if (null != theBitmap) {
+                            // The full bitmap should be available here
+                            helper.setImageBitmap(R.id.iv, theBitmap);
+                            Log.d(TAG, "Image loaded");
+                        };
+                    }
+                }.execute();
 
                 break;
             case 1:
@@ -75,12 +108,12 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
 
 
 
-                io.reactivex.Observable.just(mapDataCategory.image)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new DisposableObserver<String>() {
-                            @Override
-                            public void onNext(String s) {
+//                io.reactivex.Observable.just(mapDataCategory.image)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new DisposableObserver<String>() {
+//                            @Override
+//                            public void onNext(String s) {
 //                                try {
 //                                    Bitmap theBitmap = Glide.
 //                                            with(VSO.getInstance()).
@@ -95,19 +128,49 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
 //                                } catch (ExecutionException e) {
 //                                    e.printStackTrace();
 //                                }
-                            }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        });
 
-                            @Override
-                            public void onError(Throwable e) {
 
-                            }
+                new AsyncTask<Void, Void, Void>() {
+                    Bitmap theBitmap;
 
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-
+                    @Override
+                    protected Void doInBackground(Void... params) {
+//                        Looper.prepare();
+                        try {
+                            theBitmap = Glide.
+                                    with(VSO.getInstance()).
+                                    load(mapDataCategory.image).
+                                    asBitmap().
+                                    into(-1,-1).
+                                    get();
+                        } catch (final ExecutionException e) {
+                            Log.e(TAG, e.getMessage());
+                        } catch (final InterruptedException e) {
+                            Log.e(TAG, e.getMessage());
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void dummy) {
+                        if (null != theBitmap) {
+                            // The full bitmap should be available here
+                            helper.setImageBitmap(R.id.iv, theBitmap);
+                            Log.d(TAG, "Image loaded");
+                        };
+                    }
+                }.execute();
 
 
                 break;
