@@ -618,6 +618,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             return;
                     }
                     break;
+                case MapDataCategory.RIVER:
+                    loadBorder("river");
+                    return;
+                case MapDataCategory.ROAD:
+                    loadBorder("road");
+                    return;
             }
 
             showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
@@ -1141,7 +1147,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-
         Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
 
         List<MySection> gridItems = new ArrayList<>();
@@ -1152,24 +1157,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         poiMarkers.setIcon(defaultBitmap);
-
-        Style defaultStyle;
-
-        switch (lineType) {
-            case MapDataCategory.ROAD:
-                defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
-                loadBorder("road");
-                return;
-            case MapDataCategory.RIVER:
-                loadBorder("river");
-                defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
-                return;
-            default:
-                defaultStyle = new Style(defaultBitmap, Color.BLACK, 2f, 0x20AA1010);
-                break;
-        }
-
-//        myOverLay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument);
 
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
@@ -1362,6 +1349,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onComplete() {
+                                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                                 addOrReplaceSecondaryLayer(myOverLay);
                                 MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
                                 mapView.invalidate();

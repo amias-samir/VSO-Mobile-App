@@ -22,8 +22,10 @@ public class GeoJsonListViewModel extends AndroidViewModel {
 
         mAllGeoJsonListEntity = mRepository.getAllGeoJsonListEntity();
     }
+
     public LiveData<List<GeoJsonListEntity>> getAllGeoJsonCategoryEntity() {
-        return mAllGeoJsonListEntity; }
+        return mAllGeoJsonListEntity;
+    }
 
     public LiveData<GeoJsonListEntity> getmSpecificGeoJsonEntity(String category_table) {
         mSpecifiedGeoJsonEntity = mRepository.getSpecificGeoJsonEntity(category_table);
