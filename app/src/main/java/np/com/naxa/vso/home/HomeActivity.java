@@ -47,6 +47,7 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.facebook.common.Common;
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 import com.github.zagum.expandicon.ExpandIconView;
@@ -113,6 +114,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.subscribers.SinglePostCompleteSubscriber;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
@@ -587,22 +589,39 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             wardShowCount = 0;
-            MySection a = sectionAdapter.getData().get(position);
-            MapDataCategory gridItem = a.t;
+            MySection section = sectionAdapter.getData().get(position);
+            MapDataCategory gridItem = section.t;
 
             if (gridItem.getName() == null) {
-                ToastUtils.showToast("Error loading " + a.t.getName());
+                ToastUtils.showToast("Error loading " + section.t.getName());
                 return;
             }
 
-            geoJsonFileName = a.t.getFileName();
-            geoJsonName = a.t.getName();
-            geoJsonType = a.t.getType();
-            geoJsonmarkerImage = a.t.getMarker_image();
+            geoJsonFileName = section.t.getFileName();
+            geoJsonName = section.t.getName();
+            geoJsonType = section.t.getType();
+            geoJsonmarkerImage = section.t.getMarker_image();
 
-            showOverlayOnMap(a.t.getFileName(), a.t.getType(), a.t.getMarker_image());
-//            showDataOnList(a.t.getName(), a.t.getType());
-            showDataOnList(geoJsonFileName, a.t.getType());
+            switch (geoJsonType) {
+                case MapDataCategory.BOUNDARY:
+                    addOrReplaceSecondaryLayer(null);
+                    switch (geoJsonName) {
+                        case "Changunarayan Municipality Wards":
+                            mapView.getOverlays().set(0, myOverLayWardBoarder);
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            mapView.invalidate();
+                            return;
+                        case "Changunarayan Municipality Boundary":
+                            mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            mapView.invalidate();
+                            return;
+                    }
+                    break;
+            }
+
+            showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+            showDataOnList(geoJsonFileName, geoJsonType);
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
             gridPosition = position;
@@ -620,19 +639,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onNext(List<CommonPlacesAttrb> commonPlacesAttrbs) {
 
+                        if (commonPlacesAttrbs.size() == 0) {
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            ToastUtils.showToast("No Dataset Found");
+                            return;
+                        }
+
                         CategoryListAdapter adapter = ((CategoryListAdapter) recyclerViewDataDetails.getAdapter());
                         adapter.replaceData(commonPlacesAttrbs);
 
-                        switch (type) {
-                            case MapDataCategory.POINT:
-                                if (commonPlacesAttrbs.isEmpty()) {
-                                    ToastUtils.showToast(getString(R.string.dataset_overview, "No"));
-                                }
-                                break;
-                            default:
-                                ToastUtils.showToast("Map layer updated");
-                                break;
-                        }
+                        switchViews();
 
                         dataSetInfoText = getString(R.string.dataset_overview, commonPlacesAttrbs.size() + "");
 
@@ -640,7 +656,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onError(Throwable t) {
-
+                        t.printStackTrace();
                     }
 
                     @Override
@@ -718,21 +734,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d(TAG, "showOverlayOnMap: " + name);
 
-        if (type == "BOUNDARY") {
-            switch (name) {
-                case "wards":
-                    mapView.getOverlays().set(0, myOverLayWardBoarder);
-                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                    mapView.invalidate();
-                    return;
-                case "changunarayan_municipality_boundary.geojson":
-                    mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
-                    slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                    mapView.invalidate();
-                    return;
-            }
-        }
-
         Publisher<GeoJsonListEntity> pub = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(name));
         Observable.fromPublisher(pub)
                 .subscribeOn(Schedulers.io())
@@ -743,13 +744,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         String fileContent = geoJsonListEntity.getCategoryJson();
 
                         loadlayerToMap(fileContent, type, name, marker_image);
-
-                        if (type.equals(MapDataCategory.POINT)) {
-                            switchViews();
-                        } else {
-                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                        }
-
                     }
 
                     @Override
@@ -963,9 +957,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             rlMainCategoryList.setVisibility(View.VISIBLE);
-            if (mapView.getOverlays().size() >= 2) {
-                mapView.getOverlays().remove(1);
-            }
+            addOrReplaceSecondaryLayer(null);
             mapView.invalidate();
             switchViews();
         }
@@ -1141,13 +1133,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadlayerToMap(String geoJson, String lineType, String name, int marker_image) {
-
-//        if (gridPosition != -1 && wardShowCount % 2 != 0) {
-//            mapView.getOverlays().add(myOverLayWardBoarder);
-//            mapView.getOverlays().remove(myOverLayBoarder);
-//        }
-
-        MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
 
         try {
             final KmlDocument kmlDocument = new KmlDocument();
@@ -1326,7 +1311,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 Observable.just(multiLineStringFeatureCollection)
                         .subscribeOn(Schedulers.io())
                         .flatMap((Function<MultiLineStringFeatureCollection, ObservableSource<List<MultiLineStringFeature>>>) multiLineStringFeatureCollection1 -> Observable.just(multiLineStringFeatureCollection1.getFeatures()))
-
                         .flatMapIterable((Function<List<MultiLineStringFeature>, Iterable<MultiLineStringFeature>>) multiLineStringFeatures -> multiLineStringFeatures)
                         .flatMap((Function<MultiLineStringFeature, ObservableSource<LineStringFeatureCollection>>) multiLineStringFeature -> {
                             LineStringFeatureCollection lineStringFeatureCollection = new LineStringFeatureCollection();
@@ -1355,7 +1339,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 String geoJason = new Gson().toJson(lineStringFeatureCollection);
                                 final KmlDocument kmlDocument = new KmlDocument();
                                 kmlDocument.parseGeoJSON(geoJason);
-//                                KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
                                 Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
                                 Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
                                 Style defaultStyle;
@@ -1670,7 +1653,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @OnClick(R.id.tv_data_filter)
     public void onViewCategorizedDataFilter() {
-
         if (gridPosition == 0) {
             HospitalFilterActivity.start(HomeActivity.this);
         }
