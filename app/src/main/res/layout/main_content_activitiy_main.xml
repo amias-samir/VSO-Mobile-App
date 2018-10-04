@@ -12,7 +12,6 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-
     <include layout="@layout/search_toolbar_v2" />
 
     <ProgressBar
@@ -22,10 +21,10 @@
         android:layout_height="32dp"
         android:layout_marginLeft="@dimen/spacing_small"
         android:layout_marginTop="100dp"
+        android:tooltipText="Searching Nearest Open Space"
         android:visibility="gone"
         app:layout_anchor="@+id/map"
-        app:layout_anchorGravity="center_vertical|center_horizontal"
-        android:tooltipText="Searching Nearest Open Space"/>
+        app:layout_anchorGravity="center_vertical|center_horizontal" />
 
     <LinearLayout
         android:id="@+id/ll_inset_data"
@@ -33,12 +32,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="left"
         android:layout_marginLeft="@dimen/spacing_medium"
-        android:padding="@dimen/spacing_medium"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="80dp"
+        android:background="@color/colorWhiteHalfTransparent"
         android:gravity="left"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:background="@color/colorWhiteHalfTransparent">
+        android:padding="@dimen/spacing_medium"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tv_name_title"
@@ -46,7 +45,7 @@
             android:layout_height="wrap_content"
             android:text="Place name"
             android:textColor="@color/black"
-            android:textSize="@dimen/material_text_title"/>
+            android:textSize="@dimen/material_text_title" />
 
         <TextView
             android:id="@+id/tv_distance_subtitle"
@@ -54,7 +53,7 @@
             android:layout_height="wrap_content"
             android:text="Distance Location"
             android:textColor="@color/black"
-            android:textSize="@dimen/material_text_body1"/>
+            android:textSize="@dimen/material_text_body1" />
 
 
     </LinearLayout>
@@ -69,8 +68,7 @@
         android:src="@drawable/circular_blue_solid_bg_current_loc_button"
         app:fabSize="mini"
         app:layout_anchor="@+id/map"
-        app:layout_anchorGravity="right|top"
-        />
+        app:layout_anchorGravity="right|top" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_map_layer"
@@ -79,9 +77,9 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="160dp"
         android:padding="@dimen/spacing_xxlarge"
-        android:src="@drawable/ic_layers_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@+id/fab_location_toggle"
-        app:layout_anchorGravity="right|top" />
+        app:layout_anchorGravity="right|top"
+        app:srcCompat="@drawable/ic_layers_black_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

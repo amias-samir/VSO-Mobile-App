@@ -145,6 +145,7 @@ import np.com.naxa.vso.home.model.MapMarkerItem;
 import np.com.naxa.vso.hospitalfilter.HospitalFilterActivity;
 import np.com.naxa.vso.hospitalfilter.SortedHospitalItem;
 import np.com.naxa.vso.sudur.activities.SplashScreenActivity;
+import np.com.naxa.vso.utils.NetworkUtils;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.utils.maputils.MapCommonUtils;
@@ -181,9 +182,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.recylcer_view_map_categories)
     RecyclerView recyclerDataCategories;
-
-    @BindView(R.id.toggle_slide_panel_main_grid)
-    ImageView sliderToggleMainGrid;
 
     @BindView(R.id.view_switcher_slide_layout)
     ViewSwitcher viewSwitcherSlideLayout;
@@ -521,8 +519,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     ExpandableUseActivity.start(HomeActivity.this);
                     break;
                 case R.id.menu_open_spaces:
-                    progressbar.setVisibility(View.VISIBLE);
-                    routeLocation();
+                    if (NetworkUtils.isNetworkAvailable()) {
+                        progressbar.setVisibility(View.VISIBLE);
+                        routeLocation();
+                    } else {
+                        ToastUtils.showToast("Internet Not Available");
+                    }
 //                    HospitalFilterActivity.start(HomeActivity.this);
                     break;
             }
@@ -671,11 +673,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 tvDataSet.setText(R.string.browse_data_by_categories);
                 tvDataFilter.setVisibility(View.GONE);
                 tvGoBack.setVisibility(View.GONE);
-
+                rlMainCategoryList.setVisibility(View.VISIBLE);
                 clearClusterAndMarkers();
                 break;
             case 1:
 //                tvDataSet.setText(generateDataCardText());
+                llInsetData.setVisibility(View.GONE);
+
                 tvDataSet.setText(dataSetInfoText);
                 tvDataFilter.setVisibility(View.GONE);
                 tvGoBack.setVisibility(View.VISIBLE);
@@ -710,7 +714,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void showOverlayOnMap (String name, String type, int marker_image) {
+    private void showOverlayOnMap(String name, String type, int marker_image) {
 
         Log.d(TAG, "showOverlayOnMap: " + name);
 
@@ -989,9 +993,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void routeLocation() {
 
         final GeoPoint[] points = new GeoPoint[2];
-
-        mapView.getOverlays().clear();
-        mapView.getOverlays().add(myOverLayBoarder);
+        myOverLay = new FolderOverlay();
 
         SortingDistance sortingDistance = new SortingDistance();
 
@@ -1029,13 +1031,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(Polyline roadOverlay) {
                         if (roadOverlay.getPoints().size() != 2) {
 
+                            if (viewSwitcherSlideLayout.getDisplayedChild() == 1) switchViews();
+
                             llInsetData.setVisibility(View.VISIBLE);
                             tvNameTitle.setText(nearestOpenSpace[0]);
                             tvDistanceSubtitle.setText(nearestOpenSpace[1]);
 
-                            mapView.getOverlays().add(getMarkerOverlay(points));
-                            mapView.getOverlays().add(roadOverlay);
+//                            mapView.getOverlays().add(getMarkerOverlay(points));
+//                            mapView.getOverlays().add(roadOverlay
+// );
+                            myOverLay.add(roadOverlay);
+                            myOverLay.add(getMarkerOverlay(points));
+
+                            addOrReplaceSecondaryLayer(myOverLay);
+
                             mapView.getController().animateTo(points[0]);
+
                             // handleLocationPermission for current location position overlay
                             handleLocationPermission();
                             mapView.invalidate();
@@ -1091,7 +1102,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 nodeMarker.setSnippet(roadNode.mInstructions);
                                 nodeMarker.setSubDescription(Road.getLengthDurationText(HomeActivity.this, roadNode.mLength, roadNode.mDuration));
                                 nodeMarker.setImage(icon);
-                                mapView.getOverlays().add(nodeMarker);
+                                myOverLay.add(nodeMarker);
                             }
 
                             @Override
@@ -1380,12 +1391,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addOrReplaceSecondaryLayer(FolderOverlay folderOverlay) {
-        if (mapView.getOverlays().size() >= 2) {
+        if (mapView.getOverlays().size() > 1) {
             mapView.getOverlays().set(1, folderOverlay);
         } else {
             mapView.getOverlays().add(folderOverlay);
         }
-
     }
 
     private void loadMunicipalityBoarder() {

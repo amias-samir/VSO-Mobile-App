@@ -18,8 +18,12 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -45,6 +49,7 @@ import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.network.model.GeoJsonCategoryDetails;
 import np.com.naxa.vso.network.retrofit.NetworkApiClient;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
+import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -94,7 +99,6 @@ public class SplashActivity extends AppCompatActivity {
 
         handleStoragePermission();
 
-
 //        parseAndSaveGeoJSONPoints().subscribe(new Observer<Long>() {
 //            @Override
 //            public void onSubscribe(Disposable d) {
@@ -143,15 +147,27 @@ public class SplashActivity extends AppCompatActivity {
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-                //we are connected to a network
-                fetchGeoJsonCategoryList();
-            }else {
-                // redirect to homepage
-                HomeActivity.start(SplashActivity.this);
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            SharedPreferenceUtils sharedPreference = new SharedPreferenceUtils(this);
+
+            Date date = Calendar.getInstance(new Locale("en", "US")).getTime();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = df.format(date);
+
+            if (formattedDate.equals(sharedPreference.getStringValue("time", ""))) {
+                HomeActivity.start(this);
+            } else {
+                SharedPreferenceUtils.getInstance(this).setValue("time", formattedDate);
+                if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                        connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+                    //we are connected to a network
+                    fetchGeoJsonCategoryList();
+                } else {
+                    // redirect to homepage
+                    HomeActivity.start(SplashActivity.this);
+                }
             }
+
 
         } else {
             EasyPermissions.requestPermissions(this, "Provide storage permission to save data.",
@@ -563,7 +579,7 @@ public class SplashActivity extends AppCompatActivity {
                                 Log.d(TAG, "onNext: " + "save data to database");
                                 for (int i = 0; i < jsonarray.length(); i++) {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-                                    String name = properties.has("name") ? properties.getString("name") :properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
+                                    String name = properties.has("name") ? properties.getString("name") : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
                                     String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
                                     double latitude = properties.has("y") ? Double.parseDouble(properties.getString("y")) : Double.parseDouble(properties.getString("Y"));
                                     double longitude = properties.has("x") ? Double.parseDouble(properties.getString("x")) : Double.parseDouble(properties.getString("X"));
