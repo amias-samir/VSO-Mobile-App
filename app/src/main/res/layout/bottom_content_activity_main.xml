@@ -4,113 +4,119 @@
     android:id="@+id/drag_view_main_slider"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:clickable="true"
     android:focusable="false"
     android:orientation="vertical">
 
     <com.github.zagum.expandicon.ExpandIconView
         android:id="@+id/expand_icon_up_down_toggle"
-        android:layout_width="32dp"
+        android:layout_width="match_parent"
         android:layout_height="32dp"
-        android:layout_gravity="center" />
-
-    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
-        android:id="@+id/bnve"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/cardview_light_background"
-        app:elevation="1dp"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
-        app:menu="@menu/menu_bottom_bar" />
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardElevation="0dp"
-        card_view:cardBackgroundColor="@android:color/white"
-        card_view:cardPreventCornerOverlap="false">
+        android:background="@color/transparent" />
 
-        <RelativeLayout
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+            android:id="@+id/bnve"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/cardview_light_background"
+            app:elevation="1dp"
+            app:itemIconTint="@color/black"
+            app:itemTextColor="@color/black"
+            app:menu="@menu/menu_bottom_bar" />
 
-            <!--categories-->
-            <include
-                android:id="@+id/main_categories_list"
-                layout="@layout/main_categories_list_layout"
-                android:visibility="visible" />
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardElevation="0dp"
+            card_view:cardBackgroundColor="@android:color/white"
+            card_view:cardPreventCornerOverlap="false">
 
-            <TextView
-                android:id="@+id/tv_data_set"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_below="@id/main_categories_list"
-                android:gravity="center"
-                android:paddingLeft="@dimen/spacing_large"
-                android:paddingRight="@dimen/spacing_large"
-                android:text="@string/browse_data_by_categories" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+                <!--categories-->
+                <include
+                    android:id="@+id/main_categories_list"
+                    layout="@layout/main_categories_list_layout"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tv_data_set"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_below="@id/main_categories_list"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/spacing_large"
+                    android:paddingRight="@dimen/spacing_large"
+                    android:text="@string/browse_data_by_categories" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/main_categories_list"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_data_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/ic_filter_list_black"
+                        android:gravity="center"
+                        android:padding="@dimen/spacing_medium"
+                        android:text="@string/filter"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tv_go_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/ic_arrow_back_black_24dp"
+                        android:gravity="center"
+                        android:padding="@dimen/spacing_medium"
+                        android:text="Go Back"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <ViewSwitcher
+            android:id="@+id/view_switcher_slide_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recylcer_view_map_categories"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/main_categories_list"
-                android:orientation="horizontal">
+                android:background="@color/white" />
 
-                <TextView
-                    android:id="@+id/tv_data_filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ic_filter_list_black"
-                    android:gravity="center"
-                    android:padding="@dimen/spacing_medium"
-                    android:text="@string/filter"
-                    android:visibility="gone" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recylcer_view_categories_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWindowBackground"
+                android:fadeScrollbars="true"
+                android:scrollbarThumbVertical="@color/colorPrimaryDark"
+                android:scrollbars="vertical" />
 
-                <TextView
-                    android:id="@+id/tv_go_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ic_arrow_back_black_24dp"
-                    android:gravity="center"
-                    android:padding="@dimen/spacing_medium"
-                    android:text="Go Back"
-                    android:visibility="gone" />
-            </LinearLayout>
+        </ViewSwitcher>
 
-        </RelativeLayout>
-
-
-    </android.support.v7.widget.CardView>
-
-
-    <ViewSwitcher
-        android:id="@+id/view_switcher_slide_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recylcer_view_map_categories"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recylcer_view_categories_detail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorWindowBackground"
-            android:fadeScrollbars="true"
-            android:scrollbarThumbVertical="@color/colorPrimaryDark"
-            android:scrollbars="vertical" />
-
-    </ViewSwitcher>
-
+    </LinearLayout>
 
 </LinearLayout>

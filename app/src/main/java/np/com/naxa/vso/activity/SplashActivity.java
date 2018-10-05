@@ -471,7 +471,6 @@ public class SplashActivity extends AppCompatActivity {
                                     double latitude = properties.has("y") ? Double.parseDouble(properties.getString("y")) : Double.parseDouble(properties.getString("Y"));
                                     double longitude = properties.has("x") ? Double.parseDouble(properties.getString("x")) : Double.parseDouble(properties.getString("X"));
                                     String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
-                                    ;
 
                                     CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks);
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
