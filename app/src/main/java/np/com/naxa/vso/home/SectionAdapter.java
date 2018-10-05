@@ -85,10 +85,10 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
                                     asBitmap().
                                     into(-1,-1).
                                     get();
-                        } catch (final ExecutionException e) {
-                            Log.e(TAG, e.getMessage());
+                        } catch (final ExecutionException | NullPointerException e) {
+                            Log.e(TAG, e.getCause()+ " , "+e.getMessage());
                         } catch (final InterruptedException e) {
-                            Log.e(TAG, e.getMessage());
+                            Log.e(TAG, e.getCause()+ " , "+e.getMessage());
                         }
                         return null;
                     }
@@ -155,10 +155,10 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
                                     asBitmap().
                                     into(-1,-1).
                                     get();
-                        } catch (final ExecutionException e) {
-                            Log.e(TAG, e.getMessage());
+                        } catch (final ExecutionException | NullPointerException e) {
+                            Log.e(TAG, e.getCause()+ " , "+e.getMessage());
                         } catch (final InterruptedException e) {
-                            Log.e(TAG, e.getMessage());
+                            Log.e(TAG, e.getCause()+ " , "+e.getMessage());
                         }
                         return null;
                     }

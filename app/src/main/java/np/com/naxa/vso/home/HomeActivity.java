@@ -1213,9 +1213,52 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
+        geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Hazard_Data").toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                        setupGridRecycler(MySection.getHazardCatergorySections(geoJsonCategoryEntities));
 
-        gridItems.addAll(MySection.getBaseDataCatergorySections());
-        gridItems.addAll(MySection.getHazardCatergorySections());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
+        geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Baseline_Data").toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                        setupGridRecycler(MySection.getBaseDataCatergorySections(geoJsonCategoryEntities));
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+
+//        gridItems.addAll(MySection.getBaseDataCatergorySections());
+//        gridItems.addAll(MySection.getHazardCatergorySections());
 
         // defaultMarker.setColorFilter(color, PorterDuff.Mode.DST_ATOP);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
@@ -1771,22 +1814,83 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
     public void onMainCategoriesViewClicked(View view) {
+        GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
+
         switch (view.getId()) {
             case R.id.tv_resources:
                 mainCategoryPosition = 1;
-                GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
 //                setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data")));
 
+                geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
+                        .subscribeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                            @Override
+                            public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                                setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
                 break;
 
             case R.id.tv_hazard_and_vulnerability:
                 mainCategoryPosition = 2;
-                setupGridRecycler(MySection.getHazardCatergorySections());
+//                setupGridRecycler(MySection.getHazardCatergorySections());
+                geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Hazard_Data").toObservable()
+                        .subscribeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                            @Override
+                            public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                                setupGridRecycler(MySection.getHazardCatergorySections(geoJsonCategoryEntities));
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
                 break;
 
             case R.id.tv_base_data:
                 mainCategoryPosition = 3;
-                setupGridRecycler(MySection.getBaseDataCatergorySections());
+//                setupGridRecycler(MySection.getBaseDataCatergorySections());
+                geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Baseline_Data").toObservable()
+                        .subscribeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
+                            @Override
+                            public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+                                setupGridRecycler(MySection.getBaseDataCatergorySections(geoJsonCategoryEntities));
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
                 break;
         }
 
@@ -1866,6 +1970,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
                     mapView.invalidate();
                     break;
+
                 case R.id.menu_ward:
                     mapView.getOverlays().set(0, myOverLayWardBoarder);
                     mapView.invalidate();

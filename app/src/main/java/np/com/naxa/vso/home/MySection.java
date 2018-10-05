@@ -40,10 +40,6 @@ public class MySection extends SectionEntity<MapDataCategory> {
 
         List<MySection> list = new ArrayList<>();
 
-//        List<GeoJsonCategoryEntity>  geoJsonCategoryEntitiesList = new ArrayList<GeoJsonCategoryEntity>();
-//        GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
-//        geoJsonCategoryEntitiesList = geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data");
-
         if(geoJsonCategoryEntitiesList.size() > 0){
             for (GeoJsonCategoryEntity geoJsonCategoryEntity:geoJsonCategoryEntitiesList
                  ) {
@@ -73,20 +69,20 @@ public class MySection extends SectionEntity<MapDataCategory> {
         return list;
     }
 
-    public static List<MySection> getHazardCatergorySections() {
+    public static List<MySection> getHazardCatergorySections(List<GeoJsonCategoryEntity> geoJsonCategoryEntitiesList) {
         List<MySection> list = new ArrayList<>();
 
 //        List<GeoJsonCategoryEntity>  geoJsonCategoryEntitiesList = new ArrayList<GeoJsonCategoryEntity>();
 //        GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of((FragmentActivity) VSO.getInstance()).get(GeoJsonCategoryViewModel.class);
 //
 //        geoJsonCategoryEntitiesList = geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Hazard_Data");
-//
-//        if(geoJsonCategoryEntitiesList.size() > 0){
-//            for (GeoJsonCategoryEntity geoJsonCategoryEntity:geoJsonCategoryEntitiesList
-//                    ) {
-//                list.add(new MySection(new MapDataCategory(geoJsonCategoryEntity.getCategoryPhoto(), geoJsonCategoryEntity.getCategoryName(), geoJsonCategoryEntity.getCategoryTable(), MapDataCategory.POINT, R.drawable.marker_default)));
-//            }
-//        }
+
+        if(geoJsonCategoryEntitiesList.size() > 0){
+            for (GeoJsonCategoryEntity geoJsonCategoryEntity:geoJsonCategoryEntitiesList
+                    ) {
+                list.add(new MySection(new MapDataCategory(geoJsonCategoryEntity.getCategoryPhoto(), geoJsonCategoryEntity.getCategoryName(), geoJsonCategoryEntity.getCategoryTable(), MapDataCategory.POINT, R.drawable.marker_default)));
+            }
+        }
 
 ////        list.add(new MySection(new MapDataCategory(R.drawable.ic_earthquake, VSO.getInstance().getResources().getString(R.string.earthquake), null, MapDataCategory.POINT, R.drawable.marker_earthquake)));
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_landslide, VSO.getInstance().getResources().getString(R.string.land_slides), "landslides", MapDataCategory.POINT, R.drawable.marker_landslide)));
@@ -95,12 +91,12 @@ public class MySection extends SectionEntity<MapDataCategory> {
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_fault_lines, VSO.getInstance().getResources().getString(R.string.fault_lines), "fault_lines", MapDataCategory.POINT, R.drawable.marker_faultlines)));
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_accident, VSO.getInstance().getResources().getString(R.string.road_accidents), "road_accidents", MapDataCategory.POINT, R.drawable.marker_accident)));
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_epidemic, VSO.getInstance().getResources().getString(R.string.epidemic), "epidemics", MapDataCategory.POINT, R.drawable.marker_epidemic)));
-        list.add(new MySection(new MapDataCategory("", VSO.getInstance().getResources().getString(R.string.animal_attacks), null, MapDataCategory.POINT, R.drawable.marker_animalattack)));
+//        list.add(new MySection(new MapDataCategory("", VSO.getInstance().getResources().getString(R.string.animal_attacks), null, MapDataCategory.POINT, R.drawable.marker_animalattack)));
 
         return list;
     }
 
-    public static List<MySection> getBaseDataCatergorySections() {
+    public static List<MySection> getBaseDataCatergorySections(List<GeoJsonCategoryEntity> geoJsonCategoryEntitiesList) {
         List<MySection> list = new ArrayList<>();
 
 //        List<GeoJsonCategoryEntity>  geoJsonCategoryEntitiesList = new ArrayList<GeoJsonCategoryEntity>();
@@ -108,17 +104,17 @@ public class MySection extends SectionEntity<MapDataCategory> {
 //
 //        geoJsonCategoryEntitiesList = geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Baseline_Data");
 //
-//        if(geoJsonCategoryEntitiesList.size() > 0){
-//            for (GeoJsonCategoryEntity geoJsonCategoryEntity:geoJsonCategoryEntitiesList
-//                    ) {
-//                list.add(new MySection(new MapDataCategory(geoJsonCategoryEntity.getCategoryPhoto(), geoJsonCategoryEntity.getCategoryName(), geoJsonCategoryEntity.getCategoryTable(), MapDataCategory.POINT, R.drawable.marker_default)));
-//            }
-//        }
+        if(geoJsonCategoryEntitiesList.size() > 0){
+            for (GeoJsonCategoryEntity geoJsonCategoryEntity:geoJsonCategoryEntitiesList
+                    ) {
+                list.add(new MySection(new MapDataCategory(geoJsonCategoryEntity.getCategoryPhoto(), geoJsonCategoryEntity.getCategoryName(), geoJsonCategoryEntity.getCategoryTable(), MapDataCategory.POINT, R.drawable.marker_default)));
+            }
+        }
 
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_boundry, VSO.getInstance().getResources().getString(R.string.municipality_boundary_name), "changunarayan_municipality_boundary.geojson", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
 //        list.add(new MySection(new MapDataCategory(R.drawable.ic_wards, VSO.getInstance().getResources().getString(R.string.municipality_ward_name), "wards", MapDataCategory.BOUNDARY, R.drawable.marker_default)));
 ////        list.add(new MySection(new MapDataCategory(R.drawable.ic_road_netwoks, VSO.getInstance().getResources().getString(R.string.road_network), "road", MapDataCategory.ROAD, R.drawable.marker_roads)));
-        list.add(new MySection(new MapDataCategory("", VSO.getInstance().getResources().getString(R.string.river_network), "river", MapDataCategory.RIVER, R.drawable.marker_river)));
+//        list.add(new MySection(new MapDataCategory("", VSO.getInstance().getResources().getString(R.string.river_network), "river", MapDataCategory.RIVER, R.drawable.marker_river)));
         return list;
     }
 }
