@@ -295,6 +295,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     GeoJsonListViewModel geoJsonListViewModel;
 
+    List<GeoJsonCategoryEntity> geoJsonCategoryEntityList;
+
     @BindView(R.id.tv_go_back)
     public TextView tvGoBack;
 
@@ -349,16 +351,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setupBottomBar();
         setupListRecycler();
 
+
         GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
-
-
         geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
                 .subscribeOn(Schedulers.computation())
 //                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                     @Override
                     public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+//                        geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
                         setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
+
 
                     }
 
@@ -369,6 +372,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
+                        Log.d(TAG, "onComplete: init Resource");
 
                     }
                 });
@@ -608,11 +612,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     int geoJsonmarkerImage;
 
 
+    SectionAdapter sectionAdapter;
     private void setupGridRecycler(List<MySection> mySections) {
-        LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
-        recyclerDataCategories.setLayoutManager(mLayoutManager);
-        SectionAdapter sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
-        recyclerDataCategories.setAdapter(sectionAdapter);
+        Log.d(TAG, "setupGridRecycler: size :--> "+ mySections.size());
+        if(mainCategoryPosition <= 0) {
+            LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
+            recyclerDataCategories.setLayoutManager(mLayoutManager);
+            sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
+            recyclerDataCategories.setAdapter(sectionAdapter);
+            Log.d(TAG, "setupGridRecycler: inside if");
+        }else {
+            sectionAdapter.replaceData(mySections);
+            sectionAdapter.notifyDataSetChanged();
+            recyclerDataCategories.notify();
+            Log.d(TAG, "setupGridRecycler: inside else");
+
+        }
+
+
+        Log.d(TAG, "setupGridRecycler:  setup success");
+
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             wardShowCount = 0;
@@ -637,6 +656,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             gridPosition = position;
 
         });
+
     }
 
 
@@ -1198,7 +1218,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                     @Override
                     public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
-                        setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
+
+//                        geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
+                        gridItems.addAll(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
 
                     }
 
@@ -1209,7 +1231,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
-
+                        Log.d(TAG, "onComplete: loadLayer Resource");
                     }
                 });
 
@@ -1219,7 +1241,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                     @Override
                     public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
-                        setupGridRecycler(MySection.getHazardCatergorySections(geoJsonCategoryEntities));
+//                        geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
+                        gridItems.addAll(MySection.getHazardCatergorySections(geoJsonCategoryEntities));
 
                     }
 
@@ -1230,6 +1253,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
+                        Log.d(TAG, "onComplete: loadLayer Hazard");
+
 
                     }
                 });
@@ -1241,7 +1266,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                     @Override
                     public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
-                        setupGridRecycler(MySection.getBaseDataCatergorySections(geoJsonCategoryEntities));
+//                        geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
+                        gridItems.addAll(MySection.getBaseDataCatergorySections(geoJsonCategoryEntities));
 
                     }
 
@@ -1252,6 +1278,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     @Override
                     public void onComplete() {
+                        Log.d(TAG, "onComplete: loadLayer Basedata");
 
                     }
                 });
@@ -1827,8 +1854,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+//                                geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
                                 setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntities));
-
                             }
 
                             @Override
@@ -1838,6 +1865,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onComplete() {
+                                Log.d(TAG, "onComplete: Resources");
+//                                setupGridRecycler(MySection.getResourcesCatergorySections(geoJsonCategoryEntityList));
 
                             }
                         });
@@ -1852,6 +1881,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+//                                geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
                                 setupGridRecycler(MySection.getHazardCatergorySections(geoJsonCategoryEntities));
 
                             }
@@ -1863,6 +1893,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onComplete() {
+                                Log.d(TAG, "onComplete: Hazard");
+//                                setupGridRecycler(MySection.getHazardCatergorySections(geoJsonCategoryEntityList));
 
                             }
                         });
@@ -1877,6 +1909,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
+//                                geoJsonCategoryEntityList.addAll(geoJsonCategoryEntities);
                                 setupGridRecycler(MySection.getBaseDataCatergorySections(geoJsonCategoryEntities));
 
                             }
@@ -1888,6 +1921,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                             @Override
                             public void onComplete() {
+                                Log.d(TAG, "onComplete: Base");
+//                                setupGridRecycler(MySection.getBaseDataCatergorySections(geoJsonCategoryEntityList));
 
                             }
                         });

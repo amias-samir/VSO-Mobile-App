@@ -34,44 +34,6 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
         switch (helper.getLayoutPosition() %
                 2) {
             case 0:
-//                helper.setImageResource(R.id.iv, mapDataCategory.getImage());
-
-
-
-//                io.reactivex.Observable.just(mapDataCategory.image)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(new DisposableObserver<String>() {
-//                            @Override
-//                            public void onNext(String s) {
-//                                try {
-//                                    Bitmap theBitmap = Glide.
-//                                            with(VSO.getInstance()).
-//                                            load(s).
-//                                            asBitmap().
-//                                            into(100, 100). // Width and height
-//                                            get();
-//                                    helper.setImageBitmap(R.id.iv, theBitmap);
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                } catch (ExecutionException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onComplete() {
-//
-//                            }
-//                        });
-
-
                 new AsyncTask<Void, Void, Void>() {
                     Bitmap theBitmap;
 
@@ -98,50 +60,13 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
                             // The full bitmap should be available here
                             helper.setImageBitmap(R.id.iv, theBitmap);
                             Log.d(TAG, "Image loaded");
-                        };
+                        }
                     }
                 }.execute();
 
                 break;
+
             case 1:
-//                helper.setImageResource(R.id.iv, mapDataCategory.getImage());
-
-
-
-//                io.reactivex.Observable.just(mapDataCategory.image)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread())
-//                        .subscribe(new DisposableObserver<String>() {
-//                            @Override
-//                            public void onNext(String s) {
-//                                try {
-//                                    Bitmap theBitmap = Glide.
-//                                            with(VSO.getInstance()).
-//                                            load(s).
-//                                            asBitmap().
-//                                            into(100, 100). // Width and height
-//                                            get();
-//                                    helper.setImageBitmap(R.id.iv, theBitmap);
-//
-//                                } catch (InterruptedException e) {
-//                                    e.printStackTrace();
-//                                } catch (ExecutionException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onComplete() {
-//
-//                            }
-//                        });
-
-
                 new AsyncTask<Void, Void, Void>() {
                     Bitmap theBitmap;
 
@@ -168,7 +93,7 @@ public class SectionAdapter extends BaseSectionQuickAdapter<MySection, BaseViewH
                             // The full bitmap should be available here
                             helper.setImageBitmap(R.id.iv, theBitmap);
                             Log.d(TAG, "Image loaded");
-                        };
+                        }
                     }
                 }.execute();
 
