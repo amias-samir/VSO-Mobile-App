@@ -58,16 +58,29 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/iv_options_hamburger"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="20dp"
+        android:padding="@dimen/spacing_small"
+        android:tint="@color/black"
+        app:layout_anchor="@id/map"
+        app:layout_anchorGravity="right|top"
+        app:srcCompat="@drawable/ic_options_24dp" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_location_toggle"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="90dp"
         android:padding="@dimen/spacing_xxlarge"
         android:src="@drawable/circular_blue_solid_bg_current_loc_button"
         app:fabSize="mini"
-        app:layout_anchor="@+id/map"
+        app:layout_anchor="@+id/iv_options_hamburger"
         app:layout_anchorGravity="right|top" />
 
     <android.support.design.widget.FloatingActionButton
@@ -75,7 +88,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="155dp"
         android:padding="@dimen/spacing_xxlarge"
         app:fabSize="mini"
         app:layout_anchor="@+id/fab_location_toggle"

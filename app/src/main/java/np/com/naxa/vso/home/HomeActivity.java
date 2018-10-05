@@ -47,7 +47,6 @@ import android.widget.ViewSwitcher;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.facebook.common.Common;
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 import com.github.zagum.expandicon.ExpandIconView;
@@ -114,7 +113,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.internal.subscribers.SinglePostCompleteSubscriber;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
@@ -235,6 +233,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.expand_icon_up_down_toggle)
     ExpandIconView updownloadToggleIcon;
+
+    @BindView(R.id.iv_options_hamburger)
+    ImageView ivOptionsHamburger;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -1685,6 +1686,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void showMapLayerPopup() {
 
     }
+
+    @OnClick(R.id.iv_options_hamburger)
+    public void optionsClick() {
+        PopupMenu popup = new PopupMenu(HomeActivity.this, ivOptionsHamburger);
+        popup.getMenuInflater()
+                .inflate(R.menu.main_menu_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_switch_to_english:
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            LocaleChanger.setLocale(new Locale("en", "US"));
+                            ActivityRecreationHelper.recreate(HomeActivity.this, true);
+                        }
+                        break;
+                    case R.id.action_switch_to_nepali:
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            LocaleChanger.setLocale(new Locale("ne", "NP"));
+                            ActivityRecreationHelper.recreate(HomeActivity.this, true);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+        popup.show(); //showing popup menu
+    }
+
 
     @OnClick({R.id.tv_resources, R.id.tv_hazard_and_vulnerability, R.id.tv_base_data})
     public void onMainCategoriesViewClicked(View view) {
