@@ -29,7 +29,7 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 
 @Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class,
         GeoJsonCategoryEntity.class, GeoJsonListEntity.class
-}, version = 12, exportSchema = false)
+}, version = 13, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
 

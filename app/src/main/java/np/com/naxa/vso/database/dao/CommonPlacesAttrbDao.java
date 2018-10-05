@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
+import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 
 /**
  * Created by samir on 5/08/2018.
@@ -42,4 +43,5 @@ public interface CommonPlacesAttrbDao {
 
     @Query("SELECT * from commonplacesattrb WHERE places_type =:type")
     Flowable<List<CommonPlacesAttrb>> getPlaceByType(String type);
+
 }

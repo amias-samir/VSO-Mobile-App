@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Maybe;
 import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 
@@ -21,7 +22,7 @@ public interface GeoJsonCategoryDao {
     void insert(GeoJsonCategoryEntity geoJsonCategoryEntity);
 
     @Query("SELECT * from GeoJsonCategoryEntity WHERE category_type =:category_type")
-    LiveData<List<GeoJsonCategoryEntity>> getGeoJsonListByCategoryType(String category_type);
+    Maybe<List<GeoJsonCategoryEntity>> getGeoJsonListByCategoryType(String category_type);
 
     @Query("DELETE FROM GeoJsonCategoryEntity")
     void deleteAll();

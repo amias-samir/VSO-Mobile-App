@@ -30,6 +30,9 @@ public class CommonPlacesAttrb implements Parcelable {
     @ColumnInfo(name = "places_type")
     private String type;
 
+//    @ColumnInfo(name = "category_type")
+//    private String category_type;
+
     @ColumnInfo(name = "latitude")
     private Double latitude;
 
@@ -39,10 +42,11 @@ public class CommonPlacesAttrb implements Parcelable {
     @ColumnInfo(name = "remarks")
     private String remarks;
 
-    public CommonPlacesAttrb(String name, String address, String type, Double latitude, Double longitude, String remarks) {
+    public CommonPlacesAttrb(String name, String address, String type,  Double latitude, Double longitude, String remarks) {
         this.name = name;
         this.address = address;
         this.type = type;
+//        this.category_type = category_type;
         this.latitude = latitude;
         this.longitude = longitude;
         this.remarks = remarks;
@@ -104,6 +108,14 @@ public class CommonPlacesAttrb implements Parcelable {
         this.remarks = remarks;
     }
 
+//    public String getCategory_type() {
+//        return category_type;
+//    }
+//
+//    public void setCategory_type(String category_type) {
+//        this.category_type = category_type;
+//    }
+
 
     @Override
     public int describeContents() {
@@ -116,6 +128,7 @@ public class CommonPlacesAttrb implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.address);
         dest.writeString(this.type);
+//        dest.writeString(this.category_type);
         dest.writeValue(this.latitude);
         dest.writeValue(this.longitude);
         dest.writeString(this.remarks);
@@ -126,6 +139,7 @@ public class CommonPlacesAttrb implements Parcelable {
         this.name = in.readString();
         this.address = in.readString();
         this.type = in.readString();
+//        this.category_type = in.readString();
         this.latitude = (Double) in.readValue(Double.class.getClassLoader());
         this.longitude = (Double) in.readValue(Double.class.getClassLoader());
         this.remarks = in.readString();
@@ -142,4 +156,6 @@ public class CommonPlacesAttrb implements Parcelable {
             return new CommonPlacesAttrb[size];
         }
     };
+
+
 }
