@@ -776,10 +776,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                     switch (name) {
                                         case "municipal_boundary":
                                             primaryLayerChange(myOverlayMunicipalityBorder);
+                                            secondaryLayerChange(null);
                                             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                                             break;
                                         case "wards":
                                             primaryLayerChange(myOverLayWardBoarder);
+                                            secondaryLayerChange(null);
                                             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                                             break;
                                         case "open_spaces":
@@ -1355,17 +1357,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void primaryLayerChange(FolderOverlay folderOverlay) {
         if (mapView.getOverlays().size() == 0) mapView.getOverlays().add(folderOverlay);
-        if (mapView.getOverlays().get(0) == folderOverlay) return;
-        mapView.getOverlays().set(0, folderOverlay);
+        else if (mapView.getOverlays().get(0) == folderOverlay) return;
+        else mapView.getOverlays().set(0, folderOverlay);
         mapView.invalidate();
     }
 
     private void secondaryLayerChange(FolderOverlay folderOverlay) {
-        if (mapView.getOverlays().size() > 1) {
-            mapView.getOverlays().set(1, folderOverlay);
-        } else {
-            mapView.getOverlays().add(folderOverlay);
-        }
+        if (mapView.getOverlays().size() <= 1) mapView.getOverlays().add(folderOverlay);
+        else if (mapView.getOverlays().get(1) == folderOverlay) return;
+        else mapView.getOverlays().set(1, folderOverlay);
         mapView.invalidate();
     }
 
