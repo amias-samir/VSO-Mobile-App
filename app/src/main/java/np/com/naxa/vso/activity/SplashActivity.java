@@ -176,7 +176,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
-
     private Function<Pair, ObservableSource<Pair>> readGeoJason(int position) {
         return pair -> {
             String assetName = (String) pair.first;
@@ -426,13 +425,26 @@ public class SplashActivity extends AppCompatActivity {
         apiInterface
                 .getGeoJsonCategoryDetails()
                 .subscribeOn(Schedulers.io())
-                .flatMap((Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>) geoJsonCategoryDetails -> Observable.just(geoJsonCategoryDetails.getData()))
-                .flatMapIterable((Function<List<GeoJsonCategoryEntity>, Iterable<GeoJsonCategoryEntity>>) geoJsonCategoryEntities -> geoJsonCategoryEntities)
-                .flatMap((Function<GeoJsonCategoryEntity, Observable<ResponseBody>>) geoJsonCategoryEntity -> {
-                    geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
-                    geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
-                    geoJsonBaseType[0] = geoJsonCategoryEntity.getCategoryType();
-                    return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
+                .flatMap(new Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>() {
+                    @Override
+                    public ObservableSource<List<GeoJsonCategoryEntity>> apply(GeoJsonCategoryDetails geoJsonCategoryDetails) throws Exception {
+                        return Observable.just(geoJsonCategoryDetails.getData());
+                    }
+                })
+                .flatMapIterable(new Function<List<GeoJsonCategoryEntity>, Iterable<GeoJsonCategoryEntity>>() {
+                    @Override
+                    public Iterable<GeoJsonCategoryEntity> apply(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) throws Exception {
+                        return geoJsonCategoryEntities;
+                    }
+                })
+                .flatMap(new Function<GeoJsonCategoryEntity, Observable<ResponseBody>>() {
+                    @Override
+                    public Observable<ResponseBody> apply(GeoJsonCategoryEntity geoJsonCategoryEntity) throws Exception {
+                        geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
+                        geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
+                        geoJsonBaseType[0] = geoJsonCategoryEntity.getCategoryType();
+                        return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
+                    }
                 })
                 .subscribe(new DisposableObserver<ResponseBody>() {
                     @Override

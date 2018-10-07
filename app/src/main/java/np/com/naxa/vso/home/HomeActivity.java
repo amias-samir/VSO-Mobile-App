@@ -2,7 +2,6 @@ package np.com.naxa.vso.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -62,7 +61,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.clustering.MarkerClusterer;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
@@ -124,8 +122,6 @@ import np.com.naxa.vso.activity.ReportActivity;
 import np.com.naxa.vso.database.combinedentity.EducationAndCommon;
 import np.com.naxa.vso.database.combinedentity.HospitalAndCommon;
 import np.com.naxa.vso.database.combinedentity.OpenAndCommon;
-import np.com.naxa.vso.database.dao.GeoJsonCategoryDao;
-import np.com.naxa.vso.database.databaserepository.GeoJsonCategoryRepository;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.EducationalInstitutes;
 import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
@@ -616,15 +612,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     SectionAdapter sectionAdapter;
+
     private void setupGridRecycler(List<MySection> mySections) {
-        Log.d(TAG, "setupGridRecycler: size :--> "+ mySections.size());
-        if(mainCategoryPosition <= 0) {
+        Log.d(TAG, "setupGridRecycler: size :--> " + mySections.size());
+        if (mainCategoryPosition <= 0) {
             LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
             recyclerDataCategories.setLayoutManager(mLayoutManager);
             sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
             recyclerDataCategories.setAdapter(sectionAdapter);
             Log.d(TAG, "setupGridRecycler: inside if");
-        }else {
+        } else {
             sectionAdapter.replaceData(mySections);
             sectionAdapter.notifyDataSetChanged();
             recyclerDataCategories.notify();
@@ -632,9 +629,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-
         Log.d(TAG, "setupGridRecycler:  setup success");
-
 
         sectionAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             wardShowCount = 0;
@@ -651,32 +646,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             geoJsonType = section.t.getType();
             geoJsonmarkerImage = section.t.getMarker_image();
 
-            switch (geoJsonType) {
-                case MapDataCategory.BOUNDARY:
-                    addOrReplaceSecondaryLayer(null);
-                    switch (geoJsonName) {
-                        case "Changunarayan Municipality Wards":
-                            mapView.getOverlays().set(0, myOverLayWardBoarder);
-                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                            mapView.invalidate();
-                            return;
-                        case "Changunarayan Municipality Boundary":
-                            mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
-                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                            mapView.invalidate();
-                            return;
-                    }
-                    break;
-                case MapDataCategory.RIVER:
-                    loadBorder("river");
-                    return;
-                case MapDataCategory.ROAD:
-                    loadBorder("road");
-                    return;
-            }
-
             showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
-            showDataOnList(geoJsonFileName, geoJsonType);
+
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
             gridPosition = position;
@@ -697,7 +668,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         if (commonPlacesAttrbs.size() == 0) {
                             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                            ToastUtils.showToast("No Dataset Found");
                             return;
                         }
 
@@ -769,23 +739,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String generateDataCardText() {
-        String string = null;
-        try {
-            Collection<MapMarkerItem> currentDisplayedItems = clusterManagerPlugin.getAlgorithm().getItems();
-
-            string = getString(R.string.browse_data_category);
-            if (currentDisplayedItems != null) {
-                int totalPOI = clusterManagerPlugin.getAlgorithm().getItems().size();
-                string = getString(R.string.dataset_overview, "0");
-            }
-        } catch (NullPointerException e) {
-
-        }
-        return string;
-    }
-
-
     private void showOverlayOnMap(String name, String type, int marker_image) {
 
         Log.d(TAG, "showOverlayOnMap: " + name);
@@ -798,8 +751,56 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onNext(GeoJsonListEntity geoJsonListEntity) {
                         String fileContent = geoJsonListEntity.getCategoryJson();
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(fileContent);
+                            String dataType = jsonObject.getJSONArray("features").getJSONObject(0).getJSONObject("geometry").getString("type");
+                            switch (dataType) {
+                                case "Point":
+                                    loadlayerToMap(fileContent, type, name, marker_image);
+                                    showDataOnList(name, type);
+                                    break;
+                                case "MultiLineString":
+                                    switch (name) {
+                                        case "river":
+                                            loadBorder("river");
+                                            return;
+//                                        case "road":
+//                                            loadBorder("road");
+//                                            return;
+                                        default:
+                                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                                    }
+                                    break;
+                                case "MultiPolygon":
+                                    switch (name) {
+                                        case "municipal_boundary":
+                                            primaryLayerChange(myOverlayMunicipalityBorder);
+                                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                                            break;
+                                        case "wards":
+                                            primaryLayerChange(myOverLayWardBoarder);
+                                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                                            break;
+                                        case "open_spaces":
+                                            loadlayerToMap(fileContent, type, name, marker_image);
+                                            loadBorder("open_spaces");
+                                            showDataOnList(geoJsonFileName, geoJsonType);
+                                        default:
+                                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                                    }
+                                    break;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            ToastUtils.showToast("No Dataset Found.");
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
+                            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                            ToastUtils.showToast("Error Loading.");
+                        }
 
-                        loadlayerToMap(fileContent, type, name, marker_image);
                     }
 
                     @Override
@@ -814,120 +815,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
                 });
-
-//
-//        repo.getGeoJsonString(name)
-//                .subscribe(new DisposableObserver<Pair>() {
-//                    @Override
-//                    public void onNext(Pair pair) {
-//                        String fileContent = (String) pair.second;
-//                        mapView.getOverlays().clear();
-//                        if (name.equals("wards")) {
-//                            Log.d(TAG, "onNext: changunarayan_new_wards");
-//                            loadWardBoarderlayerToMap(fileContent, type, "",
-//                                    marker_image);
-//                        } else {
-//                            loadlayerToMap(fileContent, type, name, marker_image);
-//
-//                            if (type.equals(MapDataCategory.POINT)) {
-//                                switchViews();
-//                            } else {
-//                                slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-//                            }
-//                        }
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Timber.e("Failed to load geojson ");
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//                        Timber.i("GeoJson loaded sucessfully");
-//                    }
-//                });
-    }
-
-    private void showOverlayOnMap(int position) {
-
-        llInsetData.setVisibility(View.GONE);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // Stuff that updates the UI
-                Collection<? extends SortedHospitalItem> something = new ArrayList<>();
-                ((CategoriesDetailAdapter) recyclerViewDataDetails.getAdapter()).replaceData(something);
-                dataSetInfoText = "";
-
-            }
-        });
-
-        MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
-
-
-        switch (position) {
-            case 0:
-                loadFilteredHospitalMarkerFlowable(hospitalFacilitiesVewModel.getAllHospitalDetailList());
-                hospitalFacilitiesVewModel.getAllHospitalDetailList()
-                        .subscribe(new DisposableSubscriber<List<HospitalAndCommon>>() {
-                            @Override
-                            public void onNext(List<HospitalAndCommon> hospitalAndCommonList) {
-                                HospitalWithDistance(hospitalAndCommonList);
-                            }
-
-                            @Override
-                            public void onError(Throwable t) {
-                                t.printStackTrace();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-                return;
-            case 1:
-                //Loading data of open spaces from geoJson file
-                loadFilteredOpenPlacesMarkerFlowable(openSpaceViewModel.getAllOpenSpaceList());
-                repo.getGeoJsonString(position)
-                        .subscribe(new Observer<Pair>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-                                clearClusterAndMarkers();
-                            }
-
-                            @Override
-                            public void onNext(Pair pair) {
-                                String assetName = (String) pair.first;
-                                String fileContent = (String) pair.second;
-//                              loadLineLayers(assetName, fileContent);
-//                              loadMarkersFromGeoJson(assetName, fileContent);
-                                mapView.getOverlays().clear();
-                                //  loadlayerToMap(fileContent);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Toast.makeText(HomeActivity.this, "An error occurred while loading geojson", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
-                break;
-            case 2:
-                loadFilteredEducationMarkerFlowable(educationalInstitutesViewModel.getAllEducationDetailList());
-                return;
-        }
-
-
     }
 
 
@@ -1013,8 +900,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             rlMainCategoryList.setVisibility(View.VISIBLE);
-            addOrReplaceSecondaryLayer(null);
-            mapView.invalidate();
+            secondaryLayerChange(null);
             switchViews();
         }
     }
@@ -1091,13 +977,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             myOverLay.add(roadOverlay);
                             myOverLay.add(getMarkerOverlay(points));
 
-                            addOrReplaceSecondaryLayer(myOverLay);
+                            secondaryLayerChange(myOverLay);
                             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                             mapView.getController().animateTo(points[0]);
 
                             // handleLocationPermission for current location position overlay
                             handleLocationPermission();
-                            mapView.invalidate();
                         } else {
                             ToastUtils.showToast("Try Again Later");
                         }
@@ -1202,7 +1087,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         List<MySection> gridItems = new ArrayList<>();
         GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
 
-//        gridItems.addAll(MySection.getResourcesCatergorySections(geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data")));
         geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1290,24 +1174,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void loadWardBoarderlayerToMap(String geoJson, String lineType, String name, int marker_image) {
-        MarkerClusterer markerClusterer = new RadiusMarkerClusterer(this);
-
-        final KmlDocument kmlDocument = new KmlDocument();
-        kmlDocument.parseGeoJSON(geoJson);
-
-        myOverLayWardBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, new OverlayPopupHiddenStyler(), kmlDocument);
-        mapView.getOverlays().add(myOverLayWardBoarder);
-        mapView.invalidate();
-
-        if (gridPosition == -1) {
-            MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
-            MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
-            mapGeoJsonToObject.getWardDetailsListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
-        }
-
-    }
-
     private void loadBorder(String key) {
         Publisher<GeoJsonListEntity> publisher = LiveDataReactiveStreams.toPublisher(this, geoJsonListViewModel.getmSpecificGeoJsonEntity(key));
         Observable.fromPublisher(publisher)
@@ -1375,6 +1241,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                     case "wards":
                                         myOverLayWardBoarder = new FolderOverlay();
                                         break;
+                                    case "open_spaces":
+                                        break;
                                 }
                             }
 
@@ -1391,6 +1259,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                     case "wards":
                                         myOverLayWardBoarder.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
                                         break;
+                                    case "open_spaces":
+                                        FolderOverlay tempFolderOverlay = (FolderOverlay) mapView.getOverlays().get(1);
+                                        tempFolderOverlay.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
+                                        secondaryLayerChange(tempFolderOverlay);
+                                        break;
                                 }
 
                             }
@@ -1403,11 +1276,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onComplete() {
                                 if (key.equals("municipal_boundary")) {
-                                    if (mapView.getOverlays().size() >= 1) {
-                                        mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
-                                    } else {
-                                        mapView.getOverlays().add(myOverlayMunicipalityBorder);
-                                    }
+                                    primaryLayerChange(myOverlayMunicipalityBorder);
                                     MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
                                     mapView.invalidate();
                                 }
@@ -1474,9 +1343,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onComplete() {
                                 slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                                addOrReplaceSecondaryLayer(myOverLay);
+                                secondaryLayerChange(myOverLay);
                                 MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
-                                mapView.invalidate();
                             }
                         });
                 break;
@@ -1485,64 +1353,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void addOrReplaceSecondaryLayer(FolderOverlay folderOverlay) {
+    private void primaryLayerChange(FolderOverlay folderOverlay) {
+        if (mapView.getOverlays().size() == 0) mapView.getOverlays().add(folderOverlay);
+        if (mapView.getOverlays().get(0) == folderOverlay) return;
+        mapView.getOverlays().set(0, folderOverlay);
+        mapView.invalidate();
+    }
+
+    private void secondaryLayerChange(FolderOverlay folderOverlay) {
         if (mapView.getOverlays().size() > 1) {
             mapView.getOverlays().set(1, folderOverlay);
         } else {
             mapView.getOverlays().add(folderOverlay);
         }
+        mapView.invalidate();
     }
-
-    private void loadMunicipalityBoarder() {
-        mapView.getOverlays().clear();
-
-        RadiusMarkerClusterer radiusMarkerClusterer = new RadiusMarkerClusterer(this);
-        // marker icons
-        List<Marker> markerIconBmps_ = new ArrayList<Marker>();
-
-        new Thread(() -> {
-//            vMapView.getOverlays().clear();
-
-            String jsonString = null;
-            try {
-                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_municipality_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_boundary.geojson");
-//                InputStream jsonStream = VSO.getInstance().getAssets().open("changunarayan_new_wards.geojson");
-                int size = jsonStream.available();
-                byte[] buffer = new byte[size];
-                jsonStream.read(buffer);
-                jsonStream.close();
-                jsonString = new String(buffer, "UTF-8");
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                return;
-            }
-
-            final KmlDocument kmlDocument = new KmlDocument();
-//            kmlDocument.parseGeoJSON(jsonString);
-            kmlDocument.parseGeoJSON("");
-
-            Drawable defaultMarker = getResources().getDrawable(R.drawable.mapbox_marker_icon_default);
-            Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-//
-            KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
-            myOverLayBoarder = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument);
-
-            runOnUiThread(() -> {
-                mapView.getOverlays().add(myOverLayBoarder);
-                MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
-
-
-                //load filtered list
-                if (hospitalAndCommonList == null) {
-                } else {
-                    loadFilteredHospitalMarker(hospitalAndCommonList);
-                }
-
-            });
-        }).start();
-    }
-
 
     private LinkedHashMap HospitalWithDistance(List<HospitalAndCommon> hospitalAndCommonList) {
 
@@ -2001,13 +1826,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_municipal:
-                    mapView.getOverlays().set(0, myOverlayMunicipalityBorder);
-                    mapView.invalidate();
+                    primaryLayerChange(myOverlayMunicipalityBorder);
                     break;
-
                 case R.id.menu_ward:
-                    mapView.getOverlays().set(0, myOverLayWardBoarder);
-                    mapView.invalidate();
+                    primaryLayerChange(myOverLayWardBoarder);
                     break;
                 case R.id.menu_sudur:
                     startActivity(new Intent(HomeActivity.this, SplashScreenActivity.class));
