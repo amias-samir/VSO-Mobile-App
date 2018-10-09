@@ -196,7 +196,7 @@ public class MapMarkerOverlayUtils {
         return mOverlay;
     }
 
-    public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView, int marker_image) {
+    public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView, int marker_image, String jsonProperties) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
         String name = commonPlacesAttrb.getName()
                 + "\n" + commonPlacesAttrb.getType()
@@ -209,7 +209,8 @@ public class MapMarkerOverlayUtils {
         String jsonInString = gson.toJson(obj).toString();
         Log.d(TAG, "overlayFromCommon: " + jsonInString);
 
-        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+//        items.add(new OverlayItem(name, jsonInString, new GeoPoint(latitude, longitude)));
+        items.add(new OverlayItem(name, jsonProperties, new GeoPoint(latitude, longitude)));
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items,
                 context.getResources().getDrawable(marker_image),
                 context.getResources().getDrawable(marker_image),

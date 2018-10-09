@@ -65,10 +65,10 @@ public class MapGeoJsonToObject {
                 if(properties.has("remarks") || properties.has("Remarks")) {
                     remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
                 }
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks, properties.toString());
 
                 folderOverlay.add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-                        commonPlacesAttrb, mapView, marker_image));
+                        commonPlacesAttrb, mapView, marker_image, properties.toString()));
             }
 
             if (mapView.getOverlays().size() >= 2) {

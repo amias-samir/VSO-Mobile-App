@@ -248,7 +248,7 @@ public class SplashActivity extends AppCompatActivity {
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
 
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, "hospital", latitude, longitude, remarks);
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, "hospital", latitude, longitude, remarks, properties.toString());
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveHospitalData: " + fk_common_places);
@@ -341,7 +341,7 @@ public class SplashActivity extends AppCompatActivity {
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
 
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks);
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks, properties.toString());
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveEducationalInstitutes: " + fk_common_places);
@@ -391,7 +391,7 @@ public class SplashActivity extends AppCompatActivity {
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
 
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type,  latitude, longitude, remarks);
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type,  latitude, longitude, remarks, properties.toString());
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveOpenSpaces: " + fk_common_places);
@@ -484,7 +484,7 @@ public class SplashActivity extends AppCompatActivity {
                                     double longitude = properties.has("x") ? Double.parseDouble(properties.getString("x")) : Double.parseDouble(properties.getString("X"));
                                     String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
 
-                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks);
+                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks, properties.toString());
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                                 }
                             } catch (JSONException e) {

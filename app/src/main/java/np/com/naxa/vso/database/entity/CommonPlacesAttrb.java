@@ -30,8 +30,8 @@ public class CommonPlacesAttrb implements Parcelable {
     @ColumnInfo(name = "places_type")
     private String type;
 
-//    @ColumnInfo(name = "category_type")
-//    private String category_type;
+    @ColumnInfo(name = "detailed_properties")
+    private String detailed_properties;
 
     @ColumnInfo(name = "latitude")
     private Double latitude;
@@ -42,11 +42,11 @@ public class CommonPlacesAttrb implements Parcelable {
     @ColumnInfo(name = "remarks")
     private String remarks;
 
-    public CommonPlacesAttrb(String name, String address, String type,  Double latitude, Double longitude, String remarks) {
+    public CommonPlacesAttrb(String name, String address, String type,  Double latitude, Double longitude, String remarks, String detailed_properties) {
         this.name = name;
         this.address = address;
         this.type = type;
-//        this.category_type = category_type;
+        this.detailed_properties = detailed_properties;
         this.latitude = latitude;
         this.longitude = longitude;
         this.remarks = remarks;
@@ -128,7 +128,7 @@ public class CommonPlacesAttrb implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.address);
         dest.writeString(this.type);
-//        dest.writeString(this.category_type);
+        dest.writeString(this.detailed_properties);
         dest.writeValue(this.latitude);
         dest.writeValue(this.longitude);
         dest.writeString(this.remarks);
@@ -139,7 +139,7 @@ public class CommonPlacesAttrb implements Parcelable {
         this.name = in.readString();
         this.address = in.readString();
         this.type = in.readString();
-//        this.category_type = in.readString();
+        this.detailed_properties = in.readString();
         this.latitude = (Double) in.readValue(Double.class.getClassLoader());
         this.longitude = (Double) in.readValue(Double.class.getClassLoader());
         this.remarks = in.readString();
@@ -158,4 +158,11 @@ public class CommonPlacesAttrb implements Parcelable {
     };
 
 
+    public String getDetailed_properties() {
+        return detailed_properties;
+    }
+
+    public void setDetailed_properties(String detailed_properties) {
+        this.detailed_properties = detailed_properties;
+    }
 }

@@ -600,7 +600,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 CommonPlacesAttrb item = categoriesDetailAdapter.getData().get(position);
                 Intent intent = new Intent(HomeActivity.this, MarkerDetailsDisplayActivity.class);
-                intent.putExtra("data", new Gson().toJson(item));
+//                intent.putExtra("data", new Gson().toJson(item));
+                intent.putExtra("data", item.getDetailed_properties());
                 startActivity(intent);
             }
         });
@@ -1185,7 +1186,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     public void onNext(GeoJsonListEntity geoJsonListEntity) {
                         try {
                             loadGeoJsonByKml(geoJsonListEntity.getCategoryJson(), key);
-                        } catch (JSONException e) {
+                        } catch (JSONException | NullPointerException e) {
                             e.printStackTrace();
                             ToastUtils.showToast("Error loading geojson");
                         }
