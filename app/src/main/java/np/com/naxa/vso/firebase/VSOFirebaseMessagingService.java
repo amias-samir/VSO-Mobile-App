@@ -7,6 +7,13 @@ import timber.log.Timber;
 
 public class VSOFirebaseMessagingService extends FirebaseMessagingService {
 
+
+    @Override
+    public void onNewToken(String token) {
+        super.onNewToken(token);
+        Timber.i("New token: %s", token);
+    }
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
