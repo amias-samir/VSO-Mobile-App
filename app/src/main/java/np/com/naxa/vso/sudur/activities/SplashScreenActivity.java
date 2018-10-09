@@ -22,7 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.facebook.appevents.AppEventsLogger;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +60,7 @@ public class SplashScreenActivity extends Activity {
     ConnectivityManager connectivityManager;
     NetworkInfo networkInfo;
 //    private ProgressBar downloadProgressBar;
-        AppEventsLogger logger;
+
 
 
     private ProgressBar firstBar = null;
@@ -1807,9 +1807,5 @@ public class SplashScreenActivity extends Activity {
         });
     }
 
-
-    public void logActivityVisible () {
-        logger.logEvent("ActivityVisible");
-    }
 
 }
