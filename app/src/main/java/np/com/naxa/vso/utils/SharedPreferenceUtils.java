@@ -15,6 +15,7 @@ public class SharedPreferenceUtils {
 
 
     public static final String IS_STORAGE_PERMISSION_GRANTED = "is_permission_granted";
+    public static final String TOKEN_ID = "token_id";
 
 
     public SharedPreferenceUtils(Context context) {

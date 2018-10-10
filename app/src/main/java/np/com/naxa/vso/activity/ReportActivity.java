@@ -44,11 +44,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.firebase.VSOFirebaseMessagingService;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.network.model.AskForHelpResponse;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
+import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -87,6 +89,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     Boolean hasNewImage = false;
     String full_name, contact_no, detailed_message, latitude, longitude, incident_type, incident_type_others, incident_time, ward;
     String jsonToSend = "";
+    String token_id;
+    SharedPreferenceUtils sharedPreferenceUtils;
 
     @BindView(R.id.tv_incident_time)
     TextInputLayout tvIncidentTime;
@@ -102,6 +106,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_v2);
         ButterKnife.bind(this);
+
+        sharedPreferenceUtils = new SharedPreferenceUtils(ReportActivity.this);
 
         initUI();
 
@@ -133,6 +139,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                token_id = sharedPreferenceUtils.getStringValue(SharedPreferenceUtils.TOKEN_ID, null);
+
+
                 if (myLat == 0 && myLong == 0) {
 
                     Toast.makeText(ReportActivity.this, "you need to take GPS Location first", Toast.LENGTH_SHORT).show();
@@ -159,9 +168,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     JSONObject header = new JSONObject();
 
                     header.put("status", "pending");
+                    header.put("token_id", token_id);
                     header.put("incident_time", incident_time);
                     header.put("incident_type", incident_type);
-//                    header.put("incident_type_others", incident_type_others);
                     header.put("ward", ward);
                     header.put("name", full_name);
                     header.put("contact_no", contact_no);
