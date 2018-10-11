@@ -1,16 +1,12 @@
 package np.com.naxa.vso.firebase;
 
-import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -28,11 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.database.VsoRoomDatabase;
 import np.com.naxa.vso.database.dao.MessageHelperDao;
-import np.com.naxa.vso.database.databaserepository.MessageHelperRepository;
-import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.VSO;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
-import np.com.naxa.vso.viewmodel.MessageHelperViewModel;
 import timber.log.Timber;
 
 public class VSOFirebaseMessagingService extends FirebaseMessagingService {
@@ -42,22 +35,13 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
     SharedPreferenceUtils sharedPreferenceUtils = new SharedPreferenceUtils(VSO.getInstance());
     String title, description;
     MessageHelperDao mMessageHelperDao;
-//    MessageHelperViewModel messageHelperViewModel = ViewModelProviders.of((FragmentActivity) VSO.getInstance()).get(MessageHelperViewModel.class);
-
 
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
         Timber.i("New token: %s", token);
         sharedPreferenceUtils.setValue(SharedPreferenceUtils.TOKEN_ID, token);
-
-        title = "Mew token received";
-        description = token;
-//        messageHelperViewModel.insert(new MessageHelper("date", "time", description, 1));
-        VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
-        mMessageHelperDao = db.messageHelperDao();
-        insert(new MessageHelper("date", "time", description, 1));
-        sendNotificationTo_Home(new NotificationData(title, description));
+        
     }
 
     @Override
@@ -65,9 +49,9 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
         Timber.i("Receivced from %s", remoteMessage.getFrom());
         Timber.i("Payload %s", remoteMessage.getData());
-        title = remoteMessage.getNotification().getTitle();
-        Timber.i("Body %s", remoteMessage.getNotification().getBody());
-        description = remoteMessage.getNotification().getBody();
+        title = remoteMessage.getData().get("title");
+//        Timber.i("Body %s", remoteMessage.getNotification().getBody());
+        description = remoteMessage.getData().get("notification");
 
         Date date = Calendar.getInstance(new Locale("en", "US")).getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -80,10 +64,9 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
         String localTime = date1.format(currentLocalTime);
 
 
-//        messageHelperViewModel.insert(new MessageHelper(formattedDate, localTime, remoteMessage.toString(), 1));
         VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
         mMessageHelperDao = db.messageHelperDao();
-        insert(new MessageHelper(formattedDate, localTime, remoteMessage.toString(), 1));
+        insert(new MessageHelper(formattedDate, localTime, description, 1));
         sendNotificationTo_Home(new NotificationData(title, description));
 
     }

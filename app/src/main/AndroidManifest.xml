@@ -30,22 +30,13 @@
             </intent-filter>
         </activity>
 
-        <!-- file provider -->
-        <!-- <provider -->
-        <!-- android:name="android.support.v4.content.FileProvider" -->
-        <!-- android:authorities="np.com.naxa.vso.fileprovider" -->
-        <!-- android:exported="false" -->
-        <!-- android:grantUriPermissions="true"> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.FILE_PROVIDER_PATHS" -->
-        <!-- android:resource="@xml/file_paths" /> -->
-        <!-- </provider> -->
 
         <service android:name=".firebase.VSOFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <service
             android:name=".utils.maputils.MyLocationService"
             android:process=":my_service" />
@@ -83,9 +74,6 @@
             android:name=".gps.GeoPointActivity"
             android:exported="true" />
 
-        <!-- <activity android:name=".NavigarionActivity" -->
-        <!-- android:exported="true"> -->
-        <!-- </activity> -->
 
         <activity
             android:name=".hospitalfilter.HospitalFilterActivity"

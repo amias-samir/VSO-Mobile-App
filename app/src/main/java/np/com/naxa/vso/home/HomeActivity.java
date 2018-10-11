@@ -130,6 +130,7 @@ import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.detailspage.MarkerDetailsDisplayActivity;
 import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
+import np.com.naxa.vso.firebase.MessageActivity;
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringFeature;
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringFeatureCollection;
 import np.com.naxa.vso.geojasonPojo.lineStringAndMultiLineString.lineString.LineStringGeometry;
@@ -1656,6 +1657,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             LocaleChanger.setLocale(new Locale("ne", "NP"));
                             ActivityRecreationHelper.recreate(HomeActivity.this, true);
                         }
+                        break;
+                    case R.id.action_view_message:
+                        startActivity(new Intent(HomeActivity.this, MessageActivity.class));
+                        finish();
                         break;
                 }
                 return true;

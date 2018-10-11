@@ -25,6 +25,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.activity.ReportActivity;
+import np.com.naxa.vso.firebase.MessageActivity;
 import np.com.naxa.vso.utils.QueryBuildWithSplitter;
 
 public class MarkerDetailsDisplayActivity extends AppCompatActivity {
@@ -189,6 +191,10 @@ public class MarkerDetailsDisplayActivity extends AppCompatActivity {
                 return true;
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_view_message:
+                startActivity(new Intent(MarkerDetailsDisplayActivity.this, MessageActivity.class));
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

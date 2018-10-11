@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -84,8 +85,12 @@ public class MessageActivity extends AppCompatActivity {
                     public void onNext(List<MessageHelper> messageHelpers) {
                         Log.i("firebase", "onNext: message list size"+ messageHelpers.size());
 
+                        if(messageHelpers.size() > 0){
+                            textViewNoMessage.setVisibility(View.GONE);
+                        }
                         messageHelperList.addAll(messageHelpers);
                         ((MessageListAdapter) myRecyclerView.getAdapter()).replaceData(messageHelperList);
+
 
                     }
 
