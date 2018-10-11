@@ -1200,7 +1200,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onComplete() {
+                  public void onComplete() {
                     }
                 });
     }
@@ -1642,6 +1642,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         popup.getMenuInflater()
                 .inflate(R.menu.main_menu_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_switch_to_english:

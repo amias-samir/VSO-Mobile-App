@@ -47,6 +47,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.firebase.MessageActivity;
 import np.com.naxa.vso.firebase.MessageHelper;
 import np.com.naxa.vso.firebase.VSOFirebaseMessagingService;
 import np.com.naxa.vso.gps.GeoPointActivity;
@@ -497,6 +498,10 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     LocaleChanger.setLocale(new Locale("ne", "NP"));
                     ActivityRecreationHelper.recreate(ReportActivity.this, true);
                 }
+                return true;
+            case R.id.action_view_message:
+                   startActivity(new Intent(ReportActivity.this, MessageActivity.class));
+                   finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

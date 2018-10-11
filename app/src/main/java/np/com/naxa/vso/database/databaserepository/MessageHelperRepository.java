@@ -7,13 +7,14 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.VsoRoomDatabase;
 import np.com.naxa.vso.database.dao.MessageHelperDao;
 import np.com.naxa.vso.firebase.MessageHelper;
 
 public class MessageHelperRepository {
     private MessageHelperDao mMessageHelperDao;
-    private LiveData<List<MessageHelper>> mAllMessageList;
+    private Flowable<List<MessageHelper>> mAllMessageList;
 
     // Note that in order to unit test the WordRepository, you have to remove the Application
     // dependency. This adds complexity and much more code, and this sample is not about testing.
@@ -27,7 +28,7 @@ public class MessageHelperRepository {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    public LiveData<List<MessageHelper>> getAllMessageList() {
+    public Flowable<List<MessageHelper>> getAllMessageList() {
         return mAllMessageList;
     }
 

@@ -10,4 +10,8 @@
         android:title="नेपाली"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/action_view_message"
+        android:title="View Messages"
+        app:showAsAction="never"/>
+
 </menu>

@@ -41,13 +41,11 @@
         <!-- android:resource="@xml/file_paths" /> -->
         <!-- </provider> -->
 
-
         <service android:name=".firebase.VSOFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".utils.maputils.MyLocationService"
             android:process=":my_service" />
@@ -102,10 +100,9 @@
             android:name=".activity.MapBoxActivity"
             android:exported="true" />
 
-
-        <!--sudur manifest code-->
-        <activity android:name=".sudur.activities.SplashScreenActivity"></activity>
-        <activity android:name=".sudur.SudurMainActivity"></activity>
+        <!-- sudur manifest code -->
+        <activity android:name=".sudur.activities.SplashScreenActivity" />
+        <activity android:name=".sudur.SudurMainActivity" />
         <activity
             android:name=".sudur.activities.IntroductionActivity"
             android:parentActivityName=".sudur.SudurMainActivity">
@@ -235,7 +232,7 @@
         <activity
             android:name=".sudur.activities.AttractionDetailsActivity"
             android:screenOrientation="portrait"
-            android:value=".MainActivity"></activity>
+            android:value=".MainActivity" />
         <activity
             android:name=".sudur.activities.HistoricalPlacesActivity"
             android:screenOrientation="portrait"
@@ -432,13 +429,17 @@
         <activity
             android:name=".sudur.activities.BusinessPlacesMapActivity"
             android:exported="true">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".sudur.SudurMainActivity" />
-
         </activity>
-        <!--end of sudur manifest code-->
+        <!-- end of sudur manifest code -->
+
+        <activity android:name=".firebase.MessageActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".home.HomeActivity" />
+        </activity>
     </application>
 
 </manifest>

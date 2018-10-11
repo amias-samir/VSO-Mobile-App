@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.database.databaserepository.MessageHelperRepository;
 import np.com.naxa.vso.firebase.MessageHelper;
 
@@ -16,7 +17,7 @@ public class MessageHelperViewModel extends AndroidViewModel {
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    private LiveData<List<MessageHelper>> mAllMessageList;
+    private Flowable<List<MessageHelper>> mAllMessageList;
 
     public MessageHelperViewModel(Application application) {
         super(application);
@@ -25,9 +26,9 @@ public class MessageHelperViewModel extends AndroidViewModel {
         mAllMessageList = mRepository.getAllMessageList();
     }
     //    contact
-    public LiveData<List<MessageHelper>> getAllContacts() { return mAllMessageList; }
+    public Flowable<List<MessageHelper>> getAllMessageList() { return mAllMessageList; }
 
-    public void insert(MessageHelper contact) {
-        Log.d("VIewholder", "insert: "+contact.getMessage());
-        mRepository.insert(contact); }
+    public void insert(MessageHelper messageHelper) {
+        Log.d("VIewholder", "insert: "+messageHelper.getMessage());
+        mRepository.insert(messageHelper); }
 }

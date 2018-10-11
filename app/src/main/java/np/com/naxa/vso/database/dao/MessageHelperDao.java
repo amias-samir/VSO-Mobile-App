@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import np.com.naxa.vso.firebase.MessageHelper;
 
 @Dao
@@ -17,7 +18,7 @@ public interface MessageHelperDao {
     // data has changed. Since we are getting all the contents of the database,
     // we are notified whenever any of the database contents have changed.
     @Query("SELECT * from messagehelper ORDER BY mid ASC")
-    LiveData<List<MessageHelper>> getAllMessageList();
+    Flowable<List<MessageHelper>> getAllMessageList();
 
     // We do not need a conflict strategy, because the word is our primary key, and you cannot
     // add two items with the same primary key to the database. If the table has more than one

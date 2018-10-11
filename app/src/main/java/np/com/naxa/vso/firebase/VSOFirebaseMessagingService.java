@@ -37,6 +37,8 @@ import timber.log.Timber;
 
 public class VSOFirebaseMessagingService extends FirebaseMessagingService {
 
+    public static Boolean notification = false;
+
     SharedPreferenceUtils sharedPreferenceUtils = new SharedPreferenceUtils(VSO.getInstance());
     String title, description;
     MessageHelperDao mMessageHelperDao;
@@ -52,10 +54,10 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
         title = "Mew token received";
         description = token;
 //        messageHelperViewModel.insert(new MessageHelper("date", "time", description, 1));
-//        VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
-//        mMessageHelperDao = db.messageHelperDao();
-//        insert(new MessageHelper("date", "time", description, 1));
-//        sendNotificationTo_Home(new NotificationData(title, description));
+        VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
+        mMessageHelperDao = db.messageHelperDao();
+        insert(new MessageHelper("date", "time", description, 1));
+        sendNotificationTo_Home(new NotificationData(title, description));
     }
 
     @Override
@@ -115,7 +117,7 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
     //HOME
     private void sendNotificationTo_Home(NotificationData notificationData) {
 
-        Intent intent = new Intent(this, HomeActivity.class);
+        Intent intent = new Intent(this, MessageActivity.class);
         intent.putExtra(NotificationData.TEXT, notificationData.getTextMessage());
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
