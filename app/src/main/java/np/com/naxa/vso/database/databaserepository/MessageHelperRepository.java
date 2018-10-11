@@ -34,9 +34,9 @@ public class MessageHelperRepository {
     // You must call this on a non-UI thread or your app will crash.
     // Like this, Room ensures that you're not doing any long running operations on the main
     // thread, blocking the UI.
-    public void insert (MessageHelper contact) {
-        Log.d("MessageHelperRepository", "insert: "+ contact.getMessage());
-        new insertAsyncTask(mMessageHelperDao).execute(contact);
+    public void insert (MessageHelper messageHelper) {
+        Log.d("MessageHelperRepository", "insert: "+ messageHelper.getMessage());
+        new insertAsyncTask(mMessageHelperDao).execute(messageHelper);
     }
 
     private static class insertAsyncTask extends AsyncTask<MessageHelper, Void, Void> {

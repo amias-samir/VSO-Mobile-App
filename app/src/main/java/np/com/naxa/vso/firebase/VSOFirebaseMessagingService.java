@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -25,6 +26,8 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.database.VsoRoomDatabase;
+import np.com.naxa.vso.database.dao.MessageHelperDao;
 import np.com.naxa.vso.database.databaserepository.MessageHelperRepository;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.VSO;
@@ -36,7 +39,8 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
 
     SharedPreferenceUtils sharedPreferenceUtils = new SharedPreferenceUtils(VSO.getInstance());
     String title, description;
-    MessageHelperViewModel messageHelperViewModel = ViewModelProviders.of((FragmentActivity) VSO.getInstance()).get(MessageHelperViewModel.class);
+    MessageHelperDao mMessageHelperDao;
+//    MessageHelperViewModel messageHelperViewModel = ViewModelProviders.of((FragmentActivity) VSO.getInstance()).get(MessageHelperViewModel.class);
 
 
     @Override
@@ -47,7 +51,11 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
 
         title = "Mew token received";
         description = token;
-        sendNotificationTo_Home(new NotificationData(title, description));
+//        messageHelperViewModel.insert(new MessageHelper("date", "time", description, 1));
+//        VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
+//        mMessageHelperDao = db.messageHelperDao();
+//        insert(new MessageHelper("date", "time", description, 1));
+//        sendNotificationTo_Home(new NotificationData(title, description));
     }
 
     @Override
@@ -70,10 +78,37 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
         String localTime = date1.format(currentLocalTime);
 
 
-        messageHelperViewModel.insert(new MessageHelper(formattedDate, localTime, remoteMessage.toString(), 1));
-
+//        messageHelperViewModel.insert(new MessageHelper(formattedDate, localTime, remoteMessage.toString(), 1));
+        VsoRoomDatabase db = VsoRoomDatabase.getDatabase(VSO.getInstance());
+        mMessageHelperDao = db.messageHelperDao();
+        insert(new MessageHelper(formattedDate, localTime, remoteMessage.toString(), 1));
         sendNotificationTo_Home(new NotificationData(title, description));
 
+    }
+
+
+    // You must call this on a non-UI thread or your app will crash.
+    // Like this, Room ensures that you're not doing any long running operations on the main
+    // thread, blocking the UI.
+    public void insert (MessageHelper messageHelper) {
+        Log.d("MessageHelperRepository", "insert: "+ messageHelper.getMessage());
+        new insertAsyncTask(mMessageHelperDao).execute(messageHelper);
+    }
+
+    private static class insertAsyncTask extends AsyncTask<MessageHelper, Void, Void> {
+
+        private MessageHelperDao mAsyncTaskDao;
+
+        insertAsyncTask(MessageHelperDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final MessageHelper... params) {
+            Log.d("MessageHelperRepository", "doInBackground: "+ params[0].getMessage());
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
     }
 
 

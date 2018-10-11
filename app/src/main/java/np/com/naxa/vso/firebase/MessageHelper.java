@@ -50,19 +50,27 @@ public class MessageHelper implements Serializable {
         this.date = date;
     }
 
-    public int getQuestion() {
-        return message_type;
-    }
-
-    public void setQuestion(int question) {
-        this.message_type = message_type;
-    }
-
     public String getTime() {
         return time;
     }
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public int getMessage_type() {
+        return message_type;
+    }
+
+    public void setMessage_type(int message_type) {
+        this.message_type = message_type;
+    }
+
+    public int getMid() {
+        return mid;
+    }
+
+    public void setMid(int mid) {
+        this.mid = mid;
     }
 }
