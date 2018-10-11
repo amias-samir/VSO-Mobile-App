@@ -75,7 +75,7 @@ public class CommonPlacesAttrbRepository {
 //
 //        @Override
 //        protected Void doInBackground(final CommonPlacesAttrb... params) {
-//            Log.d("ContactRepository", "doInBackground: "+ params[0].getName());
+//            Log.d("MessageHelperRepository", "doInBackground: "+ params[0].getName());
 //            rowID = mAsyncTaskDao.insert(params[0]);
 //            pID.add(rowID);
 //

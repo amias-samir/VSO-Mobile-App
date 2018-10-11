@@ -1,6 +1,7 @@
 package np.com.naxa.vso.activity;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,11 +31,13 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +47,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import np.com.naxa.vso.R;
+import np.com.naxa.vso.firebase.MessageHelper;
 import np.com.naxa.vso.firebase.VSOFirebaseMessagingService;
 import np.com.naxa.vso.gps.GeoPointActivity;
 import np.com.naxa.vso.home.HomeActivity;
@@ -52,6 +56,7 @@ import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
 import np.com.naxa.vso.utils.DialogFactory;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
+import np.com.naxa.vso.viewmodel.MessageHelperViewModel;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -101,6 +106,9 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
     @BindView(R.id.tv_incident_type_others)
     TextInputLayout tvIncidentTypeOthers;
 
+
+    MessageHelperViewModel messageHelperViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +116,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         ButterKnife.bind(this);
 
         sharedPreferenceUtils = new SharedPreferenceUtils(ReportActivity.this);
+
+        messageHelperViewModel = ViewModelProviders.of(this).get(MessageHelperViewModel.class);
 
         initUI();
 
@@ -414,9 +424,22 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             private void handleSuccess(AskForHelpResponse askForHelpResponse) {
                 DialogFactory.createMessageDialog(ReportActivity.this, "Success", "Data sent successfully").show();
 //                HomeActivity.start(ReportActivity.this);
+
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-4:00"));
+                Date currentLocalTime = cal.getTime();
+                DateFormat date1 = new SimpleDateFormat("KK:mm:ss");
+                date1.setTimeZone(TimeZone.getTimeZone("GMT+5:45"));
+                String localTime = date1.format(currentLocalTime);
+
+                String messageToSave = "Ward no : "+ward +" \n "+ "Incident type : "+incident_type+ "\n" +detailed_message;
+
+
+                messageHelperViewModel.insert(new MessageHelper(incident_time, localTime, messageToSave, 0 ));
+
                 tvName.getEditText().setText("");
                 tvContactNumber.getEditText().setText("");
                 tvMessage.getEditText().setText("");
+
                 startActivity( new Intent(ReportActivity.this, HomeActivity.class));
                 finish();
 

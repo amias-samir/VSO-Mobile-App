@@ -14,6 +14,7 @@ import np.com.naxa.vso.database.dao.EducationalInstitutesDao;
 import np.com.naxa.vso.database.dao.GeoJsonCategoryDao;
 import np.com.naxa.vso.database.dao.GeoJsonListDao;
 import np.com.naxa.vso.database.dao.HospitalFacilitiesDao;
+import np.com.naxa.vso.database.dao.MessageHelperDao;
 import np.com.naxa.vso.database.dao.OpenSpaceDao;
 import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 import np.com.naxa.vso.database.entity.Contact;
@@ -22,18 +23,20 @@ import np.com.naxa.vso.database.entity.GeoJsonCategoryEntity;
 import np.com.naxa.vso.database.entity.GeoJsonListEntity;
 import np.com.naxa.vso.database.entity.HospitalFacilities;
 import np.com.naxa.vso.database.entity.OpenSpace;
+import np.com.naxa.vso.firebase.MessageHelper;
 
 /**
  * Created by samir on 4/22/2018.
  */
 
 @Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class,
-        GeoJsonCategoryEntity.class, GeoJsonListEntity.class
-}, version = 14, exportSchema = false)
+        GeoJsonCategoryEntity.class, GeoJsonListEntity.class, MessageHelper.class,
+}, version = 15, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
 
     public abstract ContactDao contactDao();
+    public abstract MessageHelperDao messageHelperDao();
     public abstract OpenSpaceDao openSpaceDao();
     public abstract CommonPlacesAttrbDao commonPlacesAttrbDao();
     public abstract HospitalFacilitiesDao hospitalFacilitiesDao();
@@ -81,6 +84,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
         private final ContactDao mContactDao;
+        private final MessageHelperDao mMessageHelperDao;
         private final OpenSpaceDao mOpenSpaceDao;
         private final CommonPlacesAttrbDao mCommonPlacesAttrbDao;
         private final HospitalFacilitiesDao mHospitalFacilitiesDao;
@@ -90,6 +94,7 @@ public abstract class VsoRoomDatabase extends RoomDatabase {
 
         PopulateDbAsync(VsoRoomDatabase db) {
             mContactDao = db.contactDao();
+            mMessageHelperDao = db.messageHelperDao();
             mOpenSpaceDao = db.openSpaceDao();
             mCommonPlacesAttrbDao = db.commonPlacesAttrbDao();
             mHospitalFacilitiesDao = db.hospitalFacilitiesDao();

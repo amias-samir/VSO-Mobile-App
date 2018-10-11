@@ -18,13 +18,20 @@ public class MessageHelper implements Serializable {
     @ColumnInfo(name = "date")
     private String date;
 
-    @ColumnInfo(name = "question")
-    private String question;
+    @ColumnInfo(name = "message_type")
+    private int message_type;
 
     @ColumnInfo(name = "time")
     private String time;
 
     public MessageHelper() {
+    }
+
+    public MessageHelper( String date,String time, String message, int message_type) {
+        this.message = message;
+        this.date = date;
+        this.message_type = message_type;
+        this.time = time;
     }
 
     public String getMessage() {
@@ -43,12 +50,12 @@ public class MessageHelper implements Serializable {
         this.date = date;
     }
 
-    public String getQuestion() {
-        return question;
+    public int getQuestion() {
+        return message_type;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setQuestion(int question) {
+        this.message_type = message_type;
     }
 
     public String getTime() {
