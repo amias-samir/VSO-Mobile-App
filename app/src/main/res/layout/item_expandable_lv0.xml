@@ -4,30 +4,35 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
               android:background="@android:color/white"
               android:layout_width="match_parent"
-              android:layout_height="80dp"
+              android:layout_height="wrap_content"
               android:orientation="vertical"
 
     >
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="1dp">
+        android:layout_marginTop="@dimen/sp_16"
+       >
     <ImageView
         android:id="@+id/iv_head"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:paddingLeft="@dimen/dp_10"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_person_info_list_icon"
         />
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textSize="@dimen/sp_16"
+        android:textColor="@android:color/primary_text_light_nodisable"
+        android:paddingLeft="20dp"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingBottom="@dimen/dp_10"
+        android:paddingRight="@dimen/dp_10"
         android:layout_weight="5"
         />
     <TextView
@@ -36,6 +41,7 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textColor="@android:color/black"
+        android:visibility="gone"
         />
     <ImageView
         android:id="@+id/iv"
@@ -43,6 +49,6 @@
         android:layout_height="24dp"
         android:layout_gravity="right|center"
         android:layout_weight="1"
-        android:src="@mipmap/arrow_r"/>
+        android:src="@drawable/ic_arrow_r_24dp"/>
     </LinearLayout>
 </LinearLayout>

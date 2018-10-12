@@ -41,7 +41,7 @@ public class VSOFirebaseMessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
         Timber.i("New token: %s", token);
         sharedPreferenceUtils.setValue(SharedPreferenceUtils.TOKEN_ID, token);
-        
+
     }
 
     @Override

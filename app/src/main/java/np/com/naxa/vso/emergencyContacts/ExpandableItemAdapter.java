@@ -44,7 +44,7 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                 final Level0Item lv0 = (Level0Item) item;
                 holder.setText(R.id.title, lv0.title)
                         .setText(R.id.sub_title, lv0.subTitle)
-                        .setImageResource(R.id.iv, lv0.isExpanded() ? R.mipmap.arrow_b : R.mipmap.arrow_r);
+                        .setImageResource(R.id.iv, lv0.isExpanded() ? R.drawable.ic_arrow_b_24dp : R.drawable.ic_arrow_r_24dp);
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -90,8 +90,8 @@ public class ExpandableItemAdapter extends BaseMultiItemQuickAdapter<MultiItemEn
                 });
                 holder.setText(R.id.title, lv1.title);
                 holder.setText(R.id.sub_title, lv1.subTitle);
-                holder.setText(R.id.tv_post_and_office, lv1.post);
-                holder.setText(R.id.tv_address, lv1.address);
+                holder.setText(R.id.tv_post_and_office, lv1.post+" "+lv1.address);
+//                holder.setText(R.id.tv_address, lv1.address);
 
                 break;
             case TYPE_PERSON:
