@@ -219,7 +219,7 @@ public class MapMarkerOverlayUtils {
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                        mapView.getController().setZoom(14.5);
+                        mapView.getController().setZoom(14.0);
                         mapView.getController().animateTo(new GeoPoint(latitude, longitude));
                         mapView.invalidate();
                         MarkerOnClickEvent(context, item);
