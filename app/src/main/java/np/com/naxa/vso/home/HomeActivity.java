@@ -876,6 +876,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 if (isPointInPolygon(currentLocation, municipalityGeoPointList)) {
+                    mapView.getController().animateTo(currentLocation);
                     mapView.getOverlays().add(myLocationNewOverlay);
                     myLocationNewOverlay.enableMyLocation();
 //                myLocationNewOverlay.enableFollowLocation();
@@ -961,7 +962,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     handleLocationPermission();
                 } else {
                     handleLocationPermission();
-                    mapView.getController().animateTo(currentLocation);
                     Intent serviceIntent = new Intent(this, MyLocationService.class);
                     stopService(serviceIntent);
                 }
