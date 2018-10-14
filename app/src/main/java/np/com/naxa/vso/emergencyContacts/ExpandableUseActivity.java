@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
+import com.franmontiel.localechanger.LocaleChanger;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -71,6 +73,8 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
 
         repository = new EmergencyContactsRepository();
 
+        initToolbar();
+
         getContactList(0);
 
 //        list = generateData();
@@ -99,7 +103,6 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
         mRecyclerView.setLayoutManager(manager);
 
 
-        initToolbar();
     }
 
     private void initToolbar() {
@@ -249,4 +252,9 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
     }
 
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        newBase = LocaleChanger.configureBaseContext(newBase);
+        super.attachBaseContext(newBase);
+    }
 }

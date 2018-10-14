@@ -38,6 +38,7 @@
         android:text="View Details"
         android:gravity="center"
         android:drawableRight="@drawable/moreinfo_arrow"
+        android:background="?android:selectableItemBackground"
         />
 
 </RelativeLayout>

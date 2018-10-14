@@ -1866,6 +1866,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        newBase = LocaleChanger.configureBaseContext(newBase);
+        super.attachBaseContext(newBase);
+    }
 }
 
 

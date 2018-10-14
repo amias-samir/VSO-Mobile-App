@@ -99,11 +99,14 @@
         <item>Others</item>
     </string-array>
 
+    <string name="messageActivity">Messages</string>
+    <string name="search">Search...</string>
+    <string name="view_messages">View Messages</string>
+
+
     <!-- sudur string resource -->
     <string name="app_homepage_name">गृह पृष्ठ</string>
-
     <!-- TODO: Remove or change this placeholder text -->
-
     <string name="cheese_ipsum">Jarlsberg lancashire edam. Dolcelatte hard cheese brie st. agur blue
     cheese caerphilly bavarian bergkase cheese and biscuits mascarpone. Cheeseburger swiss bavarian
     bergkase cream cheese fromage frais cheesy feet port-salut airedale.</string>
@@ -111,10 +114,8 @@
     <string name="form_not_sent_np">Unexpected error occured. </string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="about_us">About Us</string>
-
     <string name="expand">पुरा पढ्नुहोस</string>
     <string name="collapse">बन्द गर्नुहोस </string>
-
 
     <!--expandable list view items-->
     <string name="mission">सुदूरपश्चिम क्षेत्रमा रहेका विकासका अवसर र सम्भावनाहरुको पहिचान गरि उपलब्ध श्रोत साधनहरुको सन्तुलित रुपमा अधिकतम परिचालनबाट यस क्षेत्रलाई समग्र राष्ट्रिय विकास प्रवाहको समान स्तरमा पुर्याई सामाजिक, आर्थिक एवं मानविय विकासको दृष्टिले आत्मनिर्भर, गतिशिल तथा विकासोन्मुख क्षेत्रको रुपमा स्थापित गर्ने ।</string>
@@ -160,10 +161,8 @@
         <item>"बैतडी"</item>
     </string-array>
 
-
     <string name="facebook_app_id">392524947816591</string>
     <string name="fb_login_protocol_scheme">fb392524947816591</string>
-    <string name="messageActivity">Messages</string>
     <!-- end of sudur resource -->
 
 
