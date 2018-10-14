@@ -45,12 +45,12 @@
     <string name="municipality_ward_name">चाँगु नारायण नगरपालिका वडाहरु</string>
     <string name="road_network"> सडक संजाल</string>
     <string name="river_network">नदी-नालाहरु</string>
-    <string name="chairpersons_of_local_units"> स्थानीय तहका अध्यक्ष</string>
+    <string name="chairpersons_of_local_units">स्थानीय तहका अध्यक्ष</string>
     <string name="chief_of_local_level_offices">स्थानीय तहका कार्यालय प्रमुखहरु </string>
-    <string name="elected_representatives"> निर्वाचित प्रतिनिधिहरु</string>
+    <string name="elected_representatives">निर्वाचित प्रतिनिधिहरु</string>
     <string name="municipal_executive_members">नगरपालिका कार्यकारी सदस्यहरु</string>
     <string name="municipality_level_disaster_management">नगरपालिका प्रकोप व्यवस्थापन समिति</string>
-    <string name="nntds_executive_commitee"> नगरकोट नाल्दुम पर्यटन विकास समितिका कार्यकारीहरु </string>
+    <string name="nntds_executive_commitee">नगरकोट नाल्दुम पर्यटन विकास समितिका कार्यकारीहरु </string>
     <string name="full_name"> पुरा नाम</string>
     <string name="contact_number"> सम्पर्क नम्बर</string>
     <string name="photo">फोटो</string>
@@ -66,6 +66,19 @@
     <string name="resources"> स्रोतहरु</string>
     <string name="hazard_and_vulnerability"> प्रकोप र संकटासन्नती </string>
     <string name="base_data"> आधारभूत डाटा</string>
+    <string name="community_centres">सामुदायिक केन्द्रहरू</string>
+    <string name="religious_and_heritage">धार्मिक र विरासत</string>
+    <string name="atm">ए.टि.यम</string>
+    <string name="security_force">सुरक्षा बल</string>
+    <string name="gas_depo">ग्याँस डिपो</string>
+    <string name="urban_utilities">शहरी उपयोगिताहरु</string>
+    <string name="pharmacies_and_health_clinics">औषधि र स्वास्थ्य क्लिनिकहरू</string>
+    <string name="government_agencies">सरकारी एजेन्सीहरू</string>
+
+    <string name="messageActivity">सन्देशहरू</string>
+    <string name="search">खोज्नुहोस् ...</string>
+    <string name="view_messages">सन्देशहरू हेर्नुहोस्</string>
+
 
     <string-array name="array_ward">
         <item>१</item>

@@ -35,7 +35,7 @@
             app:floatingSearch_searchBarMarginLeft="@dimen/spacing_medium"
             app:floatingSearch_searchBarMarginRight="@dimen/spacing_medium"
             app:floatingSearch_searchBarMarginTop="@dimen/spacing_medium"
-            app:floatingSearch_searchHint="Search..."
+            app:floatingSearch_searchHint="@string/search"
             app:floatingSearch_showSearchKey="true"
             app:floatingSearch_suggestionsListAnimDuration="250" />
     </FrameLayout>

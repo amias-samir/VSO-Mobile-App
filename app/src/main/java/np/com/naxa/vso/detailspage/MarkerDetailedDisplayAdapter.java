@@ -19,6 +19,6 @@ public class MarkerDetailedDisplayAdapter extends BaseQuickAdapter<MarkerDetails
     @Override
     protected void convert(BaseViewHolder helper, MarkerDetailsKeyValue item) {
         helper.setText(R.id.tv_key_data,item.getKey())
-                .setText(R.id.tv_value_data, ": "+item.getValue());
+                .setText(R.id.tv_value_data, ""+item.getValue());
     }
 }

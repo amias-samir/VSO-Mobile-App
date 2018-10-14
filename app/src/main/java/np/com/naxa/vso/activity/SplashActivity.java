@@ -5,12 +5,16 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
+import com.franmontiel.localechanger.LocaleChanger;
+import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -96,6 +100,11 @@ public class SplashActivity extends AppCompatActivity {
         educationalInstitutesViewModel = ViewModelProviders.of(this).get(EducationalInstitutesViewModel.class);
         openSpaceViewModel = ViewModelProviders.of(this).get(OpenSpaceViewModel.class);
 
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            LocaleChanger.setLocale(new Locale("ne", "NP"));
+//            ActivityRecreationHelper.recreate(ReportActivity.this, true);
+        }
 
         handleStoragePermission();
 
@@ -510,5 +519,11 @@ public class SplashActivity extends AppCompatActivity {
 //                        }, 5000);
                     }
                 });
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        newBase = LocaleChanger.configureBaseContext(newBase);
+        super.attachBaseContext(newBase);
     }
 }
