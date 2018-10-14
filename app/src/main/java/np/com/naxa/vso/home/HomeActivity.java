@@ -276,6 +276,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected DirectedLocationOverlay myLocationOverlay;
     protected LocationManager mLocationManager;
     private GeoPoint currentLocation;
+    private ArrayList<GeoPoint> municipalityGeoPointList;
     Location location = null;
 
 
@@ -874,17 +875,58 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     currentLocation = new GeoPoint(myLocationNewOverlay.getMyLocation());
                 }
 
-
-                mapView.getOverlays().add(myLocationNewOverlay);
-                myLocationNewOverlay.enableMyLocation();
+                if (isPointInPolygon(currentLocation, municipalityGeoPointList)) {
+                    mapView.getOverlays().add(myLocationNewOverlay);
+                    myLocationNewOverlay.enableMyLocation();
 //                myLocationNewOverlay.enableFollowLocation();
-                mapView.invalidate();
+                    mapView.invalidate();
+                } else {
+                    ToastUtils.showToast("Current Location Not In ChanguNarayan");
+                }
+
 
             }
         } else {
             EasyPermissions.requestPermissions(this, "Provide location permission.",
                     RESULT_LOCATION_PERMISSION, Manifest.permission.ACCESS_FINE_LOCATION);
         }
+    }
+
+    //
+    //Ray Casting algorithm which identifies point in polygon
+    //
+    private boolean isPointInPolygon(GeoPoint tap, ArrayList<GeoPoint> vertices) {
+        int intersectCount = 0;
+        if (vertices == null) return false;
+        for (int j = 0; j < vertices.size() - 1; j++) {
+            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
+                intersectCount++;
+            }
+        }
+
+        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
+    }
+
+    private boolean rayCastIntersect(GeoPoint tap, GeoPoint vertA, GeoPoint vertB) {
+
+        double aY = vertA.getLatitude();
+        double aX = vertA.getLongitude();
+        double bY = vertB.getLatitude();
+        double bX = vertB.getLongitude();
+        double pY = tap.getLatitude();
+        double pX = tap.getLongitude();
+
+        if ((aY > pY && bY > pY) || (aY < pY && bY < pY)
+                || (aX < pX && bX < pX)) {
+            return false; // a and b can't both be above or below pt.y, and a or
+            // b must be east of pt.x
+        }
+
+        double m = (aY - bY) / (aX - bX); // Rise over run
+        double bee = (-aX) * m + aY; // y = mx + b
+        double x = (pY - bee) / m; // algebra is neat!
+
+        return x > pX;
     }
 
     @OnClick(R.id.tv_go_back)
@@ -915,7 +957,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.fab_location_toggle:
                 handleLocationPermission();
                 if (currentLocation == null) {
-                    Toast.makeText(this, "searching current location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Searching Current Location", Toast.LENGTH_SHORT).show();
                     handleLocationPermission();
                 } else {
                     handleLocationPermission();
@@ -1201,7 +1243,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                  public void onComplete() {
+                    public void onComplete() {
                     }
                 });
     }
@@ -1217,22 +1259,35 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 Observable.just(multipolygonFeatureCollection)
                         .subscribeOn(Schedulers.io())
-                        .flatMap((Function<MultiPolygonFeatureCollection, ObservableSource<List<MultiPolygonFeature>>>) multipolygonFeatureCollection1 -> Observable.just(multipolygonFeatureCollection1.getFeatures()))
-                        .flatMapIterable((Function<List<MultiPolygonFeature>, Iterable<MultiPolygonFeature>>) multiPolygonFeatures -> multiPolygonFeatures)
-                        .flatMap((Function<MultiPolygonFeature, ObservableSource<PolygonFeatureCollection>>) multiPolygonFeature -> {
-                            PolygonFeatureCollection polygonFeatureCollection = new PolygonFeatureCollection();
-                            PolygonFeature polygonFeature = new PolygonFeature();
-                            PolygonGeometry polygonGeometry = new PolygonGeometry();
-                            polygonGeometry.setType("Polygon");
-                            polygonGeometry.setCoordinates(multiPolygonFeature.getGeometry().getCoordinates().get(0));
-                            polygonFeature.setType(multiPolygonFeature.getType());
-                            polygonFeature.setProperties(multiPolygonFeature.getProperties());
-                            polygonFeature.setGeometry(polygonGeometry);
-                            List<PolygonFeature> polygonFeatureList = new ArrayList<>();
-                            polygonFeatureList.add(polygonFeature);
-                            polygonFeatureCollection.setFeatures(polygonFeatureList);
-                            polygonFeatureCollection.setType(multipolygonFeatureCollection.getType());
-                            return Observable.just(polygonFeatureCollection);
+                        .flatMap(new Function<MultiPolygonFeatureCollection, ObservableSource<List<MultiPolygonFeature>>>() {
+                            @Override
+                            public ObservableSource<List<MultiPolygonFeature>> apply(MultiPolygonFeatureCollection multipolygonFeatureCollection1) throws Exception {
+                                return Observable.just(multipolygonFeatureCollection1.getFeatures());
+                            }
+                        })
+                        .flatMapIterable(new Function<List<MultiPolygonFeature>, Iterable<MultiPolygonFeature>>() {
+                            @Override
+                            public Iterable<MultiPolygonFeature> apply(List<MultiPolygonFeature> multiPolygonFeatures) throws Exception {
+                                return multiPolygonFeatures;
+                            }
+                        })
+                        .flatMap(new Function<MultiPolygonFeature, ObservableSource<PolygonFeatureCollection>>() {
+                            @Override
+                            public ObservableSource<PolygonFeatureCollection> apply(MultiPolygonFeature multiPolygonFeature) throws Exception {
+                                PolygonFeatureCollection polygonFeatureCollection = new PolygonFeatureCollection();
+                                PolygonFeature polygonFeature = new PolygonFeature();
+                                PolygonGeometry polygonGeometry = new PolygonGeometry();
+                                polygonGeometry.setType("Polygon");
+                                polygonGeometry.setCoordinates(multiPolygonFeature.getGeometry().getCoordinates().get(0));
+                                polygonFeature.setType(multiPolygonFeature.getType());
+                                polygonFeature.setProperties(multiPolygonFeature.getProperties());
+                                polygonFeature.setGeometry(polygonGeometry);
+                                List<PolygonFeature> polygonFeatureList = new ArrayList<>();
+                                polygonFeatureList.add(polygonFeature);
+                                polygonFeatureCollection.setFeatures(polygonFeatureList);
+                                polygonFeatureCollection.setType(multipolygonFeatureCollection.getType());
+                                return Observable.just(polygonFeatureCollection);
+                            }
                         })
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<PolygonFeatureCollection>() {
@@ -1240,6 +1295,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             public void onSubscribe(Disposable d) {
                                 switch (key) {
                                     case "municipal_boundary":
+                                        municipalityGeoPointList = new ArrayList<>();
                                         myOverlayMunicipalityBorder = new FolderOverlay();
                                         break;
                                     case "wards":
@@ -1258,6 +1314,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 KmlFeature.Styler styler = new OverlayPopupHiddenStyler();
                                 switch (key) {
                                     case "municipal_boundary":
+                                        for (PolygonFeature polygonFeature : polygonFeatureCollection.getFeatures()) {
+                                            for (List<List<Double>> list2 : polygonFeature.getGeometry().getCoordinates()) {
+                                                for (List<Double> list : list2) {
+                                                    municipalityGeoPointList.add(new GeoPoint(list.get(1), list.get(0)));
+                                                }
+                                            }
+                                        }
                                         myOverlayMunicipalityBorder.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
                                         break;
                                     case "wards":
