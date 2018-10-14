@@ -1422,6 +1422,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (mapView.getOverlays().size() == 0) mapView.getOverlays().add(folderOverlay);
         else if (mapView.getOverlays().get(0) == folderOverlay) return;
         else mapView.getOverlays().set(0, folderOverlay);
+        MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
         mapView.invalidate();
     }
 
@@ -1429,6 +1430,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (mapView.getOverlays().size() <= 1) mapView.getOverlays().add(folderOverlay);
         else if (mapView.getOverlays().get(1) == folderOverlay) return;
         else mapView.getOverlays().set(1, folderOverlay);
+        MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
         mapView.invalidate();
     }
 

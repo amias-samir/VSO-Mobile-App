@@ -11,6 +11,7 @@ import com.google.gson.JsonParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
@@ -23,6 +24,8 @@ import np.com.naxa.vso.database.entity.CommonPlacesAttrb;
 
 public class MapGeoJsonToObject {
     private static final String TAG = "MapGeoJsonToObject";
+    GeoPoint centerPoint = new GeoPoint(27.657531140175244, 85.46161651611328);
+
 
     public List<CommonPlacesAttrb> getCommonPlacesListObj(Context context, String geoJson, String fileName, MapView mapView,
                                                           MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
@@ -76,6 +79,7 @@ public class MapGeoJsonToObject {
             } else {
                 mapView.getOverlays().add(folderOverlay);
             }
+            MapCommonUtils.zoomToMapBoundary(mapView, centerPoint);
             mapView.invalidate();
 //            }
 

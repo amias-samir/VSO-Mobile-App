@@ -65,9 +65,19 @@ public class MapMarkerOverlayUtils {
         window.setAttributes(wlp);
         //there are a lot of settings, for dialog, check them all out!
 
+
         //set up text
         TextView map_popup_header = (TextView) dialog.findViewById(R.id.map_popup_header);
-        map_popup_header.setText(item.getTitle());
+        TextView map_popup_body = (TextView) dialog.findViewById(R.id.map_popup_body);
+
+        String string = item.getTitle();
+        String[] parts = string.split(",");
+        String partName = parts[0]; // name
+        String partType = parts[1]; // type
+        String partAddress = parts[2]; // address
+
+        map_popup_header.setText(partName);
+        map_popup_body.setText(partAddress);
 
         //set up button
         TextView imgMoreInfo = (TextView) dialog.findViewById(R.id.map_more_info_textView);
@@ -199,9 +209,12 @@ public class MapMarkerOverlayUtils {
 
     public ItemizedOverlayWithFocus<OverlayItem> overlayFromCommonPlaceAttrib(Context context, CommonPlacesAttrb commonPlacesAttrb, MapView mapView, int marker_image, String jsonProperties) {
         ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+//        String name = commonPlacesAttrb.getName()
+//                + "\n" + commonPlacesAttrb.getType()
+//                + "\n" + commonPlacesAttrb.getAddress();
         String name = commonPlacesAttrb.getName()
-                + "\n" + commonPlacesAttrb.getType()
-                + "\n" + commonPlacesAttrb.getAddress();
+                + "," + commonPlacesAttrb.getType()
+                + "," + commonPlacesAttrb.getAddress();
         double latitude = commonPlacesAttrb.getLatitude();
         double longitude = commonPlacesAttrb.getLongitude();
 
