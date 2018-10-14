@@ -1332,7 +1332,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                         secondaryLayerChange(tempFolderOverlay);
                                         break;
                                 }
-
                             }
 
                             @Override
@@ -1387,19 +1386,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                 final KmlDocument kmlDocument = new KmlDocument();
                                 kmlDocument.parseGeoJSON(geoJason);
                                 Drawable defaultMarker = ContextCompat.getDrawable(HomeActivity.this, R.drawable.map_marker_blue);
-                                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-                                Style defaultStyle;
-                                switch (key) {
-                                    case "river":
-                                        defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
-                                        break;
-                                    case "road":
-                                        defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
-                                        break;
-                                    default:
-                                        defaultStyle = null;
-                                }
-                                myOverLay.add(kmlDocument.mKmlRoot.buildOverlay(mapView, defaultStyle, null, kmlDocument));
+                                KmlFeature.Styler styler = new OverlayPopupHiddenStyler(key);
+//                                Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
+//                                Style defaultStyle;
+//                                switch (key) {
+//                                    case "river":
+//                                        defaultStyle = new Style(defaultBitmap, Color.BLUE, 5f, 0x20AA1010);
+//                                        break;
+//                                    case "road":
+//                                        defaultStyle = new Style(defaultBitmap, Color.DKGRAY, 5f, 0x20AA1010);
+//                                        break;
+//                                    default:
+//                                        defaultStyle = null;
+//                                }
+                                myOverLay.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
                             }
 
                             @Override
@@ -1416,8 +1416,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         });
                 break;
         }
-
-
     }
 
     private void primaryLayerChange(FolderOverlay folderOverlay) {
@@ -1927,7 +1925,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "longPressHelper: ");
         return false;
     }
-
 
 
     @Override
