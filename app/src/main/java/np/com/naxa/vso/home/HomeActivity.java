@@ -512,7 +512,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         mapController = mapView.getController();
-        mapController.setZoom(12);
+        mapController.setZoom(12.0);
 
 //        mapView.zoomToBoundingBox(boundingBox, true);
 //        mapController.zoomToSpan(boundingBox.getLatitudeSpan(), boundingBox.getLongitudeSpan());
@@ -1660,7 +1660,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.action_view_message:
                         startActivity(new Intent(HomeActivity.this, MessageActivity.class));
-                        finish();
+//                        finish();
                         break;
                 }
                 return true;

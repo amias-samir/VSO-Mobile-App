@@ -501,7 +501,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 return true;
             case R.id.action_view_message:
                    startActivity(new Intent(ReportActivity.this, MessageActivity.class));
-                   finish();
+//                   finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

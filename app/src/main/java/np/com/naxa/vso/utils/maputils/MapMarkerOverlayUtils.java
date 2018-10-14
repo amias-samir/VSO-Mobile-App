@@ -109,6 +109,8 @@ public class MapMarkerOverlayUtils {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
                         mapView.getController().animateTo(new GeoPoint(latitude, longitude));
+                        mapView.getController().setZoom(12.0);
+                        mapView.invalidate();
                         MarkerOnClickEvent(context, item);
                         return true;
                     }
@@ -119,7 +121,6 @@ public class MapMarkerOverlayUtils {
                     }
                 },
                 context);
-
         return mOverlay;
     }
 
@@ -218,7 +219,9 @@ public class MapMarkerOverlayUtils {
                 new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                     @Override
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
+                        mapView.getController().setZoom(14.5);
                         mapView.getController().animateTo(new GeoPoint(latitude, longitude));
+                        mapView.invalidate();
                         MarkerOnClickEvent(context, item);
                         return true;
                     }
