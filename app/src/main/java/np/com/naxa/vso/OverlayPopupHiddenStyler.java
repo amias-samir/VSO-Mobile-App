@@ -13,7 +13,20 @@ import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 
+import io.reactivex.annotations.Nullable;
+
 public class OverlayPopupHiddenStyler implements KmlFeature.Styler {
+
+    private String value;
+
+    public OverlayPopupHiddenStyler() {
+        this.value = null;
+    }
+
+    public OverlayPopupHiddenStyler(@Nullable String value) {
+        this.value = value;
+    }
+
     @Override
     public void onFeature(Overlay overlay, KmlFeature kmlFeature) {
 
@@ -27,7 +40,15 @@ public class OverlayPopupHiddenStyler implements KmlFeature.Styler {
     @Override
     public void onLineString(Polyline polyline, KmlPlacemark kmlPlacemark, KmlLineString kmlLineString) {
         polyline.setWidth(Math.max(kmlLineString.mCoordinates.size() / 200.0f, 3.0f));
-        polyline.setColor(Color.BLACK);
+        switch (value) {
+            case "river":
+                polyline.setColor(Color.BLUE);
+                break;
+            case "road":
+                polyline.setColor(Color.BLACK);
+                break;
+            default:
+        }
     }
 
     @Override
