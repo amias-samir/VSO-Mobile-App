@@ -1020,7 +1020,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 waypoints.add(points[0]);
                 waypoints.add(points[1]);
 
-                OsmRouteGenerateUtils osmRouteGenerateUtils = new OsmRouteGenerateUtils();
+//                OsmRouteGenerateUtils osmRouteGenerateUtils = new OsmRouteGenerateUtils();
 //                osmRouteGenerateUtils.addRouteOverlay(mapView, points[0], points[1]);
 
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
