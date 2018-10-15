@@ -54,7 +54,7 @@ public class OverlayPopupHiddenStyler implements KmlFeature.Styler {
     @Override
     public void onPolygon(Polygon polygon, KmlPlacemark kmlPlacemark, KmlPolygon kmlPolygon) {
         polygon.setStrokeColor(Color.BLACK);
-        polygon.setStrokeWidth(5);
+        polygon.setStrokeWidth(2.5f);
         polygon.setFillColor(0x20AA1010);
     }
 

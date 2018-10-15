@@ -29,7 +29,7 @@
             android:layout_gravity="bottom"
             android:background="@color/cardview_light_background"
             app:elevation="1dp"
-            app:itemIconTint="@color/black"
+            app:itemIconTint="@color/colorPrimary"
             app:itemTextColor="@color/black"
             app:menu="@menu/menu_bottom_bar" />
 
