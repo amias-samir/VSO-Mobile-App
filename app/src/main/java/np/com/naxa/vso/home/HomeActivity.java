@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -31,7 +30,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,8 +62,8 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
-import org.osmdroid.bonuspack.kml.Style;
-import org.osmdroid.bonuspack.routing.GoogleRoadManager;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.bonuspack.routing.RoadNode;
@@ -90,8 +88,6 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.reactivestreams.Publisher;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -153,6 +149,7 @@ import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
+import np.com.naxa.vso.utils.maputils.OsmRouteGenerateUtils;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -1049,11 +1046,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public Flowable<Polyline> routeGenerateObservable(GeoPoint[] points) {
         return Observable.create((ObservableOnSubscribe<Polyline>) e -> {
             try {
-                RoadManager roadManager = new GoogleRoadManager();
+//                RoadManager roadManager = new MapQuestRoadManager(getResources().getString(R.string.access_token));
+//                roadManager.addRequestOption("routeType=fastest");
+
+                RoadManager roadManager = new OSRMRoadManager(HomeActivity.this);
 
                 ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
                 waypoints.add(points[0]);
                 waypoints.add(points[1]);
+
+                OsmRouteGenerateUtils osmRouteGenerateUtils = new OsmRouteGenerateUtils();
+//                osmRouteGenerateUtils.addRouteOverlay(mapView, points[0], points[1]);
 
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
