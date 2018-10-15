@@ -353,7 +353,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         GeoJsonCategoryViewModel geoJsonCategoryViewModel = ViewModelProviders.of(this).get(GeoJsonCategoryViewModel.class);
         geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
                 .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                     @Override
                     public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
@@ -1747,7 +1747,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                 geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Exposure_Data").toObservable()
                         .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
@@ -1774,7 +1774,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                setupGridRecycler(MySection.getHazardCatergorySections());
                 geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Hazard_Data").toObservable()
                         .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {
@@ -1802,7 +1802,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                setupGridRecycler(MySection.getBaseDataCatergorySections());
                 geoJsonCategoryViewModel.getAllGeoJsonCategoryEntityByType("Baseline_Data").toObservable()
                         .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new DisposableObserver<List<GeoJsonCategoryEntity>>() {
                             @Override
                             public void onNext(List<GeoJsonCategoryEntity> geoJsonCategoryEntities) {

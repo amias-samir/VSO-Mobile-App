@@ -95,34 +95,34 @@
 
         </android.support.v7.widget.CardView>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!--<ScrollView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
         <ViewSwitcher
             android:id="@+id/view_switcher_slide_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@color/white">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recylcer_view_map_categories"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/white"
-                android:nestedScrollingEnabled="false"/>
+                />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recylcer_view_categories_detail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/colorWindowBackground"
                 android:fadeScrollbars="true"
                 android:scrollbarThumbVertical="@color/colorPrimaryDark"
                 android:scrollbars="vertical"
-                android:nestedScrollingEnabled="false"/>
+                />
 
         </ViewSwitcher>
-    </ScrollView>
+    <!--</ScrollView>-->
 
 
 </LinearLayout>
