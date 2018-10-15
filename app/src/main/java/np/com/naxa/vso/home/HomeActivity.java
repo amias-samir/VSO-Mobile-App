@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -62,7 +63,6 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.kml.KmlFeature;
-import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -150,6 +150,7 @@ import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
 import np.com.naxa.vso.utils.maputils.OsmRouteGenerateUtils;
+import np.com.naxa.vso.utils.maputils.PolygonMapUtils;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
 import np.com.naxa.vso.viewmodel.EducationalInstitutesViewModel;
@@ -872,7 +873,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     currentLocation = new GeoPoint(myLocationNewOverlay.getMyLocation());
                 }
 
-                if (isPointInPolygon(currentLocation, municipalityGeoPointList)) {
+                if (PolygonMapUtils.isPointInPolygon(currentLocation, municipalityGeoPointList)) {
                     mapView.getController().animateTo(currentLocation);
                     mapView.getOverlays().add(myLocationNewOverlay);
                     myLocationNewOverlay.enableMyLocation();
@@ -890,42 +891,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    //
-    //Ray Casting algorithm which identifies point in polygon
-    //
-    private boolean isPointInPolygon(GeoPoint tap, ArrayList<GeoPoint> vertices) {
-        int intersectCount = 0;
-        if (vertices == null) return false;
-        for (int j = 0; j < vertices.size() - 1; j++) {
-            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
-                intersectCount++;
-            }
-        }
-
-        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
-    }
-
-    private boolean rayCastIntersect(GeoPoint tap, GeoPoint vertA, GeoPoint vertB) {
-
-        double aY = vertA.getLatitude();
-        double aX = vertA.getLongitude();
-        double bY = vertB.getLatitude();
-        double bX = vertB.getLongitude();
-        double pY = tap.getLatitude();
-        double pX = tap.getLongitude();
-
-        if ((aY > pY && bY > pY) || (aY < pY && bY < pY)
-                || (aX < pX && bX < pX)) {
-            return false; // a and b can't both be above or below pt.y, and a or
-            // b must be east of pt.x
-        }
-
-        double m = (aY - bY) / (aX - bX); // Rise over run
-        double bee = (-aX) * m + aY; // y = mx + b
-        double x = (pY - bee) / m; // algebra is neat!
-
-        return x > pX;
-    }
 
     @OnClick(R.id.tv_go_back)
     @Override
@@ -1327,7 +1292,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                         myOverlayMunicipalityBorder.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
                                         break;
                                     case "wards":
+                                        PolygonFeature polygonFeature = polygonFeatureCollection.getFeatures().get(0);
+                                        GeoPoint geoPoint = PolygonMapUtils
+                                                .calculateCentroidWithPointList(polygonFeature.getGeometry().getCoordinates().get(0));
+                                        String wardNo = polygonFeature.getProperties().getNewWardN();
+
+                                        Marker marker = new Marker(mapView);
+                                        Marker.ENABLE_TEXT_LABELS_WHEN_NO_IMAGE = true;
+
+                                        marker.setTitle(wardNo);
+                                        marker.setTextLabelFontSize((int) getResources().getDimension(R.dimen.material_text_body1));
+                                        marker.setTextLabelBackgroundColor(Color.TRANSPARENT);
+                                        marker.setOnMarkerClickListener((marker1, mapView) -> false);
+                                        marker.setPosition(geoPoint);
+                                        marker.setIcon(null);
+
                                         myOverLayWardBoarder.add(kmlDocument.mKmlRoot.buildOverlay(mapView, null, styler, kmlDocument));
+                                        myOverLayWardBoarder.add(marker);
                                         break;
                                     case "open_spaces":
                                         FolderOverlay tempFolderOverlay = (FolderOverlay) mapView.getOverlays().get(1);
