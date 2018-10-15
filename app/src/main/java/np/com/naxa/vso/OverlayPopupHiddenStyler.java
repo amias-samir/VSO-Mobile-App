@@ -48,6 +48,7 @@ public class OverlayPopupHiddenStyler implements KmlFeature.Styler {
                 polyline.setColor(Color.BLACK);
                 break;
             default:
+                polyline.setColor(Color.BLACK);
         }
     }
 
