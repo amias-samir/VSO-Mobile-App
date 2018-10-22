@@ -328,6 +328,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         sharedPreferenceUtils = new SharedPreferenceUtils(HomeActivity.this);
 
+        slidingPanel.setScrollableView(recyclerDataCategories);
+
+
         repo = new MapDataRepository();
 
         fabLocationToggle.setOnClickListener(this);
@@ -396,6 +399,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
         handleLocationPermission();
+
 
     }
 
@@ -617,7 +621,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private void setupGridRecycler(List<MySection> mySections) {
         Log.d(TAG, "setupGridRecycler: size :--> " + mySections.size());
         if (mainCategoryPosition <= 0) {
-            LinearLayoutManager mLayoutManager = new GridLayoutManager(this, 3);
+            LinearLayoutManager mLayoutManager = new GridLayoutManager(HomeActivity.this, 3);
             recyclerDataCategories.setLayoutManager(mLayoutManager);
             sectionAdapter = new SectionAdapter(R.layout.square_image_title, R.layout.list_section_header, mySections);
             recyclerDataCategories.setAdapter(sectionAdapter);
@@ -659,6 +663,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showDataOnList(String name, String type) {
+
+        slidingPanel.setScrollableView(recyclerViewDataDetails);
+
+
         commonPlacesAttribViewModel.getPlaceByType(name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -895,6 +903,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @OnClick(R.id.tv_go_back)
     @Override
     public void onBackPressed() {
+        slidingPanel.setScrollableView(recyclerDataCategories);
+
+
         int visibleItemIndex = viewSwitcherSlideLayout.getDisplayedChild();
         if (visibleItemIndex == 0) {
             if (slidingPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
@@ -1917,6 +1928,37 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected void attachBaseContext(Context newBase) {
         newBase = LocaleChanger.configureBaseContext(newBase);
         super.attachBaseContext(newBase);
+    }
+
+    @Override
+    public void onPause(){
+        try {
+            super.onPause();
+            mapView.onPause();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onResume(){
+        try {
+            super.onResume();
+            mapView.onResume();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy(){
+        try {
+            super.onDestroy();
+            mapView.onDetach();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
     }
 }
 
