@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
 import com.franmontiel.localechanger.LocaleChanger;
+import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -30,12 +33,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
+import np.com.naxa.vso.firebase.MessageActivity;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.utils.ToastUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -165,6 +170,20 @@ public class ExpandableUseActivity extends AppCompatActivity implements EasyPerm
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==RC_PHONE){
             checkPhonePermissionAndGo();
+        }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                startActivity(new Intent(ExpandableUseActivity.this, HomeActivity.class));
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

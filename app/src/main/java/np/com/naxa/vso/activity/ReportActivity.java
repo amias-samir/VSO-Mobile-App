@@ -503,6 +503,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                    startActivity(new Intent(ReportActivity.this, MessageActivity.class));
 //                   finish();
                 return true;
+
+            case android.R.id.home:
+                startActivity(new Intent(ReportActivity.this, HomeActivity.class));
+                   finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

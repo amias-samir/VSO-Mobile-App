@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,6 +23,8 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 import np.com.naxa.vso.R;
 import np.com.naxa.vso.activity.ReportActivity;
+import np.com.naxa.vso.emergencyContacts.ExpandableUseActivity;
+import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.viewmodel.MessageHelperViewModel;
 
 public class MessageActivity extends AppCompatActivity {
@@ -104,5 +107,18 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                startActivity(new Intent(MessageActivity.this, HomeActivity.class));
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

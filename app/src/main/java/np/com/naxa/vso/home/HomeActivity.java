@@ -320,6 +320,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_new_new);
         ButterKnife.bind(this);
@@ -550,9 +552,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             switch (item.getItemId()) {
                 case R.id.menu_ask_for_help:
                     ReportActivity.start(HomeActivity.this);
+//                    finish();
+//                    onDestroy();
                     break;
                 case R.id.menu_emergency_contacts:
                     ExpandableUseActivity.start(HomeActivity.this);
+//                    finish();
+//                    onDestroy();
                     break;
                 case R.id.menu_open_spaces:
                     if (NetworkUtils.isNetworkAvailable()) {
@@ -1932,34 +1938,35 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPause(){
-        try {
+//        try {
             super.onPause();
-            mapView.onPause();
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
+//            mapView.onPause();
+//        }catch (NullPointerException e){
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void onResume(){
-        try {
+//        try {
             super.onResume();
-            mapView.onResume();
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
+//            mapView.onResume();
+//        }catch (NullPointerException e){
+//            e.printStackTrace();
+//        }
     }
 
     @Override
     public void onDestroy(){
-        try {
+//        try {
             super.onDestroy();
-            mapView.onDetach();
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
+//            mapView.onDetach();
+//        }catch (NullPointerException e){
+//            e.printStackTrace();
+//        }
 
     }
+
 }
 
 
