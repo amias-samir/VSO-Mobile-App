@@ -149,7 +149,6 @@ import np.com.naxa.vso.utils.maputils.MapCommonUtils;
 import np.com.naxa.vso.utils.maputils.MapGeoJsonToObject;
 import np.com.naxa.vso.utils.maputils.MapMarkerOverlayUtils;
 import np.com.naxa.vso.utils.maputils.MyLocationService;
-import np.com.naxa.vso.utils.maputils.OsmRouteGenerateUtils;
 import np.com.naxa.vso.utils.maputils.PolygonMapUtils;
 import np.com.naxa.vso.utils.maputils.SortingDistance;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
@@ -236,6 +235,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @BindView(R.id.iv_options_hamburger)
     ImageView ivOptionsHamburger;
+    @BindView(R.id.searchingTextLBL)
+    TextView tvSearchingTextLBL;
 
     private IMapController mapController;
     private GeoPoint centerPoint;
@@ -559,6 +560,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.menu_open_spaces:
                     if (NetworkUtils.isNetworkAvailable()) {
                         progressbar.setVisibility(View.VISIBLE);
+                        tvSearchingTextLBL.setVisibility(View.VISIBLE);
                         routeLocation();
                     } else {
                         ToastUtils.showToast("Internet Not Available");
@@ -1005,9 +1007,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             // handleLocationPermission for current location position overlay
                             handleLocationPermission();
                         } else {
-                            ToastUtils.showToast("Try Again Later");
+                            ToastUtils.showToast("Slow Internet Connection!!!\nPlease Try Again Later");
                         }
                         progressbar.setVisibility(View.GONE);
+                        tvSearchingTextLBL.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -1933,19 +1936,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onPause(){
-            super.onPause();
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
-    public void onResume(){
-            super.onResume();
+    public void onResume() {
+        super.onResume();
 
     }
 
     @Override
-    public void onDestroy(){
-            super.onDestroy();
+    public void onDestroy() {
+        super.onDestroy();
 
     }
 

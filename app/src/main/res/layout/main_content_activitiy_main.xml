@@ -1,4 +1,5 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -14,6 +15,20 @@
 
     <include layout="@layout/search_toolbar_v2" />
 
+
+    <TextView
+        android:id="@+id/searchingTextLBL"
+        app:layout_anchor="@id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/sp_14"
+        android:layout_marginRight="@dimen/sp_14"
+        android:text="@string/searching_nearest_open_space"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@color/colorWhiteHalfTransparent"
+        app:layout_anchorGravity="center_vertical|center_horizontal"
+        android:visibility="gone"/>
     <ProgressBar
         android:id="@+id/progressbar"
         style="@android:style/Widget.ProgressBar.Small.Inverse"
@@ -22,9 +37,13 @@
         android:layout_marginLeft="@dimen/spacing_small"
         android:layout_marginTop="100dp"
         android:tooltipText="Searching Nearest Open Space"
+        android:progressBackgroundTint="@color/colorPrimaryDark"
+        android:secondaryProgressTint="@color/colorPrimaryDark"
         android:visibility="gone"
         app:layout_anchor="@+id/map"
         app:layout_anchorGravity="center_vertical|center_horizontal" />
+
+
 
     <LinearLayout
         android:id="@+id/ll_inset_data"

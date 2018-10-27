@@ -78,6 +78,8 @@
     <string name="messageActivity">सन्देशहरू</string>
     <string name="search">खोज्नुहोस् ...</string>
     <string name="view_messages">सन्देशहरू हेर्नुहोस्</string>
+    <string name="searching_nearest_open_space">नजिकैको खुल्ला ठाउँ खोजि जारि छ</string>
+
 
 
     <string-array name="array_ward">
