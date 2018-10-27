@@ -221,8 +221,10 @@ public class QueryBuildWithSplitter {
                 String keyPart = parts[0].trim(); // key
                 String valuePart = parts[1].trim(); // value
 
-                MarkerDetailsKeyValue markerDetailsKeyValue = new MarkerDetailsKeyValue(keyPart, valuePart);
-                splittedStringKeyValueList.add(markerDetailsKeyValue);
+                if(!keyPart.equals("the geom")) {
+                    MarkerDetailsKeyValue markerDetailsKeyValue = new MarkerDetailsKeyValue(keyPart, valuePart);
+                    splittedStringKeyValueList.add(markerDetailsKeyValue);
+                }
 
             }
 
