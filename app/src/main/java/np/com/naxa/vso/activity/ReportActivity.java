@@ -116,6 +116,8 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
         setContentView(R.layout.activity_report_v2);
         ButterKnife.bind(this);
 
+        tvIncidentTypeOthers.setVisibility(View.GONE);
+
         sharedPreferenceUtils = new SharedPreferenceUtils(ReportActivity.this);
 
         messageHelperViewModel = ViewModelProviders.of(this).get(MessageHelperViewModel.class);
@@ -161,14 +163,14 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                 incident_time = tvIncidentTime.getEditText().getText().toString();
 //                incident_type = spinnerIncidentType.getSelectedItem().toString();
 
-                if(specifyOthers){
-                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
-                }else {
+//                if(specifyOthers){
+//                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
+//                }else {
                     incident_type = spinnerIncidentType.getSelectedItem().toString();
-                }
+//                }
 
                 ward = spinnerWard.getSelectedItem().toString();
-                incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
+//                incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
                 full_name = tvName.getEditText().getText().toString();
                 contact_no = tvContactNumber.getEditText().getText().toString();
                 detailed_message = tvMessage.getEditText().getText().toString();
@@ -220,17 +222,17 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
             {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 Log.d(TAG, "onItemSelected: "+selectedItem);
-                if(selectedItem.equals("Others"))
-                {
-                    specifyOthers = true;
-                    tvIncidentTypeOthers.getEditText().setVisibility(View.VISIBLE);
+//                if(selectedItem.equals("Others"))
+//                {
+//                    specifyOthers = true;
+//                    tvIncidentTypeOthers.getEditText().setVisibility(View.VISIBLE);
 //                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
-                }else {
-                    specifyOthers = false;
-                    tvIncidentTypeOthers.getEditText().setVisibility(View.GONE);
-                    tvIncidentTypeOthers.getEditText().setText("");
+//                }else {
+//                    specifyOthers = false;
+//                    tvIncidentTypeOthers.getEditText().setVisibility(View.GONE);
+//                    tvIncidentTypeOthers.getEditText().setText("");
 //                    incident_type = spinnerIncidentType.getSelectedItem().toString();
-                }
+//                }
             } // to close the onItemSelected
             public void onNothingSelected(AdapterView<?> parent)
             {

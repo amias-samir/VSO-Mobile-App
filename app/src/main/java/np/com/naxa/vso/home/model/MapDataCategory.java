@@ -5,23 +5,27 @@ import java.util.List;
 
 public class MapDataCategory {
 
-//    public int image;
+    //    public int image;
+    public String name;
+
     public String image;
     public int marker_image;
     private String filename;
+    private String summaryName;
     private String type;
 
     public static final String ROAD = "ROAD";
-    public static  final String RIVER = "RIVER";
-    public  static final String BOUNDARY = "BOUNDARY";
-    public  static final String POINT = "POINT";
+    public static final String RIVER = "RIVER";
+    public static final String BOUNDARY = "BOUNDARY";
+    public static final String POINT = "POINT";
 
-    public MapDataCategory(String image, String name, String filename, String type, int marker_image) {
+    public MapDataCategory(String image, String name, String filename, String type, int marker_image, String summaryName) {
         this.image = image;
         this.marker_image = marker_image;
         this.name = name;
         this.filename = filename;
         this.type = type;
+        this.summaryName = summaryName;
     }
 
     public String getFileName() {
@@ -36,7 +40,9 @@ public class MapDataCategory {
         return name;
     }
 
-    public String name;
+    public String getSummaryName() {
+        return summaryName;
+    }
 
 
     public String getType() {

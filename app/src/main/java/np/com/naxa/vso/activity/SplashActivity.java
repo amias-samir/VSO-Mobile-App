@@ -430,6 +430,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void fetchGeoJsonCategoryList() {
         final String[] geoJsonName = new String[1];
+        final String[] summaryName = new String[1];
         final String[] geoJsonBaseType = new String[1];
         apiInterface
                 .getGeoJsonCategoryDetails()
@@ -452,6 +453,7 @@ public class SplashActivity extends AppCompatActivity {
                         geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
                         geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
                         geoJsonBaseType[0] = geoJsonCategoryEntity.getCategoryType();
+                        summaryName[0] = geoJsonCategoryEntity.getSummaryName();
                         return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
                     }
                 })
@@ -490,8 +492,14 @@ public class SplashActivity extends AppCompatActivity {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                                     JSONObject geometry = new JSONObject(jsonarray.getJSONObject(i).getString("geometry"));
                                     JSONArray coordinates = geometry.getJSONArray("coordinates");
-                                    String name = properties.has("name") ? properties.getString("name") : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
-                                    String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
+
+                                    String name = properties.has(summaryName[0])? properties.getString(summaryName[0])
+                                            : properties.has("name") ? properties.getString("name")
+                                            : properties.has("Name") ? properties.getString("Name")
+                                            : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service")
+                                            : "null";
+
+                                    String address = properties.has("address") ? properties.getString("address") : properties.has("Address") ?properties.getString("Address") : " ";
 
                                     String type = geometry.getString("type");
                                     double longitude;
@@ -514,7 +522,7 @@ public class SplashActivity extends AppCompatActivity {
                                         longitude = Double.parseDouble(coordinates2.get(0).toString());
                                         latitude = Double.parseDouble(coordinates2.get(1).toString());
                                     }
-                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, "", properties.toString());
+                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, summaryName[0], properties.toString());
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                                 }
                             } catch (JSONException e) {

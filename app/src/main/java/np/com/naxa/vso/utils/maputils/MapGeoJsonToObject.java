@@ -29,7 +29,7 @@ public class MapGeoJsonToObject {
 
     public List<CommonPlacesAttrb> getCommonPlacesListObj(Context context, String geoJson, String fileName, MapView mapView,
                                                           MapMarkerOverlayUtils mapMarkerOverlayUtils, FolderOverlay myOverLay,
-                                                          int marker_image) {
+                                                          int marker_image, String summaryName) {
         List<CommonPlacesAttrb> commonPlacesAttrbList = new ArrayList<CommonPlacesAttrb>();
         FolderOverlay folderOverlay = new FolderOverlay();
 
@@ -40,48 +40,35 @@ public class MapGeoJsonToObject {
 
             Log.d(TAG, "getCommonPlacesListObj: filename " + fileName);
 
-//            if(fileName.equals("open_spaces")){
-//                for (int i = 0; i < jsonarray.length(); i++) {
-//                    JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
-//                    String name = properties.getString("name");
-//                    String address = " ";
-//                    double latitude = Double.parseDouble(properties.getString("y"));
-//                    double longitude = Double.parseDouble(properties.getString("x"));
-////                    String remarks = properties.getString("Remarks");
-//                    String remarks = "";
-//                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, fileName, latitude, longitude, remarks);
-//
-//                            mapView.getOverlays().add(mapMarkerOverlayUtils.overlayFromCommonPlaceAttrib(context,
-//                                    commonPlacesAttrb, mapView , marker_image));
-//                            mapView.getOverlays().add(myOverLay);
-//                            mapView.invalidate();
-//
-//                }
-//            }else {
             String remarks = "";
             for (int i = 0; i < jsonarray.length(); i++) {
                 JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                 JSONObject geometry = new JSONObject(jsonarray.getJSONObject(i).getString("geometry"));
                 JSONArray coordinates = geometry.getJSONArray("coordinates");
-                String name = properties.has("name") ? properties.getString("name") :properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
-                String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
-//                double latitude = properties.has("Y") ? Double.parseDouble(properties.getString("Y")) : Double.parseDouble(properties.getString("y"));
-//                double longitude = properties.has("X") ? Double.parseDouble(properties.getString("X")) : Double.parseDouble(properties.getString("x"));
+
+                String name = properties.has(summaryName) ? properties.getString(summaryName)
+                        : properties.has("name") ? properties.getString("name")
+                        : properties.has("Name") ? properties.getString("Name")
+                        : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service")
+                        : "null";
+                String address = properties.has("address") ? properties.getString("address")
+                        : properties.has("Address") ? properties.getString("Address")
+                        : " ";
 
                 String type = geometry.getString("type");
                 double longitude;
                 double latitude;
-                if(type.equals("Point")) {
-                     longitude = Double.parseDouble(coordinates.get(0).toString());
-                     latitude = Double.parseDouble(coordinates.get(1).toString());
-                }else if(type.equals("MultiPolygon")) {
+                if (type.equals("Point")) {
+                    longitude = Double.parseDouble(coordinates.get(0).toString());
+                    latitude = Double.parseDouble(coordinates.get(1).toString());
+                } else if (type.equals("MultiPolygon")) {
                     JSONArray coordinates1 = coordinates.getJSONArray(0);
                     JSONArray coordinates2 = coordinates1.getJSONArray(0);
                     JSONArray coordinates3 = coordinates2.getJSONArray(0);
 
                     longitude = Double.parseDouble(coordinates3.get(0).toString());
                     latitude = Double.parseDouble(coordinates3.get(1).toString());
-                }else {
+                } else {
 // for multiLineString
                     JSONArray coordinates1 = coordinates.getJSONArray(0);
                     JSONArray coordinates2 = coordinates1.getJSONArray(0);

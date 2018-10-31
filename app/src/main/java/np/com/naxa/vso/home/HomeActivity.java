@@ -616,7 +616,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    String geoJsonFileName = "", geoJsonType = "", geoJsonName = "";
+    String geoJsonFileName = "", geoJsonType = "", geoJsonName = "", summaryName = "";
     int geoJsonmarkerImage;
 
 
@@ -654,8 +654,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             geoJsonName = section.t.getName();
             geoJsonType = section.t.getType();
             geoJsonmarkerImage = section.t.getMarker_image();
+            summaryName = section.t.getSummaryName();
 
-            showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage);
+            showOverlayOnMap(geoJsonFileName, geoJsonType, geoJsonmarkerImage, summaryName);
 
             InfoWindow.closeAllInfoWindowsOn(mapView);
 
@@ -752,7 +753,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void showOverlayOnMap(String name, String type, int marker_image) {
+    private void showOverlayOnMap(String name, String type, int marker_image, String summaryName) {
 
         Log.d(TAG, "showOverlayOnMap: " + name);
 
@@ -770,7 +771,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             String dataType = jsonObject.getJSONArray("features").getJSONObject(0).getJSONObject("geometry").getString("type");
                             switch (dataType) {
                                 case "Point":
-                                    loadlayerToMap(fileContent, type, name, marker_image);
+                                    loadlayerToMap(fileContent, type, name, marker_image, summaryName);
                                     showDataOnList(name, type);
                                     break;
                                 case "MultiLineString":
@@ -798,7 +799,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                                             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                                             break;
                                         case "open_spaces":
-                                            loadlayerToMap(fileContent, type, name, marker_image);
+                                            loadlayerToMap(fileContent, type, name, marker_image, summaryName);
                                             loadBorder("open_spaces");
                                             showDataOnList(geoJsonFileName, geoJsonType);
                                         default:
@@ -1103,7 +1104,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return geoPoint[0];
     }
 
-    private void loadlayerToMap(String geoJson, String lineType, String name, int marker_image) {
+    private void loadlayerToMap(String geoJson, String lineType, String name, int marker_image, String summaryName) {
 
         try {
             final KmlDocument kmlDocument = new KmlDocument();
@@ -1199,7 +1200,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         MapMarkerOverlayUtils mapMarkerOverlayUtils = new MapMarkerOverlayUtils();
         MapGeoJsonToObject mapGeoJsonToObject = new MapGeoJsonToObject();
 //        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, myOverLay, marker_image);
-        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, null, marker_image);
+        mapGeoJsonToObject.getCommonPlacesListObj(HomeActivity.this, geoJson, name, mapView, mapMarkerOverlayUtils, null, marker_image, summaryName);
 
 
     }

@@ -37,16 +37,29 @@ public class GeoJsonCategoryEntity {
     @Expose
     private String categoryPhoto;
 
+    @SerializedName("summary_list")
+    @ColumnInfo(name = "summary_list")
+    @Expose
+    private String summaryList;
+
+    @SerializedName("summary_name")
+    @ColumnInfo(name = "summary_name")
+    @Expose
+    private String summaryName;
+
+
 //    public GeoJsonCategoryEntity(String categoryName, String categoryTable) {
 //        this.categoryName = categoryName;
 //        this.categoryTable = categoryTable;
 //    }
 
-    public GeoJsonCategoryEntity(String categoryName, String categoryTable, String categoryType, String categoryPhoto) {
+    public GeoJsonCategoryEntity(String categoryName, String categoryTable, String categoryType, String categoryPhoto, String summaryList, String summaryName) {
         this.categoryName = categoryName;
         this.categoryTable = categoryTable;
         this.categoryType = categoryType;
         this.categoryPhoto = categoryPhoto;
+        this.summaryList = summaryList;
+        this.summaryName = summaryName;
     }
 
     public String getCategoryName() {
@@ -87,5 +100,22 @@ public class GeoJsonCategoryEntity {
 
     public void setCategoryPhoto(String categoryPhoto) {
         this.categoryPhoto = categoryPhoto;
+    }
+
+
+    public String getSummaryList() {
+        return summaryList;
+    }
+
+    public void setSummaryList(String summaryList) {
+        this.summaryList = summaryList;
+    }
+
+    public String getSummaryName() {
+        return summaryName;
+    }
+
+    public void setSummaryName(String summaryName) {
+        this.summaryName = summaryName;
     }
 }

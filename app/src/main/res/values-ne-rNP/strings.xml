@@ -91,17 +91,7 @@
         <item>६</item>
         <item>७</item>
         <item>८</item>
-        <item>
-
-        </item>
-    </string-array>
-
-
-    <string-array name="array_incident_type">
-        <item></item>
-        <item>भूकम्प</item>
-        <item></item>
-        <item></item>
+        <item>९</item>
     </string-array>
 
     <string-array name="array_incident_type">
