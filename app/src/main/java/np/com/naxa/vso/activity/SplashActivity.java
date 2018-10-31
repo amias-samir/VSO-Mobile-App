@@ -485,15 +485,36 @@ public class SplashActivity extends AppCompatActivity {
 
                                 JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
                                 Log.d(TAG, "onNext: " + "save data to database --> "+ geoJsonName[0] + " , "+ geoJsonBaseType[0]);
+
                                 for (int i = 0; i < jsonarray.length(); i++) {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
+                                    JSONObject geometry = new JSONObject(jsonarray.getJSONObject(i).getString("geometry"));
+                                    JSONArray coordinates = geometry.getJSONArray("coordinates");
                                     String name = properties.has("name") ? properties.getString("name") : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service") : properties.getString("Name");
                                     String address = properties.has("address") ? properties.getString("address") : properties.getString("Address");
-                                    double latitude = properties.has("y") ? Double.parseDouble(properties.getString("y")) : Double.parseDouble(properties.getString("Y"));
-                                    double longitude = properties.has("x") ? Double.parseDouble(properties.getString("x")) : Double.parseDouble(properties.getString("X"));
-                                    String remarks = properties.has("remarks") ? properties.getString("remarks") : properties.getString("Remarks");
 
-                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, remarks, properties.toString());
+                                    String type = geometry.getString("type");
+                                    double longitude;
+                                    double latitude;
+                                    if(type.equals("Point")) {
+                                        longitude = Double.parseDouble(coordinates.get(0).toString());
+                                        latitude = Double.parseDouble(coordinates.get(1).toString());
+                                    }else if(type.equals("MultiPolygon")) {
+                                        JSONArray coordinates1 = coordinates.getJSONArray(0);
+                                        JSONArray coordinates2 = coordinates1.getJSONArray(0);
+                                        JSONArray coordinates3 = coordinates2.getJSONArray(0);
+
+                                        longitude = Double.parseDouble(coordinates3.get(0).toString());
+                                        latitude = Double.parseDouble(coordinates3.get(1).toString());
+                                    }else {
+// for multiLineString
+                                        JSONArray coordinates1 = coordinates.getJSONArray(0);
+                                        JSONArray coordinates2 = coordinates1.getJSONArray(0);
+
+                                        longitude = Double.parseDouble(coordinates2.get(0).toString());
+                                        latitude = Double.parseDouble(coordinates2.get(1).toString());
+                                    }
+                                    CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, "", properties.toString());
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                                 }
                             } catch (JSONException e) {

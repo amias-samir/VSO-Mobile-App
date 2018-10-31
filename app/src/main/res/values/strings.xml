@@ -93,9 +93,12 @@
 
 
     <string-array name="array_incident_type">
+        <item>Flood</item>
         <item>Fire</item>
-        <item>Earth</item>
-        <item>Water</item>
+        <item>Landslide</item>
+        <item>Lightning</item>
+        <item>Waste</item>
+        <item>Road</item>
         <item>Others</item>
     </string-array>
 

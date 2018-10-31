@@ -98,9 +98,20 @@
 
 
     <string-array name="array_incident_type">
-        <item>आगलागी</item>
+        <item></item>
         <item>भूकम्प</item>
+        <item></item>
+        <item></item>
+    </string-array>
+
+    <string-array name="array_incident_type">
         <item>बाढी</item>
+        <item>आगलागी</item>
+        <item>पहिरो</item>
+        <item>चट्यांग</item>
+        <item>फोहोरमैला</item>
+        <item>बाटो</item>
         <item>अन्य</item>
     </string-array>
+
 </resources>
