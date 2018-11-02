@@ -166,10 +166,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 //                if(specifyOthers){
 //                    incident_type = tvIncidentTypeOthers.getEditText().getText().toString();
 //                }else {
-                    incident_type = spinnerIncidentType.getSelectedItem().toString();
+//                    incident_type = spinnerIncidentType.getSelectedItem().toString();
+                    incident_type = getIncidentTypeSpinnerData(spinnerIncidentType.getSelectedItemPosition());
 //                }
 
-                ward = spinnerWard.getSelectedItem().toString();
+                ward = getWardSpinnerData(spinnerWard.getSelectedItemPosition());
 //                incident_type_others = tvIncidentTypeOthers.getEditText().getText().toString();
                 full_name = tvName.getEditText().getText().toString();
                 contact_no = tvContactNumber.getEditText().getText().toString();
@@ -202,9 +203,22 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
             }
         });
+    }
 
+    private String getIncidentTypeSpinnerData( int pos){
+        String incidentType = "";
+        String[] incidentTypeArray = getResources().getStringArray(R.array.array_incident_type_no_locale);
 
+        incidentType = incidentTypeArray[pos];
+        return incidentType;
+    }
 
+    private String getWardSpinnerData( int pos){
+        String ward = "";
+        String[] incidentTypeArray = getResources().getStringArray(R.array.array_ward_no_locale);
+
+        ward = incidentTypeArray[pos];
+        return ward;
     }
 
     private void initToolbar() {

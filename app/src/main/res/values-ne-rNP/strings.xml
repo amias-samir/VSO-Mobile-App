@@ -81,7 +81,6 @@
     <string name="searching_nearest_open_space">नजिकैको खुल्ला ठाउँ खोजि जारि छ</string>
 
 
-
     <string-array name="array_ward">
         <item>१</item>
         <item>२</item>
@@ -93,6 +92,7 @@
         <item>८</item>
         <item>९</item>
     </string-array>
+
 
     <string-array name="array_incident_type">
         <item>बाढी</item>

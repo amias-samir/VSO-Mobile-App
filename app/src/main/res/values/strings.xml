@@ -92,7 +92,30 @@
     </string-array>
 
 
+    <string-array name="array_ward_no_locale">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
+
     <string-array name="array_incident_type">
+        <item>Flood</item>
+        <item>Fire</item>
+        <item>Landslide</item>
+        <item>Lightning</item>
+        <item>Waste</item>
+        <item>Road</item>
+        <item>Others</item>
+    </string-array>
+
+    <string-array name="array_incident_type_no_locale">
         <item>Flood</item>
         <item>Fire</item>
         <item>Landslide</item>
