@@ -1,6 +1,7 @@
 package np.com.naxa.vso.activity;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -49,10 +50,12 @@ import np.com.naxa.vso.database.entity.OpenSpace;
 import np.com.naxa.vso.home.HomeActivity;
 import np.com.naxa.vso.home.MapDataRepository;
 import np.com.naxa.vso.home.MySection;
+import np.com.naxa.vso.home.VSO;
 import np.com.naxa.vso.home.model.MapDataCategory;
 import np.com.naxa.vso.network.model.GeoJsonCategoryDetails;
 import np.com.naxa.vso.network.retrofit.NetworkApiClient;
 import np.com.naxa.vso.network.retrofit.NetworkApiInterface;
+import np.com.naxa.vso.utils.DialogFactory;
 import np.com.naxa.vso.utils.SharedPreferenceUtils;
 import np.com.naxa.vso.utils.ToastUtils;
 import np.com.naxa.vso.viewmodel.CommonPlacesAttribViewModel;
@@ -103,6 +106,7 @@ public class SplashActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             LocaleChanger.setLocale(new Locale("ne", "NP"));
+
 //            ActivityRecreationHelper.recreate(ReportActivity.this, true);
         }
 
@@ -400,7 +404,7 @@ public class SplashActivity extends AppCompatActivity {
                 longitude = Double.parseDouble(properties.getString("X"));
                 remarks = properties.getString("Remarks");
 
-                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type,  latitude, longitude, remarks, properties.toString());
+                CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, type, latitude, longitude, remarks, properties.toString());
 
                 fk_common_places = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                 Log.d(TAG, "saveOpenSpaces: " + fk_common_places);
@@ -428,16 +432,29 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
+    ProgressDialog progressDialog;
+    int[] totalCount = new int[1];
+    int[] progress = new int[1];
+    String[] geoJsonDisplayName = new String[1];
     private void fetchGeoJsonCategoryList() {
+        progressDialog = DialogFactory.createProgressBarDialog(SplashActivity.this, "", "");
+        progressDialog.show();
+
+
+
         final String[] geoJsonName = new String[1];
         final String[] summaryName = new String[1];
         final String[] geoJsonBaseType = new String[1];
+
         apiInterface
                 .getGeoJsonCategoryDetails()
                 .subscribeOn(Schedulers.io())
                 .flatMap(new Function<GeoJsonCategoryDetails, ObservableSource<List<GeoJsonCategoryEntity>>>() {
                     @Override
                     public ObservableSource<List<GeoJsonCategoryEntity>> apply(GeoJsonCategoryDetails geoJsonCategoryDetails) throws Exception {
+                        totalCount[0] = geoJsonCategoryDetails.getData().size();
+                        progressDialog.setMax(totalCount[0]);
+
                         return Observable.just(geoJsonCategoryDetails.getData());
                     }
                 })
@@ -450,16 +467,33 @@ public class SplashActivity extends AppCompatActivity {
                 .flatMap(new Function<GeoJsonCategoryEntity, Observable<ResponseBody>>() {
                     @Override
                     public Observable<ResponseBody> apply(GeoJsonCategoryEntity geoJsonCategoryEntity) throws Exception {
+
                         geoJsonCategoryViewModel.insert(geoJsonCategoryEntity);
+                        geoJsonDisplayName[0] = geoJsonCategoryEntity.getCategoryName();
                         geoJsonName[0] = geoJsonCategoryEntity.getCategoryTable();
                         geoJsonBaseType[0] = geoJsonCategoryEntity.getCategoryType();
                         summaryName[0] = geoJsonCategoryEntity.getSummaryName();
+
                         return apiInterface.getGeoJsonDetails(geoJsonCategoryEntity.getCategoryTable());
                     }
+
                 })
                 .subscribe(new DisposableObserver<ResponseBody>() {
                     @Override
                     public void onNext(ResponseBody s) {
+
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progress[0]++;
+
+                                String alertMsg = getString(R.string.fetching_file, geoJsonDisplayName[0], String.valueOf(progress[0]), String.valueOf(totalCount[0]));
+                                progressDialog.setMax(totalCount[0]);
+                                progressDialog.setMessage(alertMsg);
+                                progressDialog.setProgress(progress[0]);
+                            }
+                        });
 
                         BufferedReader reader = new BufferedReader(new InputStreamReader(s.byteStream()));
                         StringBuilder sb = new StringBuilder();
@@ -483,38 +517,40 @@ public class SplashActivity extends AppCompatActivity {
 //                            json parse and store to database
                             JSONObject jsonObject = null;
                             try {
+
+
                                 jsonObject = new JSONObject(geoJsonToString);
 
                                 JSONArray jsonarray = new JSONArray(jsonObject.getString("features"));
-                                Log.d(TAG, "onNext: " + "save data to database --> "+ geoJsonName[0] + " , "+ geoJsonBaseType[0]);
+                                Log.d(TAG, "onNext: " + "save data to database --> " + geoJsonName[0] + " , " + geoJsonBaseType[0]);
 
                                 for (int i = 0; i < jsonarray.length(); i++) {
                                     JSONObject properties = new JSONObject(jsonarray.getJSONObject(i).getString("properties"));
                                     JSONObject geometry = new JSONObject(jsonarray.getJSONObject(i).getString("geometry"));
                                     JSONArray coordinates = geometry.getJSONArray("coordinates");
 
-                                    String name = properties.has(summaryName[0])? properties.getString(summaryName[0])
+                                    String name = properties.has(summaryName[0]) ? properties.getString(summaryName[0])
                                             : properties.has("name") ? properties.getString("name")
                                             : properties.has("Name") ? properties.getString("Name")
                                             : properties.has("Name of Bank Providing ATM Service") ? properties.getString("Name of Bank Providing ATM Service")
                                             : "null";
 
-                                    String address = properties.has("address") ? properties.getString("address") : properties.has("Address") ?properties.getString("Address") : " ";
+                                    String address = properties.has("address") ? properties.getString("address") : properties.has("Address") ? properties.getString("Address") : " ";
 
                                     String type = geometry.getString("type");
                                     double longitude;
                                     double latitude;
-                                    if(type.equals("Point")) {
+                                    if (type.equals("Point")) {
                                         longitude = Double.parseDouble(coordinates.get(0).toString());
                                         latitude = Double.parseDouble(coordinates.get(1).toString());
-                                    }else if(type.equals("MultiPolygon")) {
+                                    } else if (type.equals("MultiPolygon")) {
                                         JSONArray coordinates1 = coordinates.getJSONArray(0);
                                         JSONArray coordinates2 = coordinates1.getJSONArray(0);
                                         JSONArray coordinates3 = coordinates2.getJSONArray(0);
 
                                         longitude = Double.parseDouble(coordinates3.get(0).toString());
                                         latitude = Double.parseDouble(coordinates3.get(1).toString());
-                                    }else {
+                                    } else {
 // for multiLineString
                                         JSONArray coordinates1 = coordinates.getJSONArray(0);
                                         JSONArray coordinates2 = coordinates1.getJSONArray(0);
@@ -525,11 +561,11 @@ public class SplashActivity extends AppCompatActivity {
                                     CommonPlacesAttrb commonPlacesAttrb = new CommonPlacesAttrb(name, address, geoJsonName[0], latitude, longitude, summaryName[0], properties.toString());
                                     long id = commonPlacesAttribViewModel.insert(commonPlacesAttrb);
                                 }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-
 
                     }
 
@@ -543,6 +579,9 @@ public class SplashActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         HomeActivity.start(SplashActivity.this);
 //                        new Handler().postDelayed(() -> {
 //                        }, 5000);

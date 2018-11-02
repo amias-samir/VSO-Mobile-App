@@ -167,6 +167,7 @@
     <string name="facebook_app_id">392524947816591</string>
     <string name="fb_login_protocol_scheme">fb392524947816591</string>
     <string name="searching_nearest_open_space">Searching Nearest Open Space</string>
+    <string name="fetching_file">Getting %1$s.\n\Geojson data %2$s of %3$s file(s)</string>
     <!-- end of sudur resource -->
 
 
