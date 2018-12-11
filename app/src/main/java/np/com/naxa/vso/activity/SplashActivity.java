@@ -542,7 +542,7 @@ public class SplashActivity extends AppCompatActivity {
 
                                     double longitude;
                                     double latitude;
-                                    double latlongMakeDiff = Double.parseDouble("0.0000000000"+latlongDiffCounter+i);
+                                    double latlongMakeDiff = Double.parseDouble("0.000000000000"+latlongDiffCounter+i);
                                     if (type.equals("Point")) {
                                         longitude = Double.parseDouble(coordinates.get(0).toString()) + latlongMakeDiff;
                                         latitude = Double.parseDouble(coordinates.get(1).toString()) + latlongMakeDiff;

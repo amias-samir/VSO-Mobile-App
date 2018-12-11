@@ -69,6 +69,7 @@ import retrofit2.Response;
 
 import static np.com.naxa.vso.network.UrlClass.REQUEST_OK;
 import static np.com.naxa.vso.network.retrofit.NetworkApiClient.getAPIClient;
+import static np.com.naxa.vso.network.retrofit.NetworkApiClient.getReportingAPIClient;
 
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
@@ -384,11 +385,11 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
     private void sendDataToServer(String jsonData) {
 
-        ProgressDialog progressDialog = DialogFactory.createProgressDialog(this, "Please wait!!!\nSending... ");
-        progressDialog.show();
 
+        ProgressDialog progressDialog;
         if (hasNewImage) {
-
+            progressDialog = DialogFactory.createProgressDialog(this, "Please wait!!!\nSending... ");
+            progressDialog.show();
 //            imageFile = new File(imageFilePath);
 //            if (imageFile.exists()) {
             Log.d(TAG, "sendDataToServer: image file exist");
@@ -397,11 +398,14 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
         } else {
             body = null;
+            DialogFactory.createSimpleOkErrorDialog(ReportActivity.this, "", "You need to take photo first").show();
+            return;
+
         }
 
 
         RequestBody data = RequestBody.create(MediaType.parse("text/plain"), jsonData);
-        NetworkApiInterface apiService = getAPIClient().create(NetworkApiInterface.class);
+        NetworkApiInterface apiService = getReportingAPIClient().create(NetworkApiInterface.class);
         Call<AskForHelpResponse> call = apiService.getAskForHelpResponse(body, data);
 
 
@@ -468,7 +472,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
                     progressDialog.dismiss();
                 }
                 String message = "Error uploading data!, please try again later.\n"+t.getMessage();
-                Log.d("", "onFailure: "+t.getMessage().toString());
+                Log.d(TAG, "onFailure: "+t.getMessage().toString());
 
                 if (t instanceof SocketTimeoutException) {
                     message = "Slow internet connection, please try again later";
