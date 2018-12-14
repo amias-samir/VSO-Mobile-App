@@ -31,7 +31,7 @@ import np.com.naxa.vso.firebase.MessageHelper;
 
 @Database(entities = {Contact.class, OpenSpace.class, CommonPlacesAttrb.class, HospitalFacilities.class, EducationalInstitutes.class,
         GeoJsonCategoryEntity.class, GeoJsonListEntity.class, MessageHelper.class,
-}, version = 16, exportSchema = false)
+}, version = 1, exportSchema = false)
 
 public abstract class VsoRoomDatabase extends RoomDatabase {
 

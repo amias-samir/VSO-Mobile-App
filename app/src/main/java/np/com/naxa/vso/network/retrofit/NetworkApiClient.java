@@ -51,29 +51,5 @@ public class NetworkApiClient {
 
     }
 
-    public static Retrofit getReportingAPIClient() {
-
-        if (retrofit == null) {
-            OkLogInterceptor okLogInterceptor = OkLogInterceptor.builder().build();
-            OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
-
-            Dispatcher dispatcher = new Dispatcher();
-            dispatcher.setMaxRequests(3);
-
-            okHttpBuilder.dispatcher(dispatcher);
-            okHttpBuilder.addInterceptor(okLogInterceptor);
-
-            OkHttpClient okHttpClient = okHttpBuilder.build();
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(UrlClass.BASE_URL_REPORTING)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .client(okHttpClient)
-                    .build();
-        }
-        return retrofit;
-
-    }
-
 
 }

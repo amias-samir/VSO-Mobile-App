@@ -4,15 +4,18 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.franmontiel.localechanger.LocaleChanger;
 import com.franmontiel.localechanger.utils.ActivityRecreationHelper;
@@ -23,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,10 +71,12 @@ import np.com.naxa.vso.viewmodel.OpenSpaceViewModel;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 import timber.log.Timber;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks,
+        EasyPermissions.RationaleCallbacks {
 
     private static final String TAG = "SplashActivity";
     private MapDataRepository repository;
@@ -85,7 +91,7 @@ public class SplashActivity extends AppCompatActivity {
     private NetworkApiInterface apiInterface;
     GeoJsonCategoryViewModel geoJsonCategoryViewModel;
     GeoJsonListViewModel geoJsonListViewModel;
-
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +115,8 @@ public class SplashActivity extends AppCompatActivity {
 
 //            ActivityRecreationHelper.recreate(ReportActivity.this, true);
         }
+
+        progressDialog = DialogFactory.createProgressBarDialog(SplashActivity.this, "", "");
 
         handleStoragePermission();
 
@@ -159,7 +167,8 @@ public class SplashActivity extends AppCompatActivity {
 
     @AfterPermissionGranted(RESULT_STORAGE_PERMISSION)
     private void handleStoragePermission() {
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (hasStoragePermission()) {
+
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             SharedPreferenceUtils sharedPreference = new SharedPreferenceUtils(this);
 
@@ -187,6 +196,7 @@ public class SplashActivity extends AppCompatActivity {
                     RESULT_STORAGE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
     }
+
 
 
     private Function<Pair, ObservableSource<Pair>> readGeoJason(int position) {
@@ -432,12 +442,11 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
-    ProgressDialog progressDialog;
+
     int[] totalCount = new int[1];
     int[] progress = new int[1];
     String[] geoJsonDisplayName = new String[1];
     private void fetchGeoJsonCategoryList() {
-        progressDialog = DialogFactory.createProgressBarDialog(SplashActivity.this, "", "");
         progressDialog.show();
 
 
@@ -583,8 +592,11 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        finish();
                         Log.d(TAG, "onError: " + e.getMessage());
+
+                        if (e instanceof SocketTimeoutException) {
+                            ToastUtils.showToast("Slow Internet Connection, Please try again later.");
+                        }
 
                     }
 
@@ -605,4 +617,80 @@ public class SplashActivity extends AppCompatActivity {
         newBase = LocaleChanger.configureBaseContext(newBase);
         super.attachBaseContext(newBase);
     }
+
+
+
+    private boolean hasStoragePermission() {
+        return EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        // EasyPermissions handles the request result.
+//        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+//    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+//        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+//            // Do something after user returned from app settings screen, like showing a Toast.
+//            Toast.makeText(this, R.string.returned_from_app_settings_to_activity, Toast.LENGTH_SHORT)
+//                    .show();
+//        }
+//        if(requestCode == RESULT_STORAGE_PERMISSION){
+//            handleStoragePermission();
+//        }
+        if(resultCode == RESULT_STORAGE_PERMISSION){
+            handleStoragePermission();
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        Log.d(TAG, "onPermissionsGranted:" + requestCode + ":" + perms.size());
+//        ActivityRecreationHelper.recreate(SplashActivity.this, false);
+        startActivity(new Intent(SplashActivity.this, SplashActivity.class));
+
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        Log.d(TAG, "onPermissionsDenied:" + requestCode + ":" + perms.size());
+        // (Optional) Check whether the user denied any permissions and checked "NEVER ASK AGAIN."
+        // This will display a dialog directing them to enable the permission in app settings.
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
+    }
+
+    @Override
+    public void onRationaleAccepted(int requestCode) {
+        Log.d(TAG, "onRationaleAccepted:" + requestCode);
+    }
+
+    @Override
+    public void onRationaleDenied(int requestCode) {
+        Log.d(TAG, "onRationaleDenied:" + requestCode);
+    }
+
+
+//    @Override
+//    protected void onPause() {
+////        progressDialog.dismiss();
+//        super.onPause();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        progressDialog.dismiss();
+//        super.onDestroy();
+//    }
+
 }

@@ -61,6 +61,9 @@ public class CommonPlacesAttrb implements Parcelable {
     }
 
     public String getName() {
+        if(name == null || name.equals("null") || name.equals("NULL")){
+            name = " ";
+        }
         return name;
     }
 
@@ -69,6 +72,9 @@ public class CommonPlacesAttrb implements Parcelable {
     }
 
     public String getAddress() {
+        if(address == null || address.equals("null") || address.equals("NULL")){
+            address = " ";
+        }
         return address;
     }
 

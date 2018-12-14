@@ -69,7 +69,6 @@ import retrofit2.Response;
 
 import static np.com.naxa.vso.network.UrlClass.REQUEST_OK;
 import static np.com.naxa.vso.network.retrofit.NetworkApiClient.getAPIClient;
-import static np.com.naxa.vso.network.retrofit.NetworkApiClient.getReportingAPIClient;
 
 
 public class ReportActivity extends AppCompatActivity implements LocationListener {
@@ -405,7 +404,7 @@ public class ReportActivity extends AppCompatActivity implements LocationListene
 
 
         RequestBody data = RequestBody.create(MediaType.parse("text/plain"), jsonData);
-        NetworkApiInterface apiService = getReportingAPIClient().create(NetworkApiInterface.class);
+        NetworkApiInterface apiService = getAPIClient().create(NetworkApiInterface.class);
         Call<AskForHelpResponse> call = apiService.getAskForHelpResponse(body, data);
 
 
